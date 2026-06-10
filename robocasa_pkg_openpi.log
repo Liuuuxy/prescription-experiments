@@ -1,0 +1,6 @@
+Obtaining file:///home/asurite.ad.asu.edu/xinyua11
+ERROR: file:///home/asurite.ad.asu.edu/xinyua11 does not appear to be a Python project: neither 'setup.py' nor 'pyproject.toml' found.
+=== verify jax + robocasa both import ===
+jax 0.5.3
+robocasa OK
+ROBOCASA_PKG_DONE

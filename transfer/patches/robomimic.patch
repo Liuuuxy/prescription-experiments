@@ -1,0 +1,15 @@
+diff --git a/robomimic/utils/torch_utils.py b/robomimic/utils/torch_utils.py
+index 543b6fd..9e88e41 100644
+--- a/robomimic/utils/torch_utils.py
++++ b/robomimic/utils/torch_utils.py
+@@ -139,8 +139,9 @@ def lr_scheduler_from_optim_params(net_optim_params, net, optimizer, num_trainin
+     """
+     lr_scheduler_type = net_optim_params["learning_rate"]["scheduler_type"]
+ 
++    from typing import Union, Optional
+     from diffusers.optimization import (
+-        Union, SchedulerType, Optional,
++        SchedulerType,
+         Optimizer, TYPE_TO_SCHEDULER_FUNCTION
+     )
+ 

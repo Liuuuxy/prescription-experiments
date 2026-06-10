@@ -1,0 +1,23 @@
+{
+    "name": "CloseDrawer",
+    "type": "robosuite",
+    "experiment": {
+        "source": {
+            "dataset_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/mimicgen_src/CloseDrawer_pi0_src_prepared.hdf5",
+            "filter_key": null
+        },
+        "generation": {
+            "path": "/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/mimicgen_src/generated",
+            "select_src_per_subtask": true,
+            "num_trials": 20,
+            "transform_first_robot_pose": true
+        },
+        "name": "closedrawer_pi0_smoke"
+    },
+    "task": {
+        "task_spec": {
+            "stage_1": {},
+            "stage_2": {}
+        }
+    }
+}

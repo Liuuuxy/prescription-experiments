@@ -1,0 +1,30 @@
+RoboCasa policy analysis -- task=PickPlaceCounterToSink -- policy=random
+========================================================================
+Overall: 0/3 = 0.0% (95% CI 0.0%-56.1%)
+
+By object category (weakest first)
+----------------------------------
+  orange                     0.0%  (0/1)
+  salt_and_pepper_shaker     0.0%  (0/1)
+  tupperware                 0.0%  (0/1)
+
+By spatial region (weakest first)
+---------------------------------
+  far-left                   0.0%  (0/1)
+  near-center                0.0%  (0/1)
+  mid-right                  0.0%  (0/1)
+
+By layout
+---------
+  54                         0.0%  (0/1)
+  24                         0.0%  (0/1)
+  21                         0.0%  (0/1)
+
+By style
+--------
+  58                         0.0%  (0/1)
+  12                         0.0%  (0/1)
+  59                         0.0%  (0/1)
+
+Weakest buckets (candidates for targeted data):
+  (not enough samples per bucket; increase --n)

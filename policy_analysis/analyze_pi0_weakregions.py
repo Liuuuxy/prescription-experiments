@@ -1,0 +1,156 @@
+"""Per-bucket weak-region analysis of pi0 on a RoboCasa task (project core method).
+
+Runs pi0 (via the websocket server) for N episodes, logging per-episode success
+joined with init-state metadata (target object category, object position
+relative to the robot, layout/style), then buckets failures with analysis.py to
+answer *where* pi0 fails -- the input to the targeted-data experiment.
+
+Run in openpi_env with the pi0 server up and MUJOCO_GL=egl.
+"""
+import argparse
+import collections
+import json
+import os
+import sys
+from datetime import datetime
+
+import gymnasium as gym
+import numpy as np
+import robocasa  # noqa: F401
+from openpi_client import image_tools
+from openpi_client import websocket_client_policy as _wcp
+from robocasa.utils.env_utils import convert_action
+from robocasa.utils.dataset_registry_utils import get_task_horizon
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import analysis  # noqa: E402
+
+TARGET_OBJ = "obj"
+
+
+def target_meta(rs):
+    ep = rs.get_ep_meta()
+    cat, split = "unknown", "unknown"
+    for cfg in ep.get("object_cfgs", []):
+        if cfg.get("name") == TARGET_OBJ:
+            cat = cfg.get("info", {}).get("cat", "unknown")
+            split = cfg.get("info", {}).get("split", "unknown")
+    base = np.array(ep.get("init_robot_base_pos", [0, 0, 0])[:2])
+    abs_xy = np.array(rs.sim.data.body_xpos[rs.obj_body_id[TARGET_OBJ]][:2])
+    return cat, split, abs_xy, abs_xy - base, ep.get("layout_id"), ep.get("style_id")
+
+
+def pi0_action(client, obs, plan, lang, resize, replan):
+    if not plan:
+        def prep(k):
+            return image_tools.convert_to_uint8(
+                image_tools.resize_with_pad(np.ascontiguousarray(obs[k]), resize, resize))
+        element = {
+            "observation/image": prep("video.robot0_agentview_left"),
+            "observation/wrist_image": prep("video.robot0_eye_in_hand"),
+            "observation/right_image": prep("video.robot0_agentview_right"),
+            "observation/state": np.concatenate((
+                obs["state.end_effector_position_relative"],
+                obs["state.end_effector_rotation_relative"],
+                obs["state.base_position"],
+                obs["state.base_rotation"],
+                obs["state.gripper_qpos"]), axis=0),
+            "prompt": lang,
+        }
+        plan.extend(client.infer(element)["actions"][:replan])
+    return plan.popleft()
+
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument("--task", default="PickPlaceCounterToSink")
+    p.add_argument("--split", default="pretrain")
+    p.add_argument("--n", type=int, default=50)
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8000)
+    p.add_argument("--resize_size", type=int, default=224)
+    p.add_argument("--replan_steps", type=int, default=5)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--out_dir", default="/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/weakregion/pi0_PickPlaceCounterToSink")
+    args = p.parse_args()
+    os.makedirs(args.out_dir, exist_ok=True)
+
+    horizon = int(get_task_horizon(args.task))
+    client = _wcp.WebsocketClientPolicy(args.host, args.port)
+    records = []
+    for i in range(args.n):
+        env = gym.make(f"robocasa/{args.task}", split=args.split, seed=args.seed + i)
+        rs = env.unwrapped
+        obs, info = env.reset()
+        lang = obs["annotation.human.task_description"]
+        cat, osplit, xy_abs, xy_rel, layout, style = target_meta(rs)
+
+        # failure-phase signals: track object lift (grasp) and proximity to the
+        # sink (transport). sink location proxied by the distractor that sits in
+        # the sink (distr_sink).
+        def obj_xyz():
+            return np.array(rs.sim.data.body_xpos[rs.obj_body_id[TARGET_OBJ]])
+        sink_xy = (np.array(rs.sim.data.body_xpos[rs.obj_body_id["distr_sink"]][:2])
+                   if "distr_sink" in getattr(rs, "obj_body_id", {}) else None)
+        init_z = float(obj_xyz()[2])
+        max_lift, min_sink_dist = 0.0, float("inf")
+
+        plan = collections.deque()
+        success, steps = False, horizon
+        for t in range(horizon):
+            a = pi0_action(client, obs, plan, lang, args.resize_size, args.replan_steps)
+            obs, r, term, trunc, info = env.step(convert_action(a))
+            pz = obj_xyz()
+            max_lift = max(max_lift, float(pz[2]) - init_z)
+            if sink_xy is not None:
+                min_sink_dist = min(min_sink_dist, float(np.linalg.norm(pz[:2] - sink_xy)))
+            if info["success"]:
+                success, steps = True, t + 1
+                break
+
+        grasped = max_lift > 0.05  # lifted >5cm
+        near_sink = sink_xy is not None and min_sink_dist < 0.15  # within 15cm
+        if success:
+            phase = "success"
+        elif not grasped:
+            phase = "fail_no_grasp"
+        elif not near_sink:
+            phase = "fail_grasped_no_transport"
+        else:
+            phase = "fail_reached_sink_no_place"
+
+        records.append(dict(
+            episode=i, success=bool(success), steps_to_success=steps if success else None,
+            failure_phase=phase, max_lift=round(max_lift, 3),
+            min_sink_dist=(round(min_sink_dist, 3) if min_sink_dist != float("inf") else None),
+            object_category=cat, object_split=osplit,
+            obj_xy_abs=[float(xy_abs[0]), float(xy_abs[1])],
+            obj_xy_rel=[float(xy_rel[0]), float(xy_rel[1])],
+            layout_id=layout, style_id=style))
+        print(f"[ep {i+1}/{args.n}] success={success} phase={phase} obj={cat} "
+              f"rel=({xy_rel[0]:.2f},{xy_rel[1]:.2f}) layout={layout} style={style}")
+        env.close()
+
+    # failure-mode breakdown (among failed episodes)
+    fails = [r for r in records if not r["success"]]
+    phase_counts = collections.Counter(r["failure_phase"] for r in fails)
+    phase_lines = ["", "Failure modes (of {} failures):".format(len(fails))]
+    for ph, c in sorted(phase_counts.items(), key=lambda kv: -kv[1]):
+        phase_lines.append("  {:<28} {:>3} ({:.0%})".format(ph, c, c / max(len(fails), 1)))
+    phase_report = "\n".join(phase_lines)
+
+    summary = analysis.summarize(records)
+    out = {"task": args.task, "split": args.split, "policy": "pi0", "n": args.n,
+           "timestamp": datetime.now().isoformat(timespec="seconds"),
+           "summary": summary, "episodes": records}
+    with open(os.path.join(args.out_dir, "weakregion.json"), "w") as f:
+        json.dump(out, f, indent=2)
+    report = analysis.format_report(summary, task=args.task, policy="pi0") + "\n" + phase_report
+    with open(os.path.join(args.out_dir, "weakregion_report.txt"), "w") as f:
+        f.write(report + "\n")
+    print("\n" + report)
+    print(f"\nWrote weakregion.json + report to {args.out_dir}")
+
+
+if __name__ == "__main__":
+    main()

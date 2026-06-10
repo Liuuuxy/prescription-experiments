@@ -1,0 +1,24 @@
+[robosuite WARNING] No private macro file found! (macros.py:57)
+WARNING:robosuite_logs:No private macro file found!
+[robosuite WARNING] It is recommended to use a private macro file (macros.py:58)
+WARNING:robosuite_logs:It is recommended to use a private macro file
+[robosuite WARNING] To setup, run: python /home/asurite.ad.asu.edu/xinyua11/robosuite/robosuite/scripts/setup_macros.py (macros.py:59)
+WARNING:robosuite_logs:To setup, run: python /home/asurite.ad.asu.edu/xinyua11/robosuite/robosuite/scripts/setup_macros.py
+[robosuite WARNING] Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install. (__init__.py:30)
+WARNING:robosuite_logs:Could not import robosuite_models. Some robots may not be available. If you want to use these robots, please install robosuite_models from source (https://github.com/ARISE-Initiative/robosuite_models) or through pip install.
+[robosuite WARNING] Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot. (__init__.py:40)
+WARNING:robosuite_logs:Could not load the mink-based whole-body IK. Make sure you install related import properly (e.g. pip install mink==0.0.5), otherwise you will not be able to use the default IK controller setting for GR1 robot.
+INFO:root:Loading model...
+INFO:2026-06-09 07:25:25,082:jax._src.xla_bridge:925: Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+INFO:jax._src.xla_bridge:Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+INFO:2026-06-09 07:25:25,083:jax._src.xla_bridge:925: Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+INFO:jax._src.xla_bridge:Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: libtpu.so: cannot open shared object file: No such file or directory
+INFO:absl:orbax-checkpoint version: 0.11.13
+INFO:absl:Created BasePyTreeCheckpointHandler: use_ocdbt=True, use_zarr3=False, pytree_metadata_options=PyTreeMetadataOptions(support_rich_types=False), array_metadata_store=<orbax.checkpoint._src.metadata.array_metadata_store.Store object at 0x747ed5590050>
+INFO:absl:Restoring checkpoint from /home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/checkpoints/pi0_ckpt/pi0/pi0_robocasa_pretrain_human300/multitask_learning/75000/params.
+INFO:absl:[thread=MainThread] Failed to get flag value for EXPERIMENTAL_ORBAX_USE_DISTRIBUTED_PROCESS_ID.
+INFO:absl:[process=0] /jax/checkpoint/read/bytes_per_sec: 1.1 GiB/s (total bytes: 6.0 GiB) (time elapsed: 5 seconds) (per-host)
+INFO:absl:Finished restoring checkpoint in 5.52 seconds from /home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/checkpoints/pi0_ckpt/pi0/pi0_robocasa_pretrain_human300/multitask_learning/75000/params.
+INFO:root:Loaded norm stats from /home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/checkpoints/pi0_ckpt/pi0/pi0_robocasa_pretrain_human300/multitask_learning/75000/assets
+INFO:root:Creating server (host: en4228314l, ip: 127.0.1.1)
+INFO:websockets.server:server listening on 0.0.0.0:8000

@@ -1,0 +1,74 @@
+diff --git a/mimicgen/env_interfaces/robocasa/single_stage/mg_drawer.py b/mimicgen/env_interfaces/robocasa/single_stage/mg_drawer.py
+index 7cc7202..2980a2e 100644
+--- a/mimicgen/env_interfaces/robocasa/single_stage/mg_drawer.py
++++ b/mimicgen/env_interfaces/robocasa/single_stage/mg_drawer.py
+@@ -13,8 +13,21 @@ class MG_OpenDrawer(RobosuiteInterface):
+         Returns:
+             object_poses (dict): dictionary that maps object name (str) to object pose matrix (4x4 np.array)
+         """
++        # robocasa v1.0.1: drawer.handle_name returns "..._door_handle_handle"
++        # but the actual geom is "..._door_handle_reg_main" (or "_g0").
++        hn = self.env.drawer.handle_name
++        geom_names = self.env.sim.model.geom_names
++        if hn in geom_names:
++            handle_geom = hn
++        else:
++            base = hn[: -len("_handle")] if hn.endswith("_handle") else hn
++            handle_geom = next(
++                ("{}_{}".format(base, s) for s in ("reg_main", "g0", "main")
++                 if "{}_{}".format(base, s) in geom_names),
++                hn,
++            )
+         return dict(
+-            handle=self.get_object_pose(obj_name=self.env.drawer.handle_name, obj_type="geom"),
++            handle=self.get_object_pose(obj_name=handle_geom, obj_type="geom"),
+         )
+ 
+     def get_subtask_term_signals(self):
+@@ -46,8 +59,21 @@ class MG_CloseDrawer(RobosuiteInterface):
+         Returns:
+             object_poses (dict): dictionary that maps object name (str) to object pose matrix (4x4 np.array)
+         """
++        # robocasa v1.0.1: drawer.handle_name returns "..._door_handle_handle"
++        # but the actual geom is "..._door_handle_reg_main" (or "_g0").
++        hn = self.env.drawer.handle_name
++        geom_names = self.env.sim.model.geom_names
++        if hn in geom_names:
++            handle_geom = hn
++        else:
++            base = hn[: -len("_handle")] if hn.endswith("_handle") else hn
++            handle_geom = next(
++                ("{}_{}".format(base, s) for s in ("reg_main", "g0", "main")
++                 if "{}_{}".format(base, s) in geom_names),
++                hn,
++            )
+         return dict(
+-            handle=self.get_object_pose(obj_name=self.env.drawer.handle_name, obj_type="geom"),
++            handle=self.get_object_pose(obj_name=handle_geom, obj_type="geom"),
+         )
+ 
+     def get_subtask_term_signals(self):
+diff --git a/mimicgen/env_interfaces/robocasa/single_stage/mg_pnp.py b/mimicgen/env_interfaces/robocasa/single_stage/mg_pnp.py
+index b20ddbb..aeaea52 100644
+--- a/mimicgen/env_interfaces/robocasa/single_stage/mg_pnp.py
++++ b/mimicgen/env_interfaces/robocasa/single_stage/mg_pnp.py
+@@ -70,9 +70,18 @@ class MG_PnPCounterToSink(RobosuiteInterface):
+         Returns:
+             object_poses (dict): dictionary that maps object name (str) to object pose matrix (4x4 np.array)
+         """
++        # robocasa v1.0.1 renamed the sink basin geom; the old "_bottom" geom is
++        # gone. Fall back across single/double-basin layouts.
++        geom_names = self.env.sim.model.geom_names
++        sink_geom = next(
++            ("{}_{}".format(self.env.sink.name, s)
++             for s in ("reg_basin_left", "reg_basin", "g0")
++             if "{}_{}".format(self.env.sink.name, s) in geom_names),
++            "{}_{}".format(self.env.sink.name, "bottom"),
++        )
+         return dict(
+             obj=self.get_object_pose(obj_name=self.env.objects["obj"].root_body, obj_type="body"),
+-            sink=self.get_object_pose(obj_name="{}_{}".format(self.env.sink.name, "bottom"), obj_type="geom"),
++            sink=self.get_object_pose(obj_name=sink_geom, obj_type="geom"),
+         )
+ 
+     def get_subtask_term_signals(self):

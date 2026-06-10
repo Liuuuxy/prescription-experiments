@@ -1,0 +1,443 @@
+{
+    "layout_id": 37,
+    "style_id": 21,
+    "object_cfgs": [
+        {
+            "name": "obj",
+            "obj_groups": "all",
+            "exclude_obj_groups": null,
+            "graspable": true,
+            "washable": true,
+            "placement": {
+                "fixture": "island_island_group_1",
+                "sample_region_kwargs": {
+                    "ref": "sink_island_group_1",
+                    "loc": "left_right",
+                    "min_size": [
+                        0.0942861,
+                        0.09428038,
+                        0.121362
+                    ]
+                },
+                "size": [
+                    0.3,
+                    0.4
+                ],
+                "pos": [
+                    "ref",
+                    -1.0
+                ]
+            },
+            "type": "object",
+            "info": {
+                "groups_containing_sampled_obj": [
+                    "all",
+                    "glass_cup",
+                    "stackable",
+                    "receptacle"
+                ],
+                "groups": [
+                    "all"
+                ],
+                "cat": "glass_cup",
+                "split": "pretrain",
+                "mjcf_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa/robocasa/models/assets/objects/lightwheel/glass_cup/GlassCup010/model.xml"
+            },
+            "reset_region": {
+                "size": [
+                    0.6220502358958159,
+                    1.045
+                ],
+                "offset": [
+                    -0.8189748820520919,
+                    2.0816681711721685e-17,
+                    0.46
+                ],
+                "name": "geom_1"
+            }
+        },
+        {
+            "name": "distr_counter",
+            "obj_groups": "all",
+            "placement": {
+                "fixture": "island_island_group_1",
+                "sample_region_kwargs": {
+                    "ref": "sink_island_group_1",
+                    "loc": "left_right",
+                    "min_size": [
+                        0.18028875200000002,
+                        0.12872486400000002,
+                        0.0750664
+                    ]
+                },
+                "size": [
+                    0.3,
+                    0.3
+                ],
+                "pos": [
+                    "ref",
+                    -1.0
+                ],
+                "offset": [
+                    0.0,
+                    0.3
+                ]
+            },
+            "type": "object",
+            "info": {
+                "groups_containing_sampled_obj": [
+                    "all",
+                    "tupperware",
+                    "receptacle"
+                ],
+                "groups": [
+                    "all"
+                ],
+                "cat": "tupperware",
+                "split": "pretrain",
+                "mjcf_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa/robocasa/models/assets/objects/lightwheel/tupperware/Tupperware031/model.xml"
+            },
+            "reset_region": {
+                "size": [
+                    0.7124502358958161,
+                    1.045
+                ],
+                "offset": [
+                    0.7737748820520918,
+                    2.0816681711721685e-17,
+                    0.46
+                ],
+                "name": "geom_0"
+            }
+        },
+        {
+            "name": "distr_sink",
+            "obj_groups": "all",
+            "washable": true,
+            "placement": {
+                "fixture": "sink_island_group_1",
+                "size": [
+                    0.25,
+                    0.25
+                ],
+                "pos": [
+                    0.0,
+                    1.0
+                ]
+            },
+            "type": "object",
+            "info": {
+                "groups_containing_sampled_obj": [
+                    "all",
+                    "scissors",
+                    "tool",
+                    "in_container"
+                ],
+                "groups": [
+                    "all"
+                ],
+                "cat": "scissors",
+                "split": "pretrain",
+                "mjcf_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa/robocasa/models/assets/objects/objaverse/scissors/scissors_0/model.xml"
+            },
+            "reset_region": {
+                "offset": [
+                    -0.25375101875937456,
+                    -0.032755945224704285,
+                    -0.157664497132104
+                ],
+                "size": [
+                    0.22678006029742603,
+                    0.2815059225014469
+                ],
+                "height": 0.1610789725350931,
+                "name": "basin"
+            }
+        }
+    ],
+    "fixtures": {
+        "wall_main_1_room": {
+            "cls": "Wall"
+        },
+        "wall_main_1_backing_room": {
+            "cls": "Wall"
+        },
+        "wall_left_1_room": {
+            "cls": "Wall"
+        },
+        "wall_left_1_backing_room": {
+            "cls": "Wall"
+        },
+        "wall_main_2_room": {
+            "cls": "Wall"
+        },
+        "wall_main_2_backing_room": {
+            "cls": "Wall"
+        },
+        "wall_main_3_room": {
+            "cls": "Wall"
+        },
+        "wall_main_3_backing_room": {
+            "cls": "Wall"
+        },
+        "wall_front_room": {
+            "cls": "Wall"
+        },
+        "wall_front_backing_room": {
+            "cls": "Wall"
+        },
+        "wall_right_room": {
+            "cls": "Wall"
+        },
+        "wall_right_backing_room": {
+            "cls": "Wall"
+        },
+        "floor_1_room": {
+            "cls": "Floor"
+        },
+        "floor_1_backing_room": {
+            "cls": "Floor"
+        },
+        "wallaccessory_1_room": {
+            "cls": "WallAccessory"
+        },
+        "wallaccessory_2_room": {
+            "cls": "WallAccessory"
+        },
+        "stool_1_room": {
+            "cls": "Stool"
+        },
+        "stool_2_room": {
+            "cls": "Stool"
+        },
+        "stool_3_room": {
+            "cls": "Stool"
+        },
+        "stovetop_left_group_1": {
+            "cls": "Stovetop"
+        },
+        "counter_1_left_group_1": {
+            "cls": "Counter"
+        },
+        "hingecabinet_2_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "hingecabinet_1_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "microwave_left_group_1": {
+            "cls": "Microwave"
+        },
+        "cab_micro_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "cube_1_left_group_1": {
+            "cls": "Box"
+        },
+        "fridgefrenchdoor_left_group_1": {
+            "cls": "FridgeFrenchDoor"
+        },
+        "fridgefrenchdoor_housing_left_group_1": {
+            "cls": "HousingCabinet"
+        },
+        "bottom_left_group_1_base": {
+            "cls": "Box"
+        },
+        "bottom_left_group_1_1": {
+            "cls": "Drawer"
+        },
+        "oven_left_group_1": {
+            "cls": "Oven"
+        },
+        "oven_housing_left_group_1": {
+            "cls": "HousingCabinet"
+        },
+        "hingecabinet_3_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "microwave_cabinet_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "top_left_group_1": {
+            "cls": "HingeCabinet"
+        },
+        "stack_1_left_group_1_base": {
+            "cls": "Box"
+        },
+        "stack_1_left_group_1_1": {
+            "cls": "HingeCabinet"
+        },
+        "stack_1_left_group_1_2": {
+            "cls": "Drawer"
+        },
+        "stack_2_left_group_1_base": {
+            "cls": "Box"
+        },
+        "stack_2_left_group_1_1": {
+            "cls": "Drawer"
+        },
+        "stack_2_left_group_1_2": {
+            "cls": "Drawer"
+        },
+        "stack_2_left_group_1_3": {
+            "cls": "PanelCabinet"
+        },
+        "stack_3_left_group_1_base": {
+            "cls": "Box"
+        },
+        "stack_3_left_group_1_1": {
+            "cls": "HingeCabinet"
+        },
+        "stack_3_left_group_1_2": {
+            "cls": "Drawer"
+        },
+        "papertowel_left_group_1": {
+            "cls": "Accessory"
+        },
+        "coffee_machine_left_group_1": {
+            "cls": "CoffeeMachine"
+        },
+        "toaster_left_group_1": {
+            "cls": "Toaster"
+        },
+        "sink_island_group_1": {
+            "cls": "Sink"
+        },
+        "island_island_group_1": {
+            "cls": "Counter"
+        },
+        "cube_5_island_group_1": {
+            "cls": "Box"
+        },
+        "cube_1_island_group_1": {
+            "cls": "Box"
+        },
+        "cube_2_island_group_1": {
+            "cls": "Box"
+        },
+        "cube_3_island_group_1": {
+            "cls": "Box"
+        },
+        "cube_4_island_group_1": {
+            "cls": "Box"
+        },
+        "stack_2_island_group_1_base": {
+            "cls": "Box"
+        },
+        "stack_2_island_group_1_1": {
+            "cls": "SingleCabinet"
+        },
+        "stack_2_island_group_1_2": {
+            "cls": "Drawer"
+        },
+        "stack_1_island_group_1_base": {
+            "cls": "Box"
+        },
+        "stack_1_island_group_1_1": {
+            "cls": "HingeCabinet"
+        },
+        "stack_1_island_group_1_2": {
+            "cls": "PanelCabinet"
+        },
+        "dishwasher_1_island_group_1": {
+            "cls": "Dishwasher"
+        }
+    },
+    "gen_textures": {},
+    "lang": "Pick the glass cup from the counter and place it in the sink.",
+    "fixture_refs": {
+        "sink": "sink_island_group_1",
+        "counter": "island_island_group_1"
+    },
+    "cam_configs": {
+        "robot0_agentview_center": {
+            "pos": [
+                -0.6,
+                0.0,
+                1.15
+            ],
+            "quat": [
+                0.636945903301239,
+                0.3325185477733612,
+                -0.3199238181114197,
+                -0.6175596117973328
+            ],
+            "parent_body": "mobilebase0_support"
+        },
+        "robot0_agentview_left": {
+            "pos": [
+                -0.5,
+                0.35,
+                1.05
+            ],
+            "quat": [
+                0.55623853,
+                0.29935253,
+                -0.37678665,
+                -0.6775092
+            ],
+            "camera_attribs": {
+                "fovy": "60"
+            },
+            "parent_body": "mobilebase0_support"
+        },
+        "robot0_agentview_right": {
+            "pos": [
+                -0.5,
+                -0.35,
+                1.05
+            ],
+            "quat": [
+                0.6775091886520386,
+                0.3767866790294647,
+                -0.2993525564670563,
+                -0.55623859167099
+            ],
+            "camera_attribs": {
+                "fovy": "60"
+            },
+            "parent_body": "mobilebase0_support"
+        },
+        "robot0_frontview": {
+            "pos": [
+                -0.5,
+                0,
+                0.95
+            ],
+            "quat": [
+                0.6088936924934387,
+                0.3814677894115448,
+                -0.3673907518386841,
+                -0.5905545353889465
+            ],
+            "camera_attribs": {
+                "fovy": "60"
+            },
+            "parent_body": "mobilebase0_support"
+        },
+        "robot0_eye_in_hand": {
+            "pos": [
+                0.05,
+                0,
+                0
+            ],
+            "quat": [
+                0,
+                0.707107,
+                0.707107,
+                0
+            ],
+            "parent_body": "robot0_right_hand"
+        }
+    },
+    "init_robot_base_pos": [
+        2.532512862895905,
+        -2.6468887858209813,
+        0.0
+    ],
+    "init_robot_base_ori": [
+        0.0,
+        0.0,
+        -4.7153339388650295e-07
+    ]
+}

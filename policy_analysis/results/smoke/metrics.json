@@ -1,0 +1,212 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "split": "pretrain",
+  "policy": "random",
+  "n": 3,
+  "steps": 25,
+  "seed": 0,
+  "timestamp": "2026-06-08T23:28:20",
+  "summary": {
+    "overall": {
+      "n": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "ci95": [
+        0.0,
+        0.5615
+      ]
+    },
+    "by_object_category": {
+      "orange": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "salt_and_pepper_shaker": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "tupperware": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      }
+    },
+    "by_region": {
+      "far-left": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "near-center": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "mid-right": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      }
+    },
+    "by_layout": {
+      "54": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "24": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "21": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      }
+    },
+    "by_style": {
+      "58": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "12": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "59": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      }
+    },
+    "region_edges": {
+      "x_edges": [
+        0.6198046642804056,
+        0.6528862940581683
+      ],
+      "y_edges": [
+        0.4115503239171501,
+        0.6427639799143596
+      ]
+    },
+    "weakest": []
+  },
+  "episodes": [
+    {
+      "episode": 0,
+      "seed": 0,
+      "success": false,
+      "steps_to_success": null,
+      "episode_length": 25,
+      "object_category": "orange",
+      "object_split": "pretrain",
+      "obj_xy_abs": [
+        5.255679132059425,
+        -1.431011686270266
+      ],
+      "obj_xy_rel": [
+        0.34792065400330774,
+        0.6427639799143596
+      ],
+      "layout_id": 54,
+      "style_id": 58,
+      "video": "./results/smoke/videos/failure/ep000_orange.mp4",
+      "region": "far-left"
+    },
+    {
+      "episode": 1,
+      "seed": 0,
+      "success": false,
+      "steps_to_success": null,
+      "episode_length": 25,
+      "object_category": "salt_and_pepper_shaker",
+      "object_split": "pretrain",
+      "obj_xy_abs": [
+        3.933424024266476,
+        -2.1476592858992682
+      ],
+      "obj_xy_rel": [
+        0.6198046642804056,
+        -0.3784234548405414
+      ],
+      "layout_id": 24,
+      "style_id": 12,
+      "video": "./results/smoke/videos/failure/ep001_salt_and_pepper_shaker.mp4",
+      "region": "near-center"
+    },
+    {
+      "episode": 2,
+      "seed": 0,
+      "success": false,
+      "steps_to_success": null,
+      "episode_length": 25,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_xy_abs": [
+        1.8084782198748652,
+        -0.3733966489727244
+      ],
+      "obj_xy_rel": [
+        0.6528862940581683,
+        0.4115503239171501
+      ],
+      "layout_id": 21,
+      "style_id": 59,
+      "video": "./results/smoke/videos/failure/ep002_tupperware.mp4",
+      "region": "mid-right"
+    }
+  ]
+}

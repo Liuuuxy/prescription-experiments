@@ -1,0 +1,14 @@
+{
+    "generation_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/mimicgen_src/generated/closedrawer_pi0_smoke",
+    "success_rate": 40.0,
+    "failure_rate": 60.0,
+    "num_success": 8,
+    "num_failures": 12,
+    "num_attempts": 20,
+    "num_problematic": 0,
+    "ep_length_mean": 217.875,
+    "ep_length_std": 15.226929270210722,
+    "ep_length_max": 242,
+    "ep_length_3std": 264,
+    "time spent (hrs)": "0.06"
+}

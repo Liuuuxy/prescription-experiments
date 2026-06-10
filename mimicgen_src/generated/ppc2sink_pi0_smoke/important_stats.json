@@ -1,0 +1,10 @@
+{
+    "generation_path": "/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/mimicgen_src/generated/ppc2sink_pi0_smoke",
+    "success_rate": 0.0,
+    "failure_rate": 100.0,
+    "num_success": 0,
+    "num_failures": 20,
+    "num_attempts": 20,
+    "num_problematic": 0,
+    "time spent (hrs)": "0.08"
+}

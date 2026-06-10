@@ -1,0 +1,61 @@
+diff --git a/diffusion_policy/env_runner/robomimic_image_runner.py b/diffusion_policy/env_runner/robomimic_image_runner.py
+index f180942..2e1b8a8 100644
+--- a/diffusion_policy/env_runner/robomimic_image_runner.py
++++ b/diffusion_policy/env_runner/robomimic_image_runner.py
+@@ -199,6 +199,7 @@ class RobomimicImageRunner(BaseImageRunner):
+         env = AsyncVectorEnv(
+             env_fns,
+             dummy_env_fn=dummy_env_fn,
++            shared_memory=False,
+         )
+         # env = SyncVectorEnv(env_fns)
+ 
+diff --git a/diffusion_policy/gym_util/async_vector_env.py b/diffusion_policy/gym_util/async_vector_env.py
+index 8f7835c..40b7ace 100644
+--- a/diffusion_policy/gym_util/async_vector_env.py
++++ b/diffusion_policy/gym_util/async_vector_env.py
+@@ -186,6 +186,14 @@ class AsyncVectorEnv(VectorEnv):
+         _, successes = zip(*[pipe.recv() for pipe in self.parent_pipes])
+         self._raise_if_errors(successes)
+ 
++    def reset(self, seed=None, options=None):
++        # gym>=0.26 base VectorEnv.reset() forwards seed/options into
++        # reset_async/reset_wait, but this vendored vector env predates that
++        # API (reset_async takes no args, reset_wait returns obs-only). Bypass
++        # the base method and use the old-style protocol the runner expects.
++        self.reset_async()
++        return self.reset_wait()
++
+     def reset_async(self):
+         self._assert_is_running()
+         if self._state != AsyncState.DEFAULT:
+@@ -231,7 +239,7 @@ class AsyncVectorEnv(VectorEnv):
+ 
+         if not self.shared_memory:
+             self.observations = concatenate(
+-                results, self.observations, self.single_observation_space
++                self.single_observation_space, results, self.observations
+             )
+ 
+         return deepcopy(self.observations) if self.copy else self.observations
+@@ -294,7 +302,7 @@ class AsyncVectorEnv(VectorEnv):
+ 
+         if not self.shared_memory:
+             self.observations = concatenate(
+-                observations_list, self.observations, self.single_observation_space
++                self.single_observation_space, observations_list, self.observations
+             )
+ 
+         return (
+diff --git a/diffusion_policy/model/common/lr_scheduler.py b/diffusion_policy/model/common/lr_scheduler.py
+index f4c0533..3b83acf 100644
+--- a/diffusion_policy/model/common/lr_scheduler.py
++++ b/diffusion_policy/model/common/lr_scheduler.py
+@@ -1,5 +1,6 @@
++from typing import Union, Optional
+ from diffusers.optimization import (
+-    Union, SchedulerType, Optional,
++    SchedulerType,
+     Optimizer, TYPE_TO_SCHEDULER_FUNCTION
+ )
+ 

@@ -1,0 +1,4 @@
+# Big / re-downloadable — do NOT commit (re-fetch on the H100, see H100_HANDOFF.md)
+checkpoints/
+# everything else here (results, scripts, configs, patches, memory copy, small
+# eval videos ~33M, mimicgen_src ~83M, weakregion reports) is fine to commit.

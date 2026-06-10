@@ -1,0 +1,15 @@
+#     $ conda deactivate
+
+
+Successfully installed Pillow-12.2.0 absl-py-2.4.0 etils-1.14.0 evdev-1.9.3 fsspec-2026.4.0 glfw-2.10.0 iniconfig-2.3.0 llvmlite-0.47.0 mujoco-3.9.0 numba-0.65.1 numpy-2.4.6 opencv-python-4.13.0.92 pluggy-1.6.0 pygments-2.20.0 pynput-1.8.2 pyopengl-3.1.10 pytest-9.0.3 python-xlib-0.33 qpsolvers-4.12.0 quadprog-0.1.13 robosuite-1.5.2 scipy-1.17.1 six-1.17.0 termcolor-3.3.0 tqdm-4.68.2 typing_extensions-4.15.0 zipp-4.1.0
+scipy 1.17.1 requires numpy<2.7,>=1.26.4, but you have numpy 1.23.2 which is incompatible.
+Successfully installed annotated-doc-0.0.4 anyio-4.13.0 certifi-2026.5.20 charset_normalizer-3.4.7 click-8.4.1 cloudpickle-3.1.2 cmake-4.3.2 contourpy-1.3.2 cycler-0.12.1 diffusers-0.11.1 filelock-3.29.1 fonttools-4.63.0 grpcio-1.81.0 gym-0.26.2 gym_notices-0.1.0 h11-0.16.0 h5py-3.16.0 hf-xet-1.5.1 httpcore-1.0.9 httpx-0.28.1 huggingface-hub-1.18.0 idna-3.18 imageio-2.37.3 imageio-ffmpeg-0.6.0 importlib-metadata-9.0.0 jinja2-3.1.6 kiwisolver-1.5.0 lit-18.1.8 markdown-3.10.2 markdown-it-py-4.2.0 markupsafe-3.0.3 matplotlib-3.10.9 mdurl-0.1.2 mpmath-1.3.0 networkx-3.6.1 numpy-1.23.2 nvidia-cublas-cu11-11.10.3.66 nvidia-cuda-cupti-cu11-11.7.101 nvidia-cuda-nvrtc-cu11-11.7.99 nvidia-cuda-runtime-cu11-11.7.99 nvidia-cudnn-cu11-8.5.0.96 nvidia-cufft-cu11-10.9.0.58 nvidia-curand-cu11-10.2.10.91 nvidia-cusolver-cu11-11.4.0.1 nvidia-cusparse-cu11-11.7.4.91 nvidia-nccl-cu11-2.14.3 nvidia-nvtx-cu11-11.7.91 protobuf-3.19.6 psutil-7.2.2 pyparsing-3.3.2 python-dateutil-2.9.0.post0 pyyaml-6.0.3 regex-2026.5.9 requests-2.34.2 rich-15.0.0 robomimic-0.3.0 safetensors-0.8.0 shellingham-1.5.4 sympy-1.14.0 tensorboard-2.20.0 tensorboard-data-server-0.7.2 tensorboardX-2.6 tianshou-0.4.10 tokenizers-0.22.2 torch-2.0.1 torchvision-0.15.2 transformers-5.10.2 triton-2.0.0 typer-0.25.1 urllib3-2.7.0 werkzeug-3.1.8
+      Successfully uninstalled robomimic-0.3.0
+Successfully installed robomimic-0.3.0
+
+Successfully installed PySocks-1.7.1 beautifulsoup4-4.15.0 chardet-7.4.3 gdown-6.1.0 mimicgen-1.0.0 soupsieve-2.8.4
+=== verify imports ===
+  File "/home/asurite.ad.asu.edu/xinyua11/miniconda3/envs/mimicgen_env/lib/python3.11/site-packages/scipy/_lib/_util.py", line 22, in <module>
+    from numpy.exceptions import AxisError
+ModuleNotFoundError: No module named 'numpy.exceptions'
+MIMICGEN_ENV_DONE

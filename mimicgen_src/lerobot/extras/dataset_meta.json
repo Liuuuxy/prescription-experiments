@@ -1,0 +1,153 @@
+{
+    "date": "2026-06-10",
+    "env": "PickPlaceCounterToSink",
+    "env_args": {
+        "type": 1,
+        "env_name": "PickPlaceCounterToSink",
+        "env_version": "1.0.1",
+        "robosuite_version": "1.5.2",
+        "mujoco_version": "3.3.1",
+        "env_kwargs": {
+            "env_name": "PickPlaceCounterToSink",
+            "robots": "PandaOmron",
+            "controller_configs": {
+                "type": "HYBRID_MOBILE_BASE",
+                "body_parts": {
+                    "right": {
+                        "type": "OSC_POSE",
+                        "input_max": 1,
+                        "input_min": -1,
+                        "output_max": [
+                            0.05,
+                            0.05,
+                            0.05,
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "output_min": [
+                            -0.05,
+                            -0.05,
+                            -0.05,
+                            -0.5,
+                            -0.5,
+                            -0.5
+                        ],
+                        "kp": 150,
+                        "damping_ratio": 1,
+                        "impedance_mode": "fixed",
+                        "kp_limits": [
+                            0,
+                            300
+                        ],
+                        "damping_ratio_limits": [
+                            0,
+                            10
+                        ],
+                        "position_limits": null,
+                        "orientation_limits": null,
+                        "uncouple_pos_ori": true,
+                        "input_type": "delta",
+                        "input_ref_frame": "base",
+                        "interpolation": null,
+                        "ramp_ratio": 0.2,
+                        "gripper": {
+                            "type": "GRIP"
+                        }
+                    },
+                    "torso": {
+                        "type": "JOINT_POSITION",
+                        "interpolation": "null",
+                        "kp": 2000
+                    },
+                    "base": {
+                        "type": "JOINT_VELOCITY",
+                        "interpolation": "null"
+                    }
+                }
+            },
+            "camera_names": [
+                "robot0_agentview_left",
+                "robot0_agentview_right",
+                "robot0_eye_in_hand"
+            ],
+            "camera_heights": 256,
+            "camera_widths": 256,
+            "translucent_robot": false
+        }
+    },
+    "env_info": {
+        "env_name": "PickPlaceCounterToSink",
+        "robots": "PandaOmron",
+        "controller_configs": {
+            "type": "HYBRID_MOBILE_BASE",
+            "body_parts": {
+                "right": {
+                    "type": "OSC_POSE",
+                    "input_max": 1,
+                    "input_min": -1,
+                    "output_max": [
+                        0.05,
+                        0.05,
+                        0.05,
+                        0.5,
+                        0.5,
+                        0.5
+                    ],
+                    "output_min": [
+                        -0.05,
+                        -0.05,
+                        -0.05,
+                        -0.5,
+                        -0.5,
+                        -0.5
+                    ],
+                    "kp": 150,
+                    "damping_ratio": 1,
+                    "impedance_mode": "fixed",
+                    "kp_limits": [
+                        0,
+                        300
+                    ],
+                    "damping_ratio_limits": [
+                        0,
+                        10
+                    ],
+                    "position_limits": null,
+                    "orientation_limits": null,
+                    "uncouple_pos_ori": true,
+                    "input_type": "delta",
+                    "input_ref_frame": "base",
+                    "interpolation": null,
+                    "ramp_ratio": 0.2,
+                    "gripper": {
+                        "type": "GRIP"
+                    }
+                },
+                "torso": {
+                    "type": "JOINT_POSITION",
+                    "interpolation": "null",
+                    "kp": 2000
+                },
+                "base": {
+                    "type": "JOINT_VELOCITY",
+                    "interpolation": "null"
+                }
+            }
+        },
+        "camera_names": [
+            "robot0_agentview_left",
+            "robot0_agentview_right",
+            "robot0_eye_in_hand"
+        ],
+        "camera_heights": 256,
+        "camera_widths": 256,
+        "translucent_robot": false
+    },
+    "mujoco_version": "3.3.1",
+    "repository_version": "1.5.2",
+    "robocasa_version": "1.0.1",
+    "robosuite_version": "1.5.2",
+    "time": "00:35:18",
+    "total": 1415
+}
