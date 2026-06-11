@@ -1,0 +1,83 @@
+name: ppc2sink_pi0
+
+# Single-task PickPlaceCounterToSink config training on a pi0-generated LeRobot
+# dataset (see robocasa_experiments/PHASE0_RUNBOOK.md). Dataset loading verified
+# end-to-end on 2026-06-11 (LerobotCotrainingDataset + this shape_meta).
+# Override the data path per-run, e.g.:
+#   python train.py --config-name=train_diffusion_transformer_bs192 \
+#     task=robocasa/ppc2sink_pi0 \
+#     'task.dataset.dataset_paths=[/path/to/lerobot_N50]' training.seed=1
+
+shape_meta: &shape_meta
+  obs:
+    robot0_agentview_right_image:
+      shape: [3, 256, 256]
+      type: rgb
+      lerobot_keys: ['video.robot0_agentview_right']
+    robot0_agentview_left_image:
+      shape: [3, 256, 256]
+      type: rgb
+      lerobot_keys: ['video.robot0_agentview_left']
+    robot0_eye_in_hand_image:
+      shape: [3, 256, 256]
+      type: rgb
+      lerobot_keys: ['video.robot0_eye_in_hand']
+    robot0_base_to_eef_pos:
+      shape: [3]
+      lerobot_keys: ['state.end_effector_position_relative']
+    robot0_base_to_eef_quat:
+      shape: [4]
+      lerobot_keys: ['state.end_effector_rotation_relative']
+    robot0_gripper_qpos:
+      shape: [2]
+      lerobot_keys: ['state.gripper_qpos']
+    lang_emb:
+      shape: [768]
+  action:
+    shape: [12]
+    lerobot_keys: ['action.end_effector_position', 'action.end_effector_rotation', 'action.gripper_close', 'action.base_motion', 'action.control_mode',]
+
+abs_action: &abs_action False
+
+# env_runner is NOT instantiated during training (rollouts are disabled in the
+# bs192 config; eval is done separately with eval_robocasa.py). Kept for config
+# completeness; dataset_path points at the generated robomimic-format hdf5.
+env_runner:
+  _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
+  dataset_path: /home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/phase1_data/ppc2sink_pi0_baseline100.hdf5
+  shape_meta: *shape_meta
+  n_train: 0
+  n_train_vis: 1
+  train_start_idx: 0
+  n_test: 50
+  n_test_vis: 4
+  test_start_seed: 100000
+  max_steps: 600
+  n_obs_steps: ${n_obs_steps}
+  n_action_steps: ${n_action_steps}
+  render_obs_key: 'robot0_agentview_right_image'
+  fps: 10
+  crf: 22
+  past_action: ${past_action_visible}
+  abs_action: *abs_action
+  tqdm_interval_sec: 1.0
+  n_envs: 1
+  env_kwargs:
+    seed: 1111111
+    split: 'pretrain'
+    env_name: 'PickPlaceCounterToSink'
+
+dataset:
+  _target_: diffusion_policy.dataset.lerobot_dataset.LerobotCotrainingDataset
+  shape_meta: *shape_meta
+  dataset_paths: ['/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/phase1_data/lerobot']
+  horizon: ${horizon}
+  pad_before: ${eval:'${n_obs_steps}-1+${n_latency_steps}'}
+  pad_after: ${eval:'${n_action_steps}-1'}
+  n_obs_steps: ${dataset_obs_steps}
+  abs_action: *abs_action
+  rotation_rep: 'rotation_6d'
+  use_legacy_normalizer: False
+  use_cache: True
+  seed: 42
+  val_ratio: 0.02
