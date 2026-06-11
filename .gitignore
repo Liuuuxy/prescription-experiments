@@ -5,3 +5,5 @@ checkpoints/
 
 __pycache__/
 *.pyc
+# phase1 demo pools are large + regenerable (record_pi0_demos.py)
+phase1_data/*.hdf5

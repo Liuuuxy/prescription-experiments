@@ -1,0 +1,1211 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "split": "pretrain",
+  "height_thresh": 0.1,
+  "weak_region": "obj_height > thresh (tall objects)",
+  "n_scanned": 138,
+  "weak_seeds": [
+    {
+      "seed": 1,
+      "object_category": "condiment_bottle",
+      "obj_height": 0.159065507475,
+      "obj_width": 0.06839425146813286,
+      "obj_xy_rel": [
+        0.3962985479213885,
+        0.781960979160989
+      ],
+      "layout_id": 34,
+      "style_id": 43
+    },
+    {
+      "seed": 2,
+      "object_category": "condiment_bottle",
+      "obj_height": 0.159065507475,
+      "obj_width": 0.06839425146813286,
+      "obj_xy_rel": [
+        -0.2822075501072471,
+        -0.6804100262036623
+      ],
+      "layout_id": 36,
+      "style_id": 38
+    },
+    {
+      "seed": 3,
+      "object_category": "jug_wide_opening",
+      "obj_height": 0.13667960459999995,
+      "obj_width": 0.20226373478759596,
+      "obj_xy_rel": [
+        -0.7116539015790329,
+        0.22952644124983013
+      ],
+      "layout_id": 41,
+      "style_id": 31
+    },
+    {
+      "seed": 6,
+      "object_category": "soap_dispenser",
+      "obj_height": 0.181234,
+      "obj_width": 0.11804549252300996,
+      "obj_xy_rel": [
+        -0.7060905326639964,
+        -0.31932055242547874
+      ],
+      "layout_id": 33,
+      "style_id": 23
+    },
+    {
+      "seed": 9,
+      "object_category": "ketchup",
+      "obj_height": 0.14999772461887564,
+      "obj_width": 0.09128205326698602,
+      "obj_xy_rel": [
+        0.4700734001892246,
+        -0.624865520200131
+      ],
+      "layout_id": 52,
+      "style_id": 58
+    },
+    {
+      "seed": 10,
+      "object_category": "dish_brush",
+      "obj_height": 0.15320367000000001,
+      "obj_width": 0.1700436361759534,
+      "obj_xy_rel": [
+        0.41016135545501076,
+        0.5670434799435782
+      ],
+      "layout_id": 49,
+      "style_id": 52
+    },
+    {
+      "seed": 12,
+      "object_category": "juice",
+      "obj_height": 0.24170649,
+      "obj_width": 0.11737270449773321,
+      "obj_xy_rel": [
+        0.7517622497469745,
+        0.40237163518534286
+      ],
+      "layout_id": 41,
+      "style_id": 42
+    },
+    {
+      "seed": 16,
+      "object_category": "cheese_grater",
+      "obj_height": 0.21690191199999997,
+      "obj_width": 0.14353472937407644,
+      "obj_xy_rel": [
+        0.6678352209157263,
+        0.44220658240398125
+      ],
+      "layout_id": 21,
+      "style_id": 23
+    },
+    {
+      "seed": 18,
+      "object_category": "milk",
+      "obj_height": 0.1814850216,
+      "obj_width": 0.07088589340466626,
+      "obj_xy_rel": [
+        0.3916191526519528,
+        0.2662407634061159
+      ],
+      "layout_id": 55,
+      "style_id": 44
+    },
+    {
+      "seed": 23,
+      "object_category": "cheese_grater",
+      "obj_height": 0.2565329665,
+      "obj_width": 0.15011785845132605,
+      "obj_xy_rel": [
+        -0.3718069854909727,
+        0.31128273362429804
+      ],
+      "layout_id": 12,
+      "style_id": 50
+    },
+    {
+      "seed": 27,
+      "object_category": "bottled_water",
+      "obj_height": 0.17534737968,
+      "obj_width": 0.07348560287736194,
+      "obj_xy_rel": [
+        0.5468142795184403,
+        -0.526361272659996
+      ],
+      "layout_id": 59,
+      "style_id": 59
+    },
+    {
+      "seed": 30,
+      "object_category": "ketchup",
+      "obj_height": 0.15155265899999998,
+      "obj_width": 0.07193919708494377,
+      "obj_xy_rel": [
+        0.5113655515312006,
+        0.4607634053056619
+      ],
+      "layout_id": 21,
+      "style_id": 33
+    },
+    {
+      "seed": 31,
+      "object_category": "ladle",
+      "obj_height": 0.13044025008318824,
+      "obj_width": 0.303868263035008,
+      "obj_xy_rel": [
+        0.32035052968824385,
+        0.6117745433779611
+      ],
+      "layout_id": 35,
+      "style_id": 45
+    },
+    {
+      "seed": 38,
+      "object_category": "pitcher",
+      "obj_height": 0.24497747,
+      "obj_width": 0.21748950608716547,
+      "obj_xy_rel": [
+        -0.6726422931777658,
+        0.43111571793364056
+      ],
+      "layout_id": 23,
+      "style_id": 34
+    },
+    {
+      "seed": 40,
+      "object_category": "kettle_non_electric",
+      "obj_height": 0.19997359,
+      "obj_width": 0.22227791148317008,
+      "obj_xy_rel": [
+        -0.38063237398949124,
+        0.4595166009316815
+      ],
+      "layout_id": 39,
+      "style_id": 14
+    },
+    {
+      "seed": 41,
+      "object_category": "salt_and_pepper_shaker",
+      "obj_height": 0.1061407725,
+      "obj_width": 0.07572834473163971,
+      "obj_xy_rel": [
+        0.23859566838496882,
+        -0.461090048806057
+      ],
+      "layout_id": 47,
+      "style_id": 34
+    },
+    {
+      "seed": 42,
+      "object_category": "jug",
+      "obj_height": 0.15154676699999994,
+      "obj_width": 0.17771489448280056,
+      "obj_xy_rel": [
+        -0.6806303544976329,
+        -0.23241427314451224
+      ],
+      "layout_id": 59,
+      "style_id": 33
+    },
+    {
+      "seed": 48,
+      "object_category": "wine",
+      "obj_height": 0.25600000000000006,
+      "obj_width": 0.10183891709861408,
+      "obj_xy_rel": [
+        0.5237626602212293,
+        -0.5430249616303304
+      ],
+      "layout_id": 17,
+      "style_id": 36
+    },
+    {
+      "seed": 50,
+      "object_category": "jar",
+      "obj_height": 0.133901109,
+      "obj_width": 0.21460191601290513,
+      "obj_xy_rel": [
+        0.5709726764730103,
+        0.35252006853258183
+      ],
+      "layout_id": 50,
+      "style_id": 14
+    },
+    {
+      "seed": 52,
+      "object_category": "teapot",
+      "obj_height": 0.1052163734375,
+      "obj_width": 0.20251380503526228,
+      "obj_xy_rel": [
+        -0.6987566716993334,
+        -0.3121686816237852
+      ],
+      "layout_id": 59,
+      "style_id": 22
+    },
+    {
+      "seed": 53,
+      "object_category": "blender_jug",
+      "obj_height": 0.16077239999999998,
+      "obj_width": 0.315490314525474,
+      "obj_xy_rel": [
+        0.37914043734470315,
+        -0.4649231065374142
+      ],
+      "layout_id": 48,
+      "style_id": 51
+    },
+    {
+      "seed": 54,
+      "object_category": "cup",
+      "obj_height": 0.10499803439999995,
+      "obj_width": 0.12201571839657337,
+      "obj_xy_rel": [
+        -0.49162627704870454,
+        -0.35308410736546225
+      ],
+      "layout_id": 26,
+      "style_id": 37
+    },
+    {
+      "seed": 56,
+      "object_category": "cup",
+      "obj_height": 0.11499999999999996,
+      "obj_width": 0.10526753710811189,
+      "obj_xy_rel": [
+        0.3931579042096951,
+        -0.7293570511206231
+      ],
+      "layout_id": 34,
+      "style_id": 25
+    },
+    {
+      "seed": 58,
+      "object_category": "kettle_non_electric",
+      "obj_height": 0.10993431968999996,
+      "obj_width": 0.22446559977743658,
+      "obj_xy_rel": [
+        0.3748839785057416,
+        0.3823217416161918
+      ],
+      "layout_id": 21,
+      "style_id": 40
+    },
+    {
+      "seed": 63,
+      "object_category": "spray",
+      "obj_height": 0.2304665653250654,
+      "obj_width": 0.12706393725531961,
+      "obj_xy_rel": [
+        0.5145268834267975,
+        -0.38913180371116174
+      ],
+      "layout_id": 33,
+      "style_id": 50
+    },
+    {
+      "seed": 64,
+      "object_category": "spray",
+      "obj_height": 0.21204336930000003,
+      "obj_width": 0.1384488716804911,
+      "obj_xy_rel": [
+        -0.38040371667323075,
+        0.5932250899486995
+      ],
+      "layout_id": 36,
+      "style_id": 36
+    },
+    {
+      "seed": 65,
+      "object_category": "salt_and_pepper_shaker",
+      "obj_height": 0.1055696145,
+      "obj_width": 0.06207438484318606,
+      "obj_xy_rel": [
+        -0.47659321098166285,
+        -0.5065141691623372
+      ],
+      "layout_id": 19,
+      "style_id": 47
+    },
+    {
+      "seed": 69,
+      "object_category": "cheese_grater",
+      "obj_height": 0.21327418850000002,
+      "obj_width": 0.1303311877798684,
+      "obj_xy_rel": [
+        0.5299908069677763,
+        -0.652799868686381
+      ],
+      "layout_id": 57,
+      "style_id": 27
+    },
+    {
+      "seed": 73,
+      "object_category": "water_bottle",
+      "obj_height": 0.20814525690000005,
+      "obj_width": 0.10381046008610795,
+      "obj_xy_rel": [
+        -0.6045909055051597,
+        0.2652523360446376
+      ],
+      "layout_id": 51,
+      "style_id": 58
+    },
+    {
+      "seed": 74,
+      "object_category": "spray",
+      "obj_height": 0.254742,
+      "obj_width": 0.1133180165765515,
+      "obj_xy_rel": [
+        -0.25952370258821644,
+        0.5338967017531249
+      ],
+      "layout_id": 20,
+      "style_id": 23
+    },
+    {
+      "seed": 75,
+      "object_category": "bottled_drink",
+      "obj_height": 0.16499963039999999,
+      "obj_width": 0.06791830731040775,
+      "obj_xy_rel": [
+        0.19576436256335272,
+        0.6296562986192711
+      ],
+      "layout_id": 40,
+      "style_id": 32
+    },
+    {
+      "seed": 77,
+      "object_category": "jar",
+      "obj_height": 0.1494828,
+      "obj_width": 0.13436653492786282,
+      "obj_xy_rel": [
+        -0.6970342398622895,
+        0.30510919290141963
+      ],
+      "layout_id": 13,
+      "style_id": 60
+    },
+    {
+      "seed": 79,
+      "object_category": "cheese_grater",
+      "obj_height": 0.2565329665,
+      "obj_width": 0.15011785845132605,
+      "obj_xy_rel": [
+        0.3711507306997266,
+        -0.7501786932017156
+      ],
+      "layout_id": 52,
+      "style_id": 44
+    },
+    {
+      "seed": 84,
+      "object_category": "soap_dispenser",
+      "obj_height": 0.19973605,
+      "obj_width": 0.12702545413194632,
+      "obj_xy_rel": [
+        0.4538964805351191,
+        0.6100053992809225
+      ],
+      "layout_id": 37,
+      "style_id": 24
+    },
+    {
+      "seed": 85,
+      "object_category": "jug",
+      "obj_height": 0.15154676699999994,
+      "obj_width": 0.17771489448280056,
+      "obj_xy_rel": [
+        -0.7497825831860876,
+        -0.296964454154252
+      ],
+      "layout_id": 46,
+      "style_id": 41
+    },
+    {
+      "seed": 86,
+      "object_category": "jug",
+      "obj_height": 0.13667960459999995,
+      "obj_width": 0.20226373478759596,
+      "obj_xy_rel": [
+        0.45084910230648356,
+        -0.5866664929913843
+      ],
+      "layout_id": 52,
+      "style_id": 44
+    },
+    {
+      "seed": 87,
+      "object_category": "ketchup",
+      "obj_height": 0.16679836634999998,
+      "obj_width": 0.06484528351299093,
+      "obj_xy_rel": [
+        0.2743574592709823,
+        0.5061269740799834
+      ],
+      "layout_id": 29,
+      "style_id": 57
+    },
+    {
+      "seed": 90,
+      "object_category": "jar",
+      "obj_height": 0.241058799,
+      "obj_width": 0.18708780410376838,
+      "obj_xy_rel": [
+        0.5129497277418276,
+        0.3053365133266134
+      ],
+      "layout_id": 13,
+      "style_id": 58
+    },
+    {
+      "seed": 98,
+      "object_category": "bottled_drink",
+      "obj_height": 0.16671768134999998,
+      "obj_width": 0.07260542359550577,
+      "obj_xy_rel": [
+        0.5770763785993165,
+        0.3861944651994013
+      ],
+      "layout_id": 27,
+      "style_id": 48
+    },
+    {
+      "seed": 108,
+      "object_category": "soap_dispenser",
+      "obj_height": 0.19155223,
+      "obj_width": 0.1293728109368197,
+      "obj_xy_rel": [
+        -0.2512766149003508,
+        0.5485087127030543
+      ],
+      "layout_id": 11,
+      "style_id": 22
+    },
+    {
+      "seed": 111,
+      "object_category": "salt_and_pepper_shaker",
+      "obj_height": 0.10412942400000001,
+      "obj_width": 0.06532953894528264,
+      "obj_xy_rel": [
+        0.40634380156791794,
+        0.5519668440103507
+      ],
+      "layout_id": 34,
+      "style_id": 46
+    },
+    {
+      "seed": 115,
+      "object_category": "pitcher",
+      "obj_height": 0.26766823,
+      "obj_width": 0.16883439236741132,
+      "obj_xy_rel": [
+        -0.2373649567150964,
+        -0.6317973929088132
+      ],
+      "layout_id": 42,
+      "style_id": 31
+    },
+    {
+      "seed": 116,
+      "object_category": "ladle",
+      "obj_height": 0.12116916657604719,
+      "obj_width": 0.239332128891837,
+      "obj_xy_rel": [
+        -0.38082381003131827,
+        0.6055453048603083
+      ],
+      "layout_id": 22,
+      "style_id": 52
+    },
+    {
+      "seed": 117,
+      "object_category": "wine",
+      "obj_height": 0.27200000272,
+      "obj_width": 0.10485690237010896,
+      "obj_xy_rel": [
+        -0.7025958461364956,
+        0.438066546094242
+      ],
+      "layout_id": 13,
+      "style_id": 13
+    },
+    {
+      "seed": 119,
+      "object_category": "dish_brush",
+      "obj_height": 0.15320367000000001,
+      "obj_width": 0.1700436361759534,
+      "obj_xy_rel": [
+        -0.3353784610029287,
+        0.35603574386057607
+      ],
+      "layout_id": 32,
+      "style_id": 30
+    },
+    {
+      "seed": 125,
+      "object_category": "soap_dispenser",
+      "obj_height": 0.18682164,
+      "obj_width": 0.13112705227381,
+      "obj_xy_rel": [
+        -0.4476821371835258,
+        -0.37924672331262377
+      ],
+      "layout_id": 59,
+      "style_id": 31
+    },
+    {
+      "seed": 129,
+      "object_category": "dish_brush",
+      "obj_height": 0.15320367000000001,
+      "obj_width": 0.1700436361759534,
+      "obj_xy_rel": [
+        0.6654736960482697,
+        0.24882236495323917
+      ],
+      "layout_id": 38,
+      "style_id": 47
+    },
+    {
+      "seed": 135,
+      "object_category": "wine",
+      "obj_height": 0.25600000000000006,
+      "obj_width": 0.09068546481745426,
+      "obj_xy_rel": [
+        -0.2106768353044579,
+        0.5810242354758248
+      ],
+      "layout_id": 43,
+      "style_id": 12
+    },
+    {
+      "seed": 136,
+      "object_category": "ketchup",
+      "obj_height": 0.16679836634999998,
+      "obj_width": 0.06484528351299093,
+      "obj_xy_rel": [
+        -0.507243705182371,
+        -0.7252231569731498
+      ],
+      "layout_id": 60,
+      "style_id": 29
+    },
+    {
+      "seed": 137,
+      "object_category": "ketchup",
+      "obj_height": 0.15998434079999996,
+      "obj_width": 0.07415468158466962,
+      "obj_xy_rel": [
+        0.5241705644588652,
+        -0.7966234589094308
+      ],
+      "layout_id": 35,
+      "style_id": 38
+    }
+  ],
+  "other_seeds": [
+    {
+      "seed": 0,
+      "object_category": "peach",
+      "obj_height": 0.06900705419999997,
+      "obj_width": 0.08992747057914048,
+      "obj_xy_rel": [
+        0.39433612618572456,
+        -0.7039276261258964
+      ],
+      "layout_id": 52,
+      "style_id": 13
+    },
+    {
+      "seed": 4,
+      "object_category": "bar_soap",
+      "obj_height": 0.036899635499999986,
+      "obj_width": 0.11175142175159523,
+      "obj_xy_rel": [
+        0.4676554693091135,
+        0.6292186664066928
+      ],
+      "layout_id": 57,
+      "style_id": 31
+    },
+    {
+      "seed": 5,
+      "object_category": "measuring_cup",
+      "obj_height": 0.0745664,
+      "obj_width": 0.23408548939564794,
+      "obj_xy_rel": [
+        0.44640116389294304,
+        0.4721020632863282
+      ],
+      "layout_id": 44,
+      "style_id": 37
+    },
+    {
+      "seed": 7,
+      "object_category": "ice_cube",
+      "obj_height": 0.049847499999999996,
+      "obj_width": 0.07049324280560514,
+      "obj_xy_rel": [
+        -0.4911416729169331,
+        0.7102188870538755
+      ],
+      "layout_id": 31,
+      "style_id": 35
+    },
+    {
+      "seed": 8,
+      "object_category": "tangerine",
+      "obj_height": 0.052538282400000004,
+      "obj_width": 0.08213271964291984,
+      "obj_xy_rel": [
+        -0.6444332807883115,
+        -0.46418288446706457
+      ],
+      "layout_id": 46,
+      "style_id": 59
+    },
+    {
+      "seed": 11,
+      "object_category": "garlic",
+      "obj_height": 0.07149926069000001,
+      "obj_width": 0.0680124416402224,
+      "obj_xy_rel": [
+        0.37656907455520106,
+        -0.6763933533351052
+      ],
+      "layout_id": 17,
+      "style_id": 45
+    },
+    {
+      "seed": 13,
+      "object_category": "chicken_drumstick",
+      "obj_height": 0.0324864,
+      "obj_width": 0.15126379032898118,
+      "obj_xy_rel": [
+        0.5435190281072648,
+        0.32357740383545774
+      ],
+      "layout_id": 55,
+      "style_id": 50
+    },
+    {
+      "seed": 14,
+      "object_category": "pizza_cutter",
+      "obj_height": 0.0911943,
+      "obj_width": 0.2396977563408129,
+      "obj_xy_rel": [
+        0.4054448379054354,
+        0.4381331233758372
+      ],
+      "layout_id": 18,
+      "style_id": 36
+    },
+    {
+      "seed": 15,
+      "object_category": "steak",
+      "obj_height": 0.036399959999999995,
+      "obj_width": 0.1512930609665217,
+      "obj_xy_rel": [
+        -0.7323254892089679,
+        0.2499863963525557
+      ],
+      "layout_id": 39,
+      "style_id": 25
+    },
+    {
+      "seed": 17,
+      "object_category": "cucumber",
+      "obj_height": 0.045520543,
+      "obj_width": 0.178065247620516,
+      "obj_xy_rel": [
+        0.41198865385095695,
+        -0.7389634646953205
+      ],
+      "layout_id": 48,
+      "style_id": 13
+    },
+    {
+      "seed": 19,
+      "object_category": "lemon",
+      "obj_height": 0.06201630599999998,
+      "obj_width": 0.10288355919207151,
+      "obj_xy_rel": [
+        0.41705994520016043,
+        0.5213852516714517
+      ],
+      "layout_id": 40,
+      "style_id": 33
+    },
+    {
+      "seed": 20,
+      "object_category": "jam",
+      "obj_height": 0.05594104889999998,
+      "obj_width": 0.0960838248434997,
+      "obj_xy_rel": [
+        0.6117756856815459,
+        0.46575157499124076
+      ],
+      "layout_id": 55,
+      "style_id": 41
+    },
+    {
+      "seed": 21,
+      "object_category": "potato",
+      "obj_height": 0.07200311039999997,
+      "obj_width": 0.1394665789857123,
+      "obj_xy_rel": [
+        -0.444147670213368,
+        -0.5194853056124247
+      ],
+      "layout_id": 42,
+      "style_id": 12
+    },
+    {
+      "seed": 22,
+      "object_category": "lemon",
+      "obj_height": 0.06187700774999999,
+      "obj_width": 0.09597830050782945,
+      "obj_xy_rel": [
+        0.25844557850524463,
+        0.5158788237581831
+      ],
+      "layout_id": 49,
+      "style_id": 39
+    },
+    {
+      "seed": 24,
+      "object_category": "peeler",
+      "obj_height": 0.027995562,
+      "obj_width": 0.2088898601502206,
+      "obj_xy_rel": [
+        0.6136995852054667,
+        0.34948482475212916
+      ],
+      "layout_id": 39,
+      "style_id": 53
+    },
+    {
+      "seed": 25,
+      "object_category": "mango",
+      "obj_height": 0.055951042004999986,
+      "obj_width": 0.09436989360555807,
+      "obj_xy_rel": [
+        -0.4617102908233165,
+        0.5228024851355295
+      ],
+      "layout_id": 36,
+      "style_id": 21
+    },
+    {
+      "seed": 26,
+      "object_category": "ice_cube",
+      "obj_height": 0.049847499999999996,
+      "obj_width": 0.07049324280560514,
+      "obj_xy_rel": [
+        0.4477055205113345,
+        -0.4761819915732981
+      ],
+      "layout_id": 54,
+      "style_id": 16
+    },
+    {
+      "seed": 28,
+      "object_category": "cheese",
+      "obj_height": 0.0573767136,
+      "obj_width": 0.1000214331669966,
+      "obj_xy_rel": [
+        0.4616759643893802,
+        0.3233474894678829
+      ],
+      "layout_id": 27,
+      "style_id": 57
+    },
+    {
+      "seed": 29,
+      "object_category": "measuring_cup",
+      "obj_height": 0.072,
+      "obj_width": 0.2302301696667429,
+      "obj_xy_rel": [
+        -0.31394855116155274,
+        0.653660478290985
+      ],
+      "layout_id": 42,
+      "style_id": 55
+    },
+    {
+      "seed": 32,
+      "object_category": "steak",
+      "obj_height": 0.036399959999999995,
+      "obj_width": 0.1512930609665217,
+      "obj_xy_rel": [
+        0.36609223392261736,
+        -0.6083737948391281
+      ],
+      "layout_id": 54,
+      "style_id": 56
+    },
+    {
+      "seed": 33,
+      "object_category": "cucumber",
+      "obj_height": 0.045520543,
+      "obj_width": 0.178065247620516,
+      "obj_xy_rel": [
+        0.26851417509499953,
+        -0.5875760653516742
+      ],
+      "layout_id": 54,
+      "style_id": 58
+    },
+    {
+      "seed": 34,
+      "object_category": "peeler",
+      "obj_height": 0.027456993,
+      "obj_width": 0.20737662762731474,
+      "obj_xy_rel": [
+        -0.3681296596684982,
+        -0.4237330441823213
+      ],
+      "layout_id": 14,
+      "style_id": 18
+    },
+    {
+      "seed": 35,
+      "object_category": "tomato",
+      "obj_height": 0.05815621890000003,
+      "obj_width": 0.0904327440936102,
+      "obj_xy_rel": [
+        0.4655746403974357,
+        0.7463844112778883
+      ],
+      "layout_id": 16,
+      "style_id": 19
+    },
+    {
+      "seed": 36,
+      "object_category": "cheese",
+      "obj_height": 0.05857998719999997,
+      "obj_width": 0.11896407627576898,
+      "obj_xy_rel": [
+        0.3165135295234074,
+        -0.5622742280665509
+      ],
+      "layout_id": 30,
+      "style_id": 18
+    },
+    {
+      "seed": 37,
+      "object_category": "broccoli",
+      "obj_height": 0.07757899957280649,
+      "obj_width": 0.12110970822715547,
+      "obj_xy_rel": [
+        0.2935655213671988,
+        0.6028634758053362
+      ],
+      "layout_id": 18,
+      "style_id": 59
+    },
+    {
+      "seed": 39,
+      "object_category": "pear",
+      "obj_height": 0.06071863479918593,
+      "obj_width": 0.13470505222935641,
+      "obj_xy_rel": [
+        -0.5968299635460173,
+        -0.4675192519608262
+      ],
+      "layout_id": 59,
+      "style_id": 54
+    },
+    {
+      "seed": 43,
+      "object_category": "cream_cheese_stick",
+      "obj_height": 0.02516305,
+      "obj_width": 0.1361886416953728,
+      "obj_xy_rel": [
+        0.5175147193635801,
+        0.7657019517973858
+      ],
+      "layout_id": 34,
+      "style_id": 56
+    },
+    {
+      "seed": 44,
+      "object_category": "mug",
+      "obj_height": 0.09038899835,
+      "obj_width": 0.1392739446968861,
+      "obj_xy_rel": [
+        0.3661827495180572,
+        -0.43027037341510876
+      ],
+      "layout_id": 33,
+      "style_id": 26
+    },
+    {
+      "seed": 45,
+      "object_category": "squash",
+      "obj_height": 0.04106902275000001,
+      "obj_width": 0.18191996880791797,
+      "obj_xy_rel": [
+        0.38668956380656555,
+        0.7850216123526641
+      ],
+      "layout_id": 57,
+      "style_id": 22
+    },
+    {
+      "seed": 46,
+      "object_category": "fish",
+      "obj_height": 0.053189783522598774,
+      "obj_width": 0.19588785022005542,
+      "obj_xy_rel": [
+        -0.3284641598753361,
+        -0.6096896450404434
+      ],
+      "layout_id": 36,
+      "style_id": 17
+    },
+    {
+      "seed": 47,
+      "object_category": "pizza_cutter",
+      "obj_height": 0.0993482,
+      "obj_width": 0.2570046245947269,
+      "obj_xy_rel": [
+        0.4182274438969469,
+        0.46081381672045696
+      ],
+      "layout_id": 15,
+      "style_id": 54
+    },
+    {
+      "seed": 49,
+      "object_category": "lemon",
+      "obj_height": 0.06453488624999998,
+      "obj_width": 0.09458346387481381,
+      "obj_xy_rel": [
+        0.38526500440786027,
+        0.41802641981705574
+      ],
+      "layout_id": 13,
+      "style_id": 17
+    },
+    {
+      "seed": 51,
+      "object_category": "wooden_spoon",
+      "obj_height": 0.022212567499999995,
+      "obj_width": 0.2107032074901202,
+      "obj_xy_rel": [
+        0.27321218173496353,
+        0.44282789692974167
+      ],
+      "layout_id": 30,
+      "style_id": 22
+    },
+    {
+      "seed": 55,
+      "object_category": "straw",
+      "obj_height": 0.00698464,
+      "obj_width": 0.17147095168570098,
+      "obj_xy_rel": [
+        -0.45013438834203034,
+        -0.2984362293752638
+      ],
+      "layout_id": 59,
+      "style_id": 20
+    },
+    {
+      "seed": 57,
+      "object_category": "shrimp",
+      "obj_height": 0.02138027,
+      "obj_width": 0.10302529844151873,
+      "obj_xy_rel": [
+        -0.5428726772861872,
+        -0.4439990298879881
+      ],
+      "layout_id": 14,
+      "style_id": 23
+    },
+    {
+      "seed": 59,
+      "object_category": "steak",
+      "obj_height": 0.07772736160054913,
+      "obj_width": 0.15234681989696808,
+      "obj_xy_rel": [
+        -0.45935025939137475,
+        0.4213126743343547
+      ],
+      "layout_id": 50,
+      "style_id": 33
+    },
+    {
+      "seed": 60,
+      "object_category": "lemon_wedge",
+      "obj_height": 0.034452,
+      "obj_width": 0.09565640193944155,
+      "obj_xy_rel": [
+        0.7534737916269485,
+        0.4685821109673537
+      ],
+      "layout_id": 12,
+      "style_id": 43
+    },
+    {
+      "seed": 61,
+      "object_category": "lemon",
+      "obj_height": 0.05532682864999999,
+      "obj_width": 0.11421347662174952,
+      "obj_xy_rel": [
+        0.3970987247720632,
+        -0.564656235133155
+      ],
+      "layout_id": 57,
+      "style_id": 54
+    },
+    {
+      "seed": 62,
+      "object_category": "tangerine",
+      "obj_height": 0.052538282400000004,
+      "obj_width": 0.08213271964291984,
+      "obj_xy_rel": [
+        0.5021888672992474,
+        -0.39490140462725476
+      ],
+      "layout_id": 33,
+      "style_id": 30
+    },
+    {
+      "seed": 66,
+      "object_category": "banana",
+      "obj_height": 0.027755119972425617,
+      "obj_width": 0.1824982606939846,
+      "obj_xy_rel": [
+        0.46000654313530287,
+        0.5529045484139146
+      ],
+      "layout_id": 18,
+      "style_id": 18
+    },
+    {
+      "seed": 67,
+      "object_category": "mug",
+      "obj_height": 0.0960879095,
+      "obj_width": 0.1351735765867684,
+      "obj_xy_rel": [
+        -0.3501392571495412,
+        0.48597182982478976
+      ],
+      "layout_id": 50,
+      "style_id": 18
+    },
+    {
+      "seed": 68,
+      "object_category": "chicken_drumstick",
+      "obj_height": 0.053881464,
+      "obj_width": 0.18742897510214368,
+      "obj_xy_rel": [
+        -0.3750046610602879,
+        -0.684586680047053
+      ],
+      "layout_id": 20,
+      "style_id": 39
+    },
+    {
+      "seed": 70,
+      "object_category": "lime",
+      "obj_height": 0.07032914699999997,
+      "obj_width": 0.09934623445736238,
+      "obj_xy_rel": [
+        -0.27453757634557485,
+        0.5795130723680328
+      ],
+      "layout_id": 43,
+      "style_id": 27
+    },
+    {
+      "seed": 71,
+      "object_category": "fish",
+      "obj_height": 0.031033123311460444,
+      "obj_width": 0.1771667051826277,
+      "obj_xy_rel": [
+        -0.551242412056316,
+        0.2669883334851094
+      ],
+      "layout_id": 58,
+      "style_id": 41
+    },
+    {
+      "seed": 72,
+      "object_category": "straw",
+      "obj_height": 0.00956192,
+      "obj_width": 0.17093970875893347,
+      "obj_xy_rel": [
+        -0.6316828620344159,
+        0.4955010512578651
+      ],
+      "layout_id": 58,
+      "style_id": 42
+    },
+    {
+      "seed": 76,
+      "object_category": "onion",
+      "obj_height": 0.07302816799999998,
+      "obj_width": 0.10831904630145357,
+      "obj_xy_rel": [
+        -0.5164889539782487,
+        0.38485210025934413
+      ],
+      "layout_id": 39,
+      "style_id": 25
+    },
+    {
+      "seed": 78,
+      "object_category": "mug",
+      "obj_height": 0.0951638127,
+      "obj_width": 0.13443552306168044,
+      "obj_xy_rel": [
+        0.3000739582080527,
+        -0.705266254946181
+      ],
+      "layout_id": 47,
+      "style_id": 43
+    },
+    {
+      "seed": 80,
+      "object_category": "bell_pepper",
+      "obj_height": 0.05559345577499998,
+      "obj_width": 0.10381093703756403,
+      "obj_xy_rel": [
+        0.3434572822692401,
+        0.5645888652040667
+      ],
+      "layout_id": 15,
+      "style_id": 12
+    },
+    {
+      "seed": 81,
+      "object_category": "onion",
+      "obj_height": 0.07202737999999997,
+      "obj_width": 0.12365585109440219,
+      "obj_xy_rel": [
+        0.5346292625749376,
+        0.46283914799422904
+      ],
+      "layout_id": 13,
+      "style_id": 55
+    },
+    {
+      "seed": 82,
+      "object_category": "mushroom",
+      "obj_height": 0.06436875793101933,
+      "obj_width": 0.08393114877670431,
+      "obj_xy_rel": [
+        0.4166429444300075,
+        -0.6508593906180509
+      ],
+      "layout_id": 47,
+      "style_id": 53
+    }
+  ]
+}
