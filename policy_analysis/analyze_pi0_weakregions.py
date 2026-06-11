@@ -85,6 +85,18 @@ def main():
         lang = obs["annotation.human.task_description"]
         cat, osplit, xy_abs, xy_rel, layout, style = target_meta(rs)
 
+        # per-episode object geometry (direct, not category-averaged) for the
+        # failure predictor: height + width of the target object.
+        _o = rs.objects[TARGET_OBJ]
+        try:
+            obj_h = float(_o.top_offset[2] - _o.bottom_offset[2])
+        except Exception:
+            obj_h = None
+        try:
+            obj_w = float(_o.horizontal_radius) * 2.0
+        except Exception:
+            obj_w = None
+
         # failure-phase signals: track object lift (grasp) and proximity to the
         # sink (transport). sink location proxied by the distractor that sits in
         # the sink (distr_sink).
@@ -124,6 +136,8 @@ def main():
             failure_phase=phase, max_lift=round(max_lift, 3),
             min_sink_dist=(round(min_sink_dist, 3) if min_sink_dist != float("inf") else None),
             object_category=cat, object_split=osplit,
+            obj_height=(round(obj_h, 4) if obj_h is not None else None),
+            obj_width=(round(obj_w, 4) if obj_w is not None else None),
             obj_xy_abs=[float(xy_abs[0]), float(xy_abs[1])],
             obj_xy_rel=[float(xy_rel[0]), float(xy_rel[1])],
             layout_id=layout, style_id=style))

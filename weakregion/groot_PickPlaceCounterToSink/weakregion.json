@@ -1,0 +1,3470 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "split": "pretrain",
+  "policy": "groot",
+  "n": 100,
+  "summary": {
+    "overall": {
+      "n": 100,
+      "successes": 56,
+      "success_rate": 0.56,
+      "ci95": [
+        0.4623,
+        0.6533
+      ]
+    },
+    "by_object_category": {
+      "cream_cheese_stick": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "bar_soap": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "bottled_drink": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "wine": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "steak": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "blender_jug": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "mushroom": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "juice": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "cheese_grater": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "peeler": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "water_bottle": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "jar": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "shrimp": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "salt_and_pepper_shaker": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "bottled_water": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "chicken_drumstick": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "spray": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "kettle_non_electric": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "teapot": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "ketchup": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "beer": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "broccoli": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "cucumber": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "garlic": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "lemon": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "ice_cube": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "pitcher": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "strainer": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "peach": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "condiment_bottle": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "jug": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "measuring_cup": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "cheese": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "boxed_drink": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "sponge": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "lime": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "kiwi": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "reamer": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "mug": {
+        "n": 4,
+        "successes": 4,
+        "success_rate": 1.0,
+        "ci95": [
+          0.5101,
+          1.0
+        ]
+      },
+      "can": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "tangerine": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "egg": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "whisk": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "rolling_pin": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "saucepan_lid": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "apple": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "ladle": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "lemon_wedge": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "wooden_spoon": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "orange": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "pizza_cutter": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "fish": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "yogurt": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "avocado": {
+        "n": 3,
+        "successes": 3,
+        "success_rate": 1.0,
+        "ci95": [
+          0.4385,
+          1.0
+        ]
+      },
+      "carrot": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "jam": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "potato": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "soap_dispenser": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "tomato": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "eggplant": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "saucepan": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "sweet_potato": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      }
+    },
+    "by_region": {
+      "near-right": {
+        "n": 11,
+        "successes": 3,
+        "success_rate": 0.2727272727272727,
+        "ci95": [
+          0.0975,
+          0.5657
+        ]
+      },
+      "near-center": {
+        "n": 13,
+        "successes": 5,
+        "success_rate": 0.38461538461538464,
+        "ci95": [
+          0.1771,
+          0.6448
+        ]
+      },
+      "far-right": {
+        "n": 12,
+        "successes": 5,
+        "success_rate": 0.4166666666666667,
+        "ci95": [
+          0.1933,
+          0.6805
+        ]
+      },
+      "far-left": {
+        "n": 10,
+        "successes": 5,
+        "success_rate": 0.5,
+        "ci95": [
+          0.2366,
+          0.7634
+        ]
+      },
+      "near-left": {
+        "n": 9,
+        "successes": 5,
+        "success_rate": 0.5555555555555556,
+        "ci95": [
+          0.2666,
+          0.8112
+        ]
+      },
+      "mid-left": {
+        "n": 14,
+        "successes": 9,
+        "success_rate": 0.6428571428571429,
+        "ci95": [
+          0.3876,
+          0.8366
+        ]
+      },
+      "far-center": {
+        "n": 12,
+        "successes": 8,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.3906,
+          0.8619
+        ]
+      },
+      "mid-right": {
+        "n": 11,
+        "successes": 9,
+        "success_rate": 0.8181818181818182,
+        "ci95": [
+          0.523,
+          0.9486
+        ]
+      },
+      "mid-center": {
+        "n": 8,
+        "successes": 7,
+        "success_rate": 0.875,
+        "ci95": [
+          0.5291,
+          0.9776
+        ]
+      }
+    },
+    "by_layout": {
+      "57": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "47": {
+        "n": 3,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.5615
+        ]
+      },
+      "53": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "43": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "37": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "26": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "45": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "22": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "28": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "34": {
+        "n": 4,
+        "successes": 1,
+        "success_rate": 0.25,
+        "ci95": [
+          0.0456,
+          0.6994
+        ]
+      },
+      "38": {
+        "n": 4,
+        "successes": 1,
+        "success_rate": 0.25,
+        "ci95": [
+          0.0456,
+          0.6994
+        ]
+      },
+      "14": {
+        "n": 6,
+        "successes": 2,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0968,
+          0.7
+        ]
+      },
+      "60": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "35": {
+        "n": 5,
+        "successes": 2,
+        "success_rate": 0.4,
+        "ci95": [
+          0.1176,
+          0.7693
+        ]
+      },
+      "54": {
+        "n": 4,
+        "successes": 2,
+        "success_rate": 0.5,
+        "ci95": [
+          0.15,
+          0.85
+        ]
+      },
+      "48": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "59": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "33": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "46": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "40": {
+        "n": 5,
+        "successes": 3,
+        "success_rate": 0.6,
+        "ci95": [
+          0.2307,
+          0.8824
+        ]
+      },
+      "49": {
+        "n": 6,
+        "successes": 4,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.3,
+          0.9032
+        ]
+      },
+      "12": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "18": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "29": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "52": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "13": {
+        "n": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "ci95": [
+          0.3755,
+          0.9638
+        ]
+      },
+      "24": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "58": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "42": {
+        "n": 3,
+        "successes": 3,
+        "success_rate": 1.0,
+        "ci95": [
+          0.4385,
+          1.0
+        ]
+      },
+      "27": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "20": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "36": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "50": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "23": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "15": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "32": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "41": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "56": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "25": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "21": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "51": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "11": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "44": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      }
+    },
+    "by_style": {
+      "22": {
+        "n": 2,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.6576
+        ]
+      },
+      "35": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "29": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "12": {
+        "n": 4,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.4899
+        ]
+      },
+      "55": {
+        "n": 3,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.5615
+        ]
+      },
+      "57": {
+        "n": 3,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.5615
+        ]
+      },
+      "60": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "48": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "49": {
+        "n": 1,
+        "successes": 0,
+        "success_rate": 0.0,
+        "ci95": [
+          0.0,
+          0.7935
+        ]
+      },
+      "31": {
+        "n": 4,
+        "successes": 1,
+        "success_rate": 0.25,
+        "ci95": [
+          0.0456,
+          0.6994
+        ]
+      },
+      "28": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "38": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "24": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "19": {
+        "n": 3,
+        "successes": 1,
+        "success_rate": 0.3333333333333333,
+        "ci95": [
+          0.0615,
+          0.7923
+        ]
+      },
+      "44": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "50": {
+        "n": 4,
+        "successes": 2,
+        "success_rate": 0.5,
+        "ci95": [
+          0.15,
+          0.85
+        ]
+      },
+      "46": {
+        "n": 4,
+        "successes": 2,
+        "success_rate": 0.5,
+        "ci95": [
+          0.15,
+          0.85
+        ]
+      },
+      "30": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "56": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "25": {
+        "n": 2,
+        "successes": 1,
+        "success_rate": 0.5,
+        "ci95": [
+          0.0945,
+          0.9055
+        ]
+      },
+      "47": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "16": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "13": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "45": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "43": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "39": {
+        "n": 3,
+        "successes": 2,
+        "success_rate": 0.6666666666666666,
+        "ci95": [
+          0.2077,
+          0.9385
+        ]
+      },
+      "58": {
+        "n": 4,
+        "successes": 3,
+        "success_rate": 0.75,
+        "ci95": [
+          0.3006,
+          0.9544
+        ]
+      },
+      "59": {
+        "n": 5,
+        "successes": 4,
+        "success_rate": 0.8,
+        "ci95": [
+          0.3755,
+          0.9638
+        ]
+      },
+      "21": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "51": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "11": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "20": {
+        "n": 3,
+        "successes": 3,
+        "success_rate": 1.0,
+        "ci95": [
+          0.4385,
+          1.0
+        ]
+      },
+      "18": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "26": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "36": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "14": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "40": {
+        "n": 4,
+        "successes": 4,
+        "success_rate": 1.0,
+        "ci95": [
+          0.5101,
+          1.0
+        ]
+      },
+      "23": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "15": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "37": {
+        "n": 2,
+        "successes": 2,
+        "success_rate": 1.0,
+        "ci95": [
+          0.3424,
+          1.0
+        ]
+      },
+      "42": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "54": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      },
+      "32": {
+        "n": 1,
+        "successes": 1,
+        "success_rate": 1.0,
+        "ci95": [
+          0.2065,
+          1.0
+        ]
+      }
+    },
+    "region_edges": {
+      "x_edges": [
+        -0.2740079672328384,
+        0.3465844092787824
+      ],
+      "y_edges": [
+        -0.3964016178255221,
+        0.43619615055041105
+      ]
+    },
+    "weakest": [
+      {
+        "dimension": "by_region",
+        "bucket": "near-right",
+        "success_rate": 0.2727272727272727,
+        "n": 11
+      },
+      {
+        "dimension": "by_object_category",
+        "bucket": "broccoli",
+        "success_rate": 0.3333333333333333,
+        "n": 3
+      },
+      {
+        "dimension": "by_region",
+        "bucket": "near-center",
+        "success_rate": 0.38461538461538464,
+        "n": 13
+      }
+    ]
+  },
+  "episodes": [
+    {
+      "object_category": "kiwi",
+      "obj_height": 0.0513,
+      "obj_width": 0.0926,
+      "obj_xy_abs": [
+        3.924597705475939,
+        -2.0290076542271027
+      ],
+      "obj_xy_rel": [
+        0.6915414376645317,
+        -0.2953542120312824
+      ],
+      "layout_id": 24,
+      "style_id": 44,
+      "episode": 0,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.052,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "cheese",
+      "obj_height": 0.0586,
+      "obj_width": 0.119,
+      "obj_xy_abs": [
+        3.4908932016491074,
+        -0.47576269721558334
+      ],
+      "obj_xy_rel": [
+        -0.6656172185891882,
+        0.3133384335425414
+      ],
+      "layout_id": 58,
+      "style_id": 21,
+      "episode": 1,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.109,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "reamer",
+      "obj_height": 0.2752,
+      "obj_width": 0.273,
+      "obj_xy_abs": [
+        3.113976209922265,
+        -3.4564198098177314
+      ],
+      "obj_xy_rel": [
+        -0.3154785469378063,
+        0.4842536486971669
+      ],
+      "layout_id": 42,
+      "style_id": 47,
+      "episode": 2,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.007,
+      "region": "far-left"
+    },
+    {
+      "object_category": "cream_cheese_stick",
+      "obj_height": 0.0157,
+      "obj_width": 0.1403,
+      "obj_xy_abs": [
+        3.4654390919389897,
+        -2.542810077226014
+      ],
+      "obj_xy_rel": [
+        0.4642502283651253,
+        -0.5640902315612171
+      ],
+      "layout_id": 40,
+      "style_id": 22,
+      "episode": 3,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "region": "near-right"
+    },
+    {
+      "object_category": "cucumber",
+      "obj_height": 0.0396,
+      "obj_width": 0.2036,
+      "obj_xy_abs": [
+        -0.5078422603519327,
+        -2.887710145005277
+      ],
+      "obj_xy_rel": [
+        0.27046224912734296,
+        -0.7804384212524917
+      ],
+      "layout_id": 57,
+      "style_id": 28,
+      "episode": 4,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.041,
+      "region": "near-center"
+    },
+    {
+      "object_category": "cheese",
+      "obj_height": 0.0596,
+      "obj_width": 0.1427,
+      "obj_xy_abs": [
+        3.269196321862791,
+        -1.4673025423795092
+      ],
+      "obj_xy_rel": [
+        0.3143677389242794,
+        0.560721687388926
+      ],
+      "layout_id": 40,
+      "style_id": 50,
+      "episode": 5,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "region": "far-center"
+    },
+    {
+      "object_category": "garlic",
+      "obj_height": 0.077,
+      "obj_width": 0.0897,
+      "obj_xy_abs": [
+        1.91898946592215,
+        -0.525692098604809
+      ],
+      "obj_xy_rel": [
+        0.5949931751923427,
+        0.23512204587976437
+      ],
+      "layout_id": 27,
+      "style_id": 51,
+      "episode": 6,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.065,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "mug",
+      "obj_height": 0.0913,
+      "obj_width": 0.1352,
+      "obj_xy_abs": [
+        0.31983071869849256,
+        -2.2315276184564095
+      ],
+      "obj_xy_rel": [
+        -0.4828574028337388,
+        -0.632326184302288
+      ],
+      "layout_id": 20,
+      "style_id": 11,
+      "episode": 7,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.077,
+      "region": "near-left"
+    },
+    {
+      "object_category": "lemon",
+      "obj_height": 0.0603,
+      "obj_width": 0.1032,
+      "obj_xy_abs": [
+        2.4221870091744035,
+        -1.8290043788702302
+      ],
+      "obj_xy_rel": [
+        -0.6167643757206989,
+        -0.31215369260525283
+      ],
+      "layout_id": 14,
+      "style_id": 35,
+      "episode": 8,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.035,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "can",
+      "obj_height": 0.1,
+      "obj_width": 0.085,
+      "obj_xy_abs": [
+        0.43005745750779223,
+        -1.372401132884315
+      ],
+      "obj_xy_rel": [
+        -0.37731163719127003,
+        0.38942479454967494
+      ],
+      "layout_id": 36,
+      "style_id": 50,
+      "episode": 9,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.063,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "tangerine",
+      "obj_height": 0.0514,
+      "obj_width": 0.0896,
+      "obj_xy_abs": [
+        4.004605710831944,
+        -0.5390120329473432
+      ],
+      "obj_xy_rel": [
+        -0.430544811961151,
+        0.2810203206670996
+      ],
+      "layout_id": 50,
+      "style_id": 20,
+      "episode": 10,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.02,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "bar_soap",
+      "obj_height": 0.0326,
+      "obj_width": 0.1133,
+      "obj_xy_abs": [
+        2.4159676864831443,
+        -2.7711422503260414
+      ],
+      "obj_xy_rel": [
+        0.24854559663780362,
+        0.4229691963867839
+      ],
+      "layout_id": 34,
+      "style_id": 28,
+      "episode": 11,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.035,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "boxed_drink",
+      "obj_height": 0.1011,
+      "obj_width": 0.0616,
+      "obj_xy_abs": [
+        3.5019036658045346,
+        -0.3118521800100498
+      ],
+      "obj_xy_rel": [
+        0.46861250277120403,
+        0.441045511120159
+      ],
+      "layout_id": 13,
+      "style_id": 18,
+      "episode": 12,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.159,
+      "region": "far-right"
+    },
+    {
+      "object_category": "egg",
+      "obj_height": 0.0434,
+      "obj_width": 0.0793,
+      "obj_xy_abs": [
+        2.498277890667536,
+        -3.7372891550478515
+      ],
+      "obj_xy_rel": [
+        0.34453840674844693,
+        -0.33489555862755616
+      ],
+      "layout_id": 34,
+      "style_id": 26,
+      "episode": 13,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.118,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "whisk",
+      "obj_height": 0.0493,
+      "obj_width": 0.2873,
+      "obj_xy_abs": [
+        5.612604834238095,
+        -2.2954867874043305
+      ],
+      "obj_xy_rel": [
+        0.31155151894955324,
+        -0.29476475618911735
+      ],
+      "layout_id": 49,
+      "style_id": 50,
+      "episode": 14,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.098,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "cheese",
+      "obj_height": 0.0596,
+      "obj_width": 0.1427,
+      "obj_xy_abs": [
+        2.1314659890606165,
+        -0.5196034976922961
+      ],
+      "obj_xy_rel": [
+        -0.6857008412576233,
+        0.32158461861245624
+      ],
+      "layout_id": 23,
+      "style_id": 46,
+      "episode": 15,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.095,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "bottled_drink",
+      "obj_height": 0.165,
+      "obj_width": 0.0679,
+      "obj_xy_abs": [
+        5.004864657082759,
+        -2.916872779399072
+      ],
+      "obj_xy_rel": [
+        0.4818947629666397,
+        -0.7641643861725935
+      ],
+      "layout_id": 35,
+      "style_id": 58,
+      "episode": 16,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "near-right"
+    },
+    {
+      "object_category": "sponge",
+      "obj_height": 0.0384,
+      "obj_width": 0.1011,
+      "obj_xy_abs": [
+        3.2305842637744946,
+        -2.38670514080425
+      ],
+      "obj_xy_rel": [
+        0.282930988535115,
+        -0.40441098147332233
+      ],
+      "layout_id": 40,
+      "style_id": 20,
+      "episode": 17,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.236,
+      "region": "near-center"
+    },
+    {
+      "object_category": "wine",
+      "obj_height": 0.256,
+      "obj_width": 0.0956,
+      "obj_xy_abs": [
+        6.480115253020647,
+        -3.0307897856043744
+      ],
+      "obj_xy_rel": [
+        0.3461073046095242,
+        -0.5010747162669529
+      ],
+      "layout_id": 47,
+      "style_id": 29,
+      "episode": 18,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "region": "near-center"
+    },
+    {
+      "object_category": "steak",
+      "obj_height": 0.0164,
+      "obj_width": 0.1569,
+      "obj_xy_abs": [
+        2.494752772378514,
+        -0.4129294296728295
+      ],
+      "obj_xy_rel": [
+        0.7203034691861103,
+        0.4321279480055579
+      ],
+      "layout_id": 38,
+      "style_id": 38,
+      "episode": 19,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "broccoli",
+      "obj_height": 0.071,
+      "obj_width": 0.1146,
+      "obj_xy_abs": [
+        1.8577028386800558,
+        -3.579459962811755
+      ],
+      "obj_xy_rel": [
+        0.24534687141738698,
+        -0.39735672861681115
+      ],
+      "layout_id": 15,
+      "style_id": 36,
+      "episode": 20,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.182,
+      "region": "near-center"
+    },
+    {
+      "object_category": "blender_jug",
+      "obj_height": 0.1834,
+      "obj_width": 0.2229,
+      "obj_xy_abs": [
+        2.361182207371967,
+        -0.3140351504647877
+      ],
+      "obj_xy_rel": [
+        -0.4834162817894958,
+        0.4745278954424327
+      ],
+      "layout_id": 13,
+      "style_id": 31,
+      "episode": 21,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.089,
+      "region": "far-left"
+    },
+    {
+      "object_category": "ice_cube",
+      "obj_height": 0.029,
+      "obj_width": 0.0435,
+      "obj_xy_abs": [
+        2.468662017568254,
+        -0.25354668404041014
+      ],
+      "obj_xy_rel": [
+        0.6817265871616582,
+        0.5094809452910796
+      ],
+      "layout_id": 38,
+      "style_id": 12,
+      "episode": 22,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "region": "far-right"
+    },
+    {
+      "object_category": "rolling_pin",
+      "obj_height": 0.0587,
+      "obj_width": 0.2917,
+      "obj_xy_abs": [
+        4.969450386743746,
+        -0.4485654258424425
+      ],
+      "obj_xy_rel": [
+        0.5935275886016749,
+        0.3556133459706089
+      ],
+      "layout_id": 50,
+      "style_id": 58,
+      "episode": 23,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.187,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "saucepan_lid",
+      "obj_height": 0.0782,
+      "obj_width": 0.3298,
+      "obj_xy_abs": [
+        5.2509414953737865,
+        -1.4617892820375449
+      ],
+      "obj_xy_rel": [
+        0.3440727772690986,
+        0.34569709443637553
+      ],
+      "layout_id": 54,
+      "style_id": 14,
+      "episode": 24,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.081,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "mushroom",
+      "obj_height": 0.0621,
+      "obj_width": 0.0951,
+      "obj_xy_abs": [
+        4.969475121893477,
+        -2.8774879513113443
+      ],
+      "obj_xy_rel": [
+        0.498556086349053,
+        -0.8069464738567973
+      ],
+      "layout_id": 35,
+      "style_id": 59,
+      "episode": 25,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "region": "near-right"
+    },
+    {
+      "object_category": "cream_cheese_stick",
+      "obj_height": 0.0157,
+      "obj_width": 0.1403,
+      "obj_xy_abs": [
+        2.404159219186724,
+        -1.9637906807193455
+      ],
+      "obj_xy_rel": [
+        -0.5185759083346553,
+        -0.473206409176391
+      ],
+      "layout_id": 14,
+      "style_id": 31,
+      "episode": 26,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.04,
+      "region": "near-left"
+    },
+    {
+      "object_category": "mug",
+      "obj_height": 0.096,
+      "obj_width": 0.1287,
+      "obj_xy_abs": [
+        1.947447315656346,
+        -2.7687386417337363
+      ],
+      "obj_xy_rel": [
+        -0.3579694277776164,
+        -0.6472252190129031
+      ],
+      "layout_id": 60,
+      "style_id": 38,
+      "episode": 27,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.098,
+      "region": "near-left"
+    },
+    {
+      "object_category": "juice",
+      "obj_height": 0.2925,
+      "obj_width": 0.1495,
+      "obj_xy_abs": [
+        2.454711742711904,
+        -3.8960666180887418
+      ],
+      "obj_xy_rel": [
+        0.2912218973543199,
+        -0.7232909329812727
+      ],
+      "layout_id": 34,
+      "style_id": 38,
+      "episode": 28,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "region": "near-center"
+    },
+    {
+      "object_category": "apple",
+      "obj_height": 0.0653,
+      "obj_width": 0.0922,
+      "obj_xy_abs": [
+        2.5191084668421384,
+        -0.3273676122853037
+      ],
+      "obj_xy_rel": [
+        -0.5031602594541025,
+        0.4779100695933504
+      ],
+      "layout_id": 32,
+      "style_id": 24,
+      "episode": 29,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.136,
+      "region": "far-left"
+    },
+    {
+      "object_category": "cheese_grater",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        4.109755866872714,
+        -0.37300887949829625
+      ],
+      "obj_xy_rel": [
+        0.6118542893859957,
+        0.47263684076697227
+      ],
+      "layout_id": 53,
+      "style_id": 19,
+      "episode": 30,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.05,
+      "region": "far-right"
+    },
+    {
+      "object_category": "juice",
+      "obj_height": 0.2925,
+      "obj_width": 0.1495,
+      "obj_xy_abs": [
+        2.1725106540988657,
+        -2.1420004098285608
+      ],
+      "obj_xy_rel": [
+        -0.3369388400101192,
+        0.5719443246142979
+      ],
+      "layout_id": 43,
+      "style_id": 16,
+      "episode": 31,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "region": "far-left"
+    },
+    {
+      "object_category": "boxed_drink",
+      "obj_height": 0.1011,
+      "obj_width": 0.0616,
+      "obj_xy_abs": [
+        2.9346133235177216,
+        -0.2736804240552148
+      ],
+      "obj_xy_rel": [
+        0.5263374736718642,
+        0.5038781260659151
+      ],
+      "layout_id": 12,
+      "style_id": 13,
+      "episode": 32,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.138,
+      "region": "far-right"
+    },
+    {
+      "object_category": "pitcher",
+      "obj_height": 0.2677,
+      "obj_width": 0.1688,
+      "obj_xy_abs": [
+        6.546315519323283,
+        -3.018235746644954
+      ],
+      "obj_xy_rel": [
+        0.39734358195323516,
+        -0.6089359162799952
+      ],
+      "layout_id": 47,
+      "style_id": 55,
+      "episode": 33,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "region": "near-right"
+    },
+    {
+      "object_category": "strainer",
+      "obj_height": 0.0904,
+      "obj_width": 0.3792,
+      "obj_xy_abs": [
+        5.3003424365753276,
+        -2.5993027380627693
+      ],
+      "obj_xy_rel": [
+        0.41769227845728274,
+        -0.7429772728967243
+      ],
+      "layout_id": 54,
+      "style_id": 59,
+      "episode": 34,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.092,
+      "region": "near-right"
+    },
+    {
+      "object_category": "ladle",
+      "obj_height": 0.1212,
+      "obj_width": 0.2393,
+      "obj_xy_abs": [
+        0.38998791635305213,
+        -1.2293060861783707
+      ],
+      "obj_xy_rel": [
+        -0.41864041879630004,
+        0.4600929207134843
+      ],
+      "layout_id": 36,
+      "style_id": 58,
+      "episode": 35,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.087,
+      "region": "far-left"
+    },
+    {
+      "object_category": "lime",
+      "obj_height": 0.0613,
+      "obj_width": 0.0984,
+      "obj_xy_abs": [
+        2.01746084752278,
+        -0.35613438937288566
+      ],
+      "obj_xy_rel": [
+        -0.6608713945318114,
+        0.4872015614474837
+      ],
+      "layout_id": 41,
+      "style_id": 46,
+      "episode": 36,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.123,
+      "region": "far-left"
+    },
+    {
+      "object_category": "peach",
+      "obj_height": 0.0641,
+      "obj_width": 0.0904,
+      "obj_xy_abs": [
+        4.061642644267785,
+        -1.9445462564569507
+      ],
+      "obj_xy_rel": [
+        0.3152663632399473,
+        0.652035604901477
+      ],
+      "layout_id": 48,
+      "style_id": 57,
+      "episode": 37,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.404,
+      "region": "far-center"
+    },
+    {
+      "object_category": "lemon_wedge",
+      "obj_height": 0.0445,
+      "obj_width": 0.1134,
+      "obj_xy_abs": [
+        2.7291063131869753,
+        -0.35468524219017333
+      ],
+      "obj_xy_rel": [
+        -0.41567336199170457,
+        0.4674011685529101
+      ],
+      "layout_id": 32,
+      "style_id": 40,
+      "episode": 38,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.101,
+      "region": "far-left"
+    },
+    {
+      "object_category": "lemon",
+      "obj_height": 0.0558,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.3676344480989875,
+        -2.4026935176921387
+      ],
+      "obj_xy_rel": [
+        0.3785670007566946,
+        -0.5848010129514547
+      ],
+      "layout_id": 40,
+      "style_id": 47,
+      "episode": 39,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.092,
+      "region": "near-right"
+    },
+    {
+      "object_category": "mug",
+      "obj_height": 0.091,
+      "obj_width": 0.1264,
+      "obj_xy_abs": [
+        5.674062268948057,
+        -1.3906298962054189
+      ],
+      "obj_xy_rel": [
+        0.36149355312215636,
+        0.5638911460588134
+      ],
+      "layout_id": 49,
+      "style_id": 13,
+      "episode": 40,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.059,
+      "region": "far-right"
+    },
+    {
+      "object_category": "ladle",
+      "obj_height": 0.1304,
+      "obj_width": 0.3039,
+      "obj_xy_abs": [
+        5.619483398886029,
+        -2.331715794887891
+      ],
+      "obj_xy_rel": [
+        0.3443599412695555,
+        -0.3964016178255221
+      ],
+      "layout_id": 49,
+      "style_id": 30,
+      "episode": 41,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.122,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "wooden_spoon",
+      "obj_height": 0.0175,
+      "obj_width": 0.2471,
+      "obj_xy_abs": [
+        2.410727084956919,
+        -1.9740633147715405
+      ],
+      "obj_xy_rel": [
+        -0.5407116920144794,
+        -0.4551243578731319
+      ],
+      "layout_id": 14,
+      "style_id": 23,
+      "episode": 42,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.09,
+      "region": "near-left"
+    },
+    {
+      "object_category": "condiment_bottle",
+      "obj_height": 0.1591,
+      "obj_width": 0.0973,
+      "obj_xy_abs": [
+        2.663270789538257,
+        -2.6756034289085084
+      ],
+      "obj_xy_rel": [
+        0.4387974467703053,
+        0.43619615055041105
+      ],
+      "layout_id": 18,
+      "style_id": 19,
+      "episode": 43,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "region": "far-right"
+    },
+    {
+      "object_category": "blender_jug",
+      "obj_height": 0.1825,
+      "obj_width": 0.2054,
+      "obj_xy_abs": [
+        5.736894066530939,
+        -1.2905070475145457
+      ],
+      "obj_xy_rel": [
+        0.4761173605443467,
+        0.5466803677904801
+      ],
+      "layout_id": 49,
+      "style_id": 60,
+      "episode": 44,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.023,
+      "region": "far-right"
+    },
+    {
+      "object_category": "orange",
+      "obj_height": 0.0635,
+      "obj_width": 0.0967,
+      "obj_xy_abs": [
+        3.0559797111013833,
+        -2.4435831962906045
+      ],
+      "obj_xy_rel": [
+        -0.6058867635199472,
+        -0.30811474840727326
+      ],
+      "layout_id": 59,
+      "style_id": 59,
+      "episode": 45,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.05,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "peach",
+      "obj_height": 0.069,
+      "obj_width": 0.0899,
+      "obj_xy_abs": [
+        2.216577337919625,
+        -0.5510894659813615
+      ],
+      "obj_xy_rel": [
+        0.2719018180330055,
+        0.24262005035295442
+      ],
+      "layout_id": 38,
+      "style_id": 20,
+      "episode": 46,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.071,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "pizza_cutter",
+      "obj_height": 0.0993,
+      "obj_width": 0.257,
+      "obj_xy_abs": [
+        1.5521114381910317,
+        -3.59833846866395
+      ],
+      "obj_xy_rel": [
+        0.31914890288177,
+        0.6310399458393046
+      ],
+      "layout_id": 29,
+      "style_id": 59,
+      "episode": 47,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.395,
+      "region": "far-center"
+    },
+    {
+      "object_category": "jug",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        2.7968545815761163,
+        -2.2078698338574068
+      ],
+      "obj_xy_rel": [
+        0.45175654977187785,
+        -0.4509406576592556
+      ],
+      "layout_id": 33,
+      "style_id": 48,
+      "episode": 48,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "region": "near-right"
+    },
+    {
+      "object_category": "lime",
+      "obj_height": 0.0703,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        1.883452623212957,
+        -1.5583844439425811
+      ],
+      "obj_xy_rel": [
+        -0.40961723803585004,
+        0.8175190568991808
+      ],
+      "layout_id": 60,
+      "style_id": 12,
+      "episode": 49,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.117,
+      "region": "far-left"
+    },
+    {
+      "object_category": "wine",
+      "obj_height": 0.304,
+      "obj_width": 0.0823,
+      "obj_xy_abs": [
+        4.216458616251006,
+        -2.4301377449711494
+      ],
+      "obj_xy_rel": [
+        0.6263075852585414,
+        -0.3334406731700952
+      ],
+      "layout_id": 59,
+      "style_id": 47,
+      "episode": 50,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "fish",
+      "obj_height": 0.1028,
+      "obj_width": 0.1779,
+      "obj_xy_abs": [
+        3.5665082246825714,
+        -0.3729673195297295
+      ],
+      "obj_xy_rel": [
+        0.4808900018847222,
+        0.4572756867979618
+      ],
+      "layout_id": 13,
+      "style_id": 15,
+      "episode": 51,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.037,
+      "region": "far-right"
+    },
+    {
+      "object_category": "yogurt",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.517853446191149,
+        -2.7253376520487667
+      ],
+      "obj_xy_rel": [
+        0.2927994976094741,
+        0.43756388691650727
+      ],
+      "layout_id": 18,
+      "style_id": 37,
+      "episode": 52,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.011,
+      "region": "far-center"
+    },
+    {
+      "object_category": "avocado",
+      "obj_height": 0.0523,
+      "obj_width": 0.0967,
+      "obj_xy_abs": [
+        5.55090258352108,
+        -2.5893582636975356
+      ],
+      "obj_xy_rel": [
+        0.27735111715830296,
+        -0.7500208036383946
+      ],
+      "layout_id": 49,
+      "style_id": 31,
+      "episode": 53,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.113,
+      "region": "near-center"
+    },
+    {
+      "object_category": "peeler",
+      "obj_height": 0.0275,
+      "obj_width": 0.2074,
+      "obj_xy_abs": [
+        -0.4973019718357561,
+        -2.7501673223066954
+      ],
+      "obj_xy_rel": [
+        0.27186382062476167,
+        -0.4235411895327492
+      ],
+      "layout_id": 57,
+      "style_id": 46,
+      "episode": 54,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.241,
+      "region": "near-center"
+    },
+    {
+      "object_category": "measuring_cup",
+      "obj_height": 0.0648,
+      "obj_width": 0.208,
+      "obj_xy_abs": [
+        3.3157860666627728,
+        -2.544936491152852
+      ],
+      "obj_xy_rel": [
+        0.3039365257765412,
+        -0.284587345352846
+      ],
+      "layout_id": 56,
+      "style_id": 40,
+      "episode": 55,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.108,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "carrot",
+      "obj_height": 0.0407,
+      "obj_width": 0.15,
+      "obj_xy_abs": [
+        0.4184362033531324,
+        -2.4535485381670457
+      ],
+      "obj_xy_rel": [
+        -0.3814916618973114,
+        -0.45867002551633607
+      ],
+      "layout_id": 25,
+      "style_id": 45,
+      "episode": 56,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.082,
+      "region": "near-left"
+    },
+    {
+      "object_category": "water_bottle",
+      "obj_height": 0.2025,
+      "obj_width": 0.1068,
+      "obj_xy_abs": [
+        2.5458218711492164,
+        -2.7121751128064924
+      ],
+      "obj_xy_rel": [
+        0.3772546404378736,
+        0.5166831306983717
+      ],
+      "layout_id": 34,
+      "style_id": 56,
+      "episode": 57,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "region": "far-right"
+    },
+    {
+      "object_category": "cucumber",
+      "obj_height": 0.0396,
+      "obj_width": 0.2036,
+      "obj_xy_abs": [
+        2.703404082906369,
+        -2.062177790947201
+      ],
+      "obj_xy_rel": [
+        -0.7295390118520308,
+        -0.307339571535181
+      ],
+      "layout_id": 24,
+      "style_id": 58,
+      "episode": 58,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.062,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "carrot",
+      "obj_height": 0.0407,
+      "obj_width": 0.15,
+      "obj_xy_abs": [
+        1.7983327809324086,
+        -0.35980712501177314
+      ],
+      "obj_xy_rel": [
+        0.5463326932436008,
+        0.4350023072401783
+      ],
+      "layout_id": 21,
+      "style_id": 25,
+      "episode": 59,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.228,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "jar",
+      "obj_height": 0.2314,
+      "obj_width": 0.3155,
+      "obj_xy_abs": [
+        2.86803817660778,
+        -3.228920318596279
+      ],
+      "obj_xy_rel": [
+        0.33321976135759757,
+        -0.7486961244089003
+      ],
+      "layout_id": 37,
+      "style_id": 13,
+      "episode": 60,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.027,
+      "region": "near-center"
+    },
+    {
+      "object_category": "shrimp",
+      "obj_height": 0.0214,
+      "obj_width": 0.103,
+      "obj_xy_abs": [
+        2.4100942876106393,
+        -1.9532095837852883
+      ],
+      "obj_xy_rel": [
+        -0.4991448100600917,
+        -0.46399973486925816
+      ],
+      "layout_id": 14,
+      "style_id": 25,
+      "episode": 61,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.072,
+      "region": "near-left"
+    },
+    {
+      "object_category": "condiment_bottle",
+      "obj_height": 0.1591,
+      "obj_width": 0.0973,
+      "obj_xy_abs": [
+        1.8622039232456329,
+        -3.6933127181293264
+      ],
+      "obj_xy_rel": [
+        0.2032850675390483,
+        -0.5583089750390129
+      ],
+      "layout_id": 15,
+      "style_id": 19,
+      "episode": 62,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.086,
+      "region": "near-center"
+    },
+    {
+      "object_category": "jug",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        4.57719971700999,
+        -0.5043643708065115
+      ],
+      "obj_xy_rel": [
+        0.4488014122396997,
+        0.3367664072611468
+      ],
+      "layout_id": 51,
+      "style_id": 45,
+      "episode": 63,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.105,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "sponge",
+      "obj_height": 0.0415,
+      "obj_width": 0.1205,
+      "obj_xy_abs": [
+        3.172892113623185,
+        -3.3668901289906796
+      ],
+      "obj_xy_rel": [
+        -0.2740079672328384,
+        0.6196277826202885
+      ],
+      "layout_id": 42,
+      "style_id": 23,
+      "episode": 64,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.02,
+      "region": "far-center"
+    },
+    {
+      "object_category": "jam",
+      "obj_height": 0.0559,
+      "obj_width": 0.0961,
+      "obj_xy_abs": [
+        0.5640340874988242,
+        -1.1005328271158905
+      ],
+      "obj_xy_rel": [
+        -0.24375068446341763,
+        0.5661666469590907
+      ],
+      "layout_id": 11,
+      "style_id": 28,
+      "episode": 65,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.219,
+      "region": "far-center"
+    },
+    {
+      "object_category": "mug",
+      "obj_height": 0.0894,
+      "obj_width": 0.1302,
+      "obj_xy_abs": [
+        3.248854819900223,
+        -1.2462838796394344
+      ],
+      "obj_xy_rel": [
+        0.30730897460973905,
+        0.52415830152553
+      ],
+      "layout_id": 40,
+      "style_id": 43,
+      "episode": 66,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.021,
+      "region": "far-center"
+    },
+    {
+      "object_category": "potato",
+      "obj_height": 0.0625,
+      "obj_width": 0.1293,
+      "obj_xy_abs": [
+        1.4817548850629814,
+        -3.5852184649392767
+      ],
+      "obj_xy_rel": [
+        0.2336816812267346,
+        0.6306800576661731
+      ],
+      "layout_id": 29,
+      "style_id": 42,
+      "episode": 67,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.079,
+      "region": "far-center"
+    },
+    {
+      "object_category": "salt_and_pepper_shaker",
+      "obj_height": 0.1058,
+      "obj_width": 0.0627,
+      "obj_xy_abs": [
+        5.239431661989348,
+        -2.3178867710108255
+      ],
+      "obj_xy_rel": [
+        0.30975755842236286,
+        -0.47947544499378414
+      ],
+      "layout_id": 54,
+      "style_id": 50,
+      "episode": 68,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.036,
+      "region": "near-center"
+    },
+    {
+      "object_category": "bottled_water",
+      "obj_height": 0.1743,
+      "obj_width": 0.0656,
+      "obj_xy_abs": [
+        1.1056979732850605,
+        -0.44139592952722256
+      ],
+      "obj_xy_rel": [
+        -0.850173981931442,
+        0.3902319936290776
+      ],
+      "layout_id": 38,
+      "style_id": 57,
+      "episode": 69,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "soap_dispenser",
+      "obj_height": 0.1828,
+      "obj_width": 0.1438,
+      "obj_xy_abs": [
+        3.579830690882138,
+        -0.4968201787939284
+      ],
+      "obj_xy_rel": [
+        0.6385232956020568,
+        0.3279614615490379
+      ],
+      "layout_id": 44,
+      "style_id": 16,
+      "episode": 70,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.078,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "tomato",
+      "obj_height": 0.0559,
+      "obj_width": 0.0882,
+      "obj_xy_abs": [
+        2.345704024275312,
+        -0.3992345474795856
+      ],
+      "obj_xy_rel": [
+        -0.5374482729137533,
+        0.3691254860623217
+      ],
+      "layout_id": 13,
+      "style_id": 15,
+      "episode": 71,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.102,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "cheese_grater",
+      "obj_height": 0.2439,
+      "obj_width": 0.152,
+      "obj_xy_abs": [
+        3.9859202794983712,
+        -3.1192711321477273
+      ],
+      "obj_xy_rel": [
+        -0.47501704540108936,
+        -0.45129080596395754
+      ],
+      "layout_id": 46,
+      "style_id": 30,
+      "episode": 72,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "region": "near-left"
+    },
+    {
+      "object_category": "pitcher",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        4.780831339678891,
+        -1.5470971634145643
+      ],
+      "obj_xy_rel": [
+        0.2935607833083944,
+        0.6785522280441934
+      ],
+      "layout_id": 35,
+      "style_id": 11,
+      "episode": 73,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.345,
+      "region": "far-center"
+    },
+    {
+      "object_category": "boxed_drink",
+      "obj_height": 0.1092,
+      "obj_width": 0.0665,
+      "obj_xy_abs": [
+        5.603430751142056,
+        -2.538966498123408
+      ],
+      "obj_xy_rel": [
+        0.2963275202226452,
+        -0.545879905288053
+      ],
+      "layout_id": 49,
+      "style_id": 12,
+      "episode": 74,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "near-center"
+    },
+    {
+      "object_category": "garlic",
+      "obj_height": 0.0715,
+      "obj_width": 0.068,
+      "obj_xy_abs": [
+        4.966864740417293,
+        -2.8529977394125368
+      ],
+      "obj_xy_rel": [
+        0.4834593959016136,
+        -0.7164913651835456
+      ],
+      "layout_id": 35,
+      "style_id": 24,
+      "episode": 75,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "near-right"
+    },
+    {
+      "object_category": "lime",
+      "obj_height": 0.0613,
+      "obj_width": 0.0984,
+      "obj_xy_abs": [
+        2.5031965945859316,
+        -0.5366911645427113
+      ],
+      "obj_xy_rel": [
+        -0.44277901531833885,
+        0.252689501843125
+      ],
+      "layout_id": 13,
+      "style_id": 16,
+      "episode": 76,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.041,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "strainer",
+      "obj_height": 0.0863,
+      "obj_width": 0.4071,
+      "obj_xy_abs": [
+        6.503524346283315,
+        -1.8826131293681447
+      ],
+      "obj_xy_rel": [
+        0.34601829462710576,
+        0.6175155720434504
+      ],
+      "layout_id": 47,
+      "style_id": 24,
+      "episode": 77,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "region": "far-center"
+    },
+    {
+      "object_category": "eggplant",
+      "obj_height": 0.0558,
+      "obj_width": 0.1496,
+      "obj_xy_abs": [
+        2.954046132890301,
+        -0.4395889977157478
+      ],
+      "obj_xy_rel": [
+        0.5465235918059741,
+        0.4103302228185768
+      ],
+      "layout_id": 12,
+      "style_id": 43,
+      "episode": 78,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.142,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "broccoli",
+      "obj_height": 0.071,
+      "obj_width": 0.1146,
+      "obj_xy_abs": [
+        3.2595173447972394,
+        -4.756934345551912
+      ],
+      "obj_xy_rel": [
+        -0.7107852623752473,
+        -0.37634650063815034
+      ],
+      "layout_id": 26,
+      "style_id": 55,
+      "episode": 79,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "steak",
+      "obj_height": 0.0357,
+      "obj_width": 0.1555,
+      "obj_xy_abs": [
+        1.6599484431166192,
+        -3.5624197029191444
+      ],
+      "obj_xy_rel": [
+        0.47162753119463585,
+        0.707402020920382
+      ],
+      "layout_id": 29,
+      "style_id": 49,
+      "episode": 80,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.272,
+      "region": "far-right"
+    },
+    {
+      "object_category": "egg",
+      "obj_height": 0.0474,
+      "obj_width": 0.0796,
+      "obj_xy_abs": [
+        2.8361846978370457,
+        -1.499618128835524
+      ],
+      "obj_xy_rel": [
+        0.359897045742517,
+        -0.2644583074557416
+      ],
+      "layout_id": 52,
+      "style_id": 40,
+      "episode": 81,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.127,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "ice_cube",
+      "obj_height": 0.0498,
+      "obj_width": 0.0705,
+      "obj_xy_abs": [
+        3.916218051012552,
+        -2.99011184792647
+      ],
+      "obj_xy_rel": [
+        -0.5871109473421248,
+        -0.3072701468189569
+      ],
+      "layout_id": 46,
+      "style_id": 39,
+      "episode": 82,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.149,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "avocado",
+      "obj_height": 0.0582,
+      "obj_width": 0.1075,
+      "obj_xy_abs": [
+        4.845822385726872,
+        -2.8140222682658074
+      ],
+      "obj_xy_rel": [
+        0.3465844092787824,
+        -0.5505690199214164
+      ],
+      "layout_id": 35,
+      "style_id": 37,
+      "episode": 83,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.099,
+      "region": "near-right"
+    },
+    {
+      "object_category": "saucepan",
+      "obj_height": 0.1955,
+      "obj_width": 0.433,
+      "obj_xy_abs": [
+        2.465526584969292,
+        -1.9829096346815211
+      ],
+      "obj_xy_rel": [
+        -0.5431491251707463,
+        -0.4394345048284962
+      ],
+      "layout_id": 14,
+      "style_id": 54,
+      "episode": 84,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.09,
+      "region": "near-left"
+    },
+    {
+      "object_category": "kiwi",
+      "obj_height": 0.0513,
+      "obj_width": 0.0926,
+      "obj_xy_abs": [
+        2.4981387100252896,
+        -2.7220327541686946
+      ],
+      "obj_xy_rel": [
+        0.2736390414492593,
+        0.5823867132180425
+      ],
+      "layout_id": 18,
+      "style_id": 59,
+      "episode": 85,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.203,
+      "region": "far-center"
+    },
+    {
+      "object_category": "potato",
+      "obj_height": 0.0734,
+      "obj_width": 0.1139,
+      "obj_xy_abs": [
+        3.2296603793717855,
+        -3.715370417262792
+      ],
+      "obj_xy_rel": [
+        -0.24927355173753085,
+        0.35027691016052254
+      ],
+      "layout_id": 42,
+      "style_id": 40,
+      "episode": 86,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.115,
+      "region": "mid-center"
+    },
+    {
+      "object_category": "chicken_drumstick",
+      "obj_height": 0.0325,
+      "obj_width": 0.1513,
+      "obj_xy_abs": [
+        2.4520655158577336,
+        -1.9761430903985477
+      ],
+      "obj_xy_rel": [
+        -0.5478598271139496,
+        -0.4279760790836227
+      ],
+      "layout_id": 14,
+      "style_id": 55,
+      "episode": 87,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.132,
+      "region": "near-left"
+    },
+    {
+      "object_category": "spray",
+      "obj_height": 0.2909,
+      "obj_width": 0.169,
+      "obj_xy_abs": [
+        3.352221435180762,
+        -0.3366711870891602
+      ],
+      "obj_xy_rel": [
+        0.6106971515459243,
+        0.5042745948743813
+      ],
+      "layout_id": 45,
+      "style_id": 57,
+      "episode": 88,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "region": "far-right"
+    },
+    {
+      "object_category": "jar",
+      "obj_height": 0.2411,
+      "obj_width": 0.1871,
+      "obj_xy_abs": [
+        5.322650826535485,
+        -2.5417982040864673
+      ],
+      "obj_xy_rel": [
+        0.4039301854967414,
+        -0.4457932464320664
+      ],
+      "layout_id": 54,
+      "style_id": 39,
+      "episode": 89,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.015,
+      "region": "near-right"
+    },
+    {
+      "object_category": "sponge",
+      "obj_height": 0.0415,
+      "obj_width": 0.1205,
+      "obj_xy_abs": [
+        0.5548924807793089,
+        -2.9100452878093597
+      ],
+      "obj_xy_rel": [
+        -0.25874338368701233,
+        -0.6696511460277854
+      ],
+      "layout_id": 22,
+      "style_id": 43,
+      "episode": 90,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "near-center"
+    },
+    {
+      "object_category": "kettle_non_electric",
+      "obj_height": 0.2,
+      "obj_width": 0.2279,
+      "obj_xy_abs": [
+        1.7953745230809115,
+        -0.5193368235764766
+      ],
+      "obj_xy_rel": [
+        -0.503334010425619,
+        0.3140293882346431
+      ],
+      "layout_id": 12,
+      "style_id": 44,
+      "episode": 91,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.069,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "orange",
+      "obj_height": 0.0365,
+      "obj_width": 0.0962,
+      "obj_xy_abs": [
+        4.120525195934421,
+        -1.8974886031975562
+      ],
+      "obj_xy_rel": [
+        0.3511085017379987,
+        0.43628480559611105
+      ],
+      "layout_id": 48,
+      "style_id": 32,
+      "episode": 92,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.048,
+      "region": "far-right"
+    },
+    {
+      "object_category": "teapot",
+      "obj_height": 0.1449,
+      "obj_width": 0.1889,
+      "obj_xy_abs": [
+        1.8983447917200766,
+        -1.5921412110209106
+      ],
+      "obj_xy_rel": [
+        -0.44461154176123885,
+        0.7381862046575105
+      ],
+      "layout_id": 60,
+      "style_id": 22,
+      "episode": 93,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "region": "far-left"
+    },
+    {
+      "object_category": "ketchup",
+      "obj_height": 0.15,
+      "obj_width": 0.0913,
+      "obj_xy_abs": [
+        0.5606659123194013,
+        -1.6302213671678807
+      ],
+      "obj_xy_rel": [
+        -0.2625036039366163,
+        0.5892757212260284
+      ],
+      "layout_id": 22,
+      "style_id": 31,
+      "episode": 94,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "far-center"
+    },
+    {
+      "object_category": "sweet_potato",
+      "obj_height": 0.0535,
+      "obj_width": 0.133,
+      "obj_xy_abs": [
+        2.785140279412578,
+        -1.6733618950282767
+      ],
+      "obj_xy_rel": [
+        0.32525419095819164,
+        -0.4180174785027746
+      ],
+      "layout_id": 52,
+      "style_id": 39,
+      "episode": 95,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.122,
+      "region": "near-center"
+    },
+    {
+      "object_category": "beer",
+      "obj_height": 0.1975,
+      "obj_width": 0.0763,
+      "obj_xy_abs": [
+        2.845882596440472,
+        -1.7282571225508252
+      ],
+      "obj_xy_rel": [
+        0.36128034135329967,
+        -0.6409893268723248
+      ],
+      "layout_id": 52,
+      "style_id": 46,
+      "episode": 96,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "region": "near-right"
+    },
+    {
+      "object_category": "broccoli",
+      "obj_height": 0.071,
+      "obj_width": 0.1146,
+      "obj_xy_abs": [
+        2.363431999127962,
+        -0.5930603271660112
+      ],
+      "obj_xy_rel": [
+        -0.7725140452586188,
+        0.2530410851955883
+      ],
+      "layout_id": 28,
+      "style_id": 12,
+      "episode": 97,
+      "success": false,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "region": "mid-left"
+    },
+    {
+      "object_category": "avocado",
+      "obj_height": 0.0523,
+      "obj_width": 0.0967,
+      "obj_xy_abs": [
+        2.88376926307698,
+        -2.0168710236532057
+      ],
+      "obj_xy_rel": [
+        0.6893502781364345,
+        -0.22700758039456304
+      ],
+      "layout_id": 33,
+      "style_id": 56,
+      "episode": 98,
+      "success": true,
+      "failure_phase": "success",
+      "max_lift": 0.13,
+      "region": "mid-right"
+    },
+    {
+      "object_category": "measuring_cup",
+      "obj_height": 0.0595,
+      "obj_width": 0.1645,
+      "obj_xy_abs": [
+        2.223794116440937,
+        -2.088890848382826
+      ],
+      "obj_xy_rel": [
+        -0.28565828447608954,
+        0.70943651697509
+      ],
+      "layout_id": 43,
+      "style_id": 45,
+      "episode": 99,
+      "success": false,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.151,
+      "region": "far-left"
+    }
+  ]
+}

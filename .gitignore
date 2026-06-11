@@ -2,3 +2,6 @@
 checkpoints/
 # everything else here (results, scripts, configs, patches, memory copy, small
 # eval videos ~33M, mimicgen_src ~83M, weakregion reports) is fine to commit.
+
+__pycache__/
+*.pyc

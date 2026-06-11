@@ -7,5 +7,6 @@
 - [DP model smoke-test status](dp-model-smoketest-status.md) — real DP checkpoint runs end-to-end on the 4070 box (official eval_robocasa); install steps + 5 gym/diffusers compat patches + run command; DP 50-rollout = 10% (5/50)
 - [pi0 & GR00T local eval setup](pi0-groot-local-eval-setup.md) — openpi_env (pi0) server working + norm-stats patch + jax/chex gotcha; GR00T groot_env (flash-attn wheel); mimicgen pipeline + results; checkpoint paths + run commands. Eval n=50: GR00T 66% > pi0 58% > DP 10%
 - [Expert data-generation loop](expert-data-generation-loop.md) — VALIDATED keystone: pi0/GR00T → record states → convert_hdf5_lerobot → trainable LeRobot data, no human demos needed
-- [pi0 weak-region finding](pi0-weakregion-finding.md) — pi0 fails at GRASP (96% of failures) on tall/awkward objects at far/lateral positions; the concrete targeting signal
+- [pi0 weak-region finding](pi0-weakregion-finding.md) — pi0 fails at GRASP (76% never-touched); object HEIGHT is a real but WEAK predictor (R²~0.08); NOT an embodiment limit; geometry too weak to target → use uncertainty/instance signals
+- [Cross-policy weak-region](cross-policy-weakregion.md) — GR00T replicates pi0 almost exactly (same rate/mode/height effect, AUC 0.63) → tall-object grasp weakness is UNIVERSAL + data-addressable (shared data gap, not embodiment)
 - [H100 handoff](../../../robocasa_experiments/H100_HANDOFF.md) — (in robocasa_experiments/) training setup + experiment plan + transfer/ bundle for moving to the H100

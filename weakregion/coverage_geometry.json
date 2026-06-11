@@ -1,0 +1,400 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "n_resets": 200,
+  "n_eval_eps": 50,
+  "per_category": {
+    "reamer": {
+      "freq": 6,
+      "height": 0.142,
+      "width": 0.249
+    },
+    "ladle": {
+      "freq": 6,
+      "height": 0.101,
+      "width": 0.261
+    },
+    "soap_dispenser": {
+      "freq": 5,
+      "height": 0.185,
+      "width": 0.118
+    },
+    "onion": {
+      "freq": 5,
+      "height": 0.07,
+      "width": 0.134
+    },
+    "lime": {
+      "freq": 5,
+      "height": 0.065,
+      "width": 0.099
+    },
+    "wine": {
+      "freq": 5,
+      "height": 0.265,
+      "width": 0.094
+    },
+    "straw": {
+      "freq": 5,
+      "height": 0.007,
+      "width": 0.195
+    },
+    "orange": {
+      "freq": 5,
+      "height": 0.069,
+      "width": 0.1
+    },
+    "condiment_bottle": {
+      "freq": 5,
+      "height": 0.159,
+      "width": 0.086
+    },
+    "bell_pepper": {
+      "freq": 5,
+      "height": 0.059,
+      "width": 0.099
+    },
+    "pizza_cutter": {
+      "freq": 5,
+      "height": 0.082,
+      "width": 0.25
+    },
+    "squash": {
+      "freq": 4,
+      "height": 0.063,
+      "width": 0.107
+    },
+    "beer": {
+      "freq": 4,
+      "height": 0.192,
+      "width": 0.075
+    },
+    "pitcher": {
+      "freq": 4,
+      "height": 0.232,
+      "width": 0.212
+    },
+    "banana": {
+      "freq": 4,
+      "height": 0.036,
+      "width": 0.185
+    },
+    "kettle_non_electric": {
+      "freq": 4,
+      "height": 0.207,
+      "width": 0.241
+    },
+    "bar_soap": {
+      "freq": 4,
+      "height": 0.034,
+      "width": 0.113
+    },
+    "cucumber": {
+      "freq": 4,
+      "height": 0.041,
+      "width": 0.197
+    },
+    "potato": {
+      "freq": 4,
+      "height": 0.071,
+      "width": 0.123
+    },
+    "whisk": {
+      "freq": 4,
+      "height": 0.056,
+      "width": 0.279
+    },
+    "sweet_potato": {
+      "freq": 4,
+      "height": 0.053,
+      "width": 0.13
+    },
+    "mushroom": {
+      "freq": 4,
+      "height": 0.063,
+      "width": 0.097
+    },
+    "mug": {
+      "freq": 3,
+      "height": 0.088,
+      "width": 0.157
+    },
+    "bottled_water": {
+      "freq": 3,
+      "height": 0.175,
+      "width": 0.073
+    },
+    "saucepan": {
+      "freq": 3,
+      "height": 0.102,
+      "width": 0.419
+    },
+    "boxed_drink": {
+      "freq": 3,
+      "height": 0.104,
+      "width": 0.063
+    },
+    "tupperware": {
+      "freq": 3,
+      "height": 0.055,
+      "width": 0.202
+    },
+    "blender_jug": {
+      "freq": 3,
+      "height": 0.185,
+      "width": 0.217
+    },
+    "garlic": {
+      "freq": 3,
+      "height": 0.075,
+      "width": 0.082
+    },
+    "peeler": {
+      "freq": 3,
+      "height": 0.019,
+      "width": 0.212
+    },
+    "sponge": {
+      "freq": 3,
+      "height": 0.019,
+      "width": 0.116
+    },
+    "avocado": {
+      "freq": 3,
+      "height": 0.062,
+      "width": 0.112
+    },
+    "wooden_spoon": {
+      "freq": 3,
+      "height": 0.02,
+      "width": 0.229
+    },
+    "yogurt": {
+      "freq": 3,
+      "height": 0.049,
+      "width": 0.099
+    },
+    "broccoli": {
+      "freq": 3,
+      "height": 0.075,
+      "width": 0.119
+    },
+    "can": {
+      "freq": 3,
+      "height": 0.111,
+      "width": 0.088
+    },
+    "cheese": {
+      "freq": 3,
+      "height": 0.052,
+      "width": 0.113
+    },
+    "fish": {
+      "freq": 2,
+      "height": 0.068,
+      "width": 0.186
+    },
+    "lemon": {
+      "freq": 2,
+      "height": 0.063,
+      "width": 0.099
+    },
+    "pear": {
+      "freq": 2,
+      "height": 0.061,
+      "width": 0.135
+    },
+    "ice_cube": {
+      "freq": 2,
+      "height": 0.045,
+      "width": 0.07
+    },
+    "corn": {
+      "freq": 2,
+      "height": 0.064,
+      "width": 0.175
+    },
+    "jar": {
+      "freq": 2,
+      "height": 0.177,
+      "width": 0.212
+    },
+    "apple": {
+      "freq": 2,
+      "height": 0.061,
+      "width": 0.086
+    },
+    "egg": {
+      "freq": 2,
+      "height": 0.047,
+      "width": 0.081
+    },
+    "measuring_cup": {
+      "freq": 2,
+      "height": 0.078,
+      "width": 0.261
+    },
+    "rolling_pin": {
+      "freq": 2,
+      "height": 0.042,
+      "width": 0.291
+    },
+    "kiwi": {
+      "freq": 2,
+      "height": 0.05,
+      "width": 0.092
+    },
+    "jug_wide_opening": {
+      "freq": 2,
+      "height": 0.149,
+      "width": 0.228
+    },
+    "cream_cheese_stick": {
+      "freq": 2,
+      "height": 0.031,
+      "width": 0.138
+    },
+    "strainer": {
+      "freq": 2,
+      "height": 0.085,
+      "width": 0.344
+    },
+    "shrimp": {
+      "freq": 2,
+      "height": 0.021,
+      "width": 0.111
+    },
+    "steak": {
+      "freq": 2,
+      "height": 0.057,
+      "width": 0.152
+    },
+    "eggplant": {
+      "freq": 2,
+      "height": 0.084,
+      "width": 0.132
+    },
+    "colander": {
+      "freq": 2,
+      "height": 0.087,
+      "width": 0.348
+    },
+    "bowl": {
+      "freq": 2,
+      "height": 0.064,
+      "width": 0.361
+    },
+    "teapot": {
+      "freq": 2,
+      "height": 0.139,
+      "width": 0.193
+    },
+    "ketchup": {
+      "freq": 1,
+      "height": 0.15,
+      "width": 0.091
+    },
+    "jug": {
+      "freq": 1,
+      "height": 0.152,
+      "width": 0.178
+    },
+    "glass_cup": {
+      "freq": 1,
+      "height": 0.111,
+      "width": 0.104
+    },
+    "dish_brush": {
+      "freq": 1,
+      "height": 0.082,
+      "width": 0.22
+    },
+    "tongs": {
+      "freq": 1,
+      "height": 0.055,
+      "width": 0.281
+    },
+    "tomato": {
+      "freq": 1,
+      "height": 0.064,
+      "width": 0.099
+    },
+    "spray": {
+      "freq": 1,
+      "height": 0.23,
+      "width": 0.127
+    },
+    "jam": {
+      "freq": 1,
+      "height": 0.056,
+      "width": 0.096
+    },
+    "cheese_grater": {
+      "freq": 1,
+      "height": 0.257,
+      "width": 0.15
+    },
+    "canned_food": {
+      "freq": 1,
+      "height": 0.09,
+      "width": 0.085
+    },
+    "bottled_drink": {
+      "freq": 1,
+      "height": 0.165,
+      "width": 0.068
+    },
+    "carrot": {
+      "freq": 1,
+      "height": 0.041,
+      "width": 0.168
+    },
+    "saucepan_lid": {
+      "freq": 1,
+      "height": 0.065,
+      "width": 0.312
+    },
+    "salt_and_pepper_shaker": {
+      "freq": 1,
+      "height": 0.1,
+      "width": 0.076
+    }
+  },
+  "height_split": {
+    "median_height": 0.075,
+    "tall_objects (>median)": [
+      22,
+      12,
+      0.545
+    ],
+    "short_objects (<=median)": [
+      23,
+      12,
+      0.522
+    ]
+  },
+  "width_split": {
+    "median_width": 0.132,
+    "wide_objects (>median)": [
+      22,
+      12,
+      0.545
+    ],
+    "narrow_objects (<=median)": [
+      23,
+      12,
+      0.522
+    ]
+  },
+  "frequency_split": {
+    "rare (freq<=median)": [
+      37,
+      21,
+      0.568
+    ],
+    "common (freq>median)": [
+      13,
+      5,
+      0.385
+    ]
+  }
+}
