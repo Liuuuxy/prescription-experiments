@@ -97,6 +97,11 @@ def main():
     p.add_argument("--replan_steps", type=int, default=5)
     p.add_argument("--seed", type=int, default=100)
     p.add_argument("--out", default=None)
+    # targeted-region control via rejection sampling on the init state:
+    # only run the policy when the target object's height is inside the band.
+    # (targeted arm: --min_obj_height 0.10 ; random arm: leave unset)
+    p.add_argument("--min_obj_height", type=float, default=None)
+    p.add_argument("--max_obj_height", type=float, default=None)
     args = p.parse_args()
 
     out = args.out or os.path.join(
@@ -114,6 +119,23 @@ def main():
         env = gym.make(f"robocasa/{args.task}", split=args.split, seed=args.seed + attempts)
         rs = env.unwrapped
         obs, info = env.reset()
+
+        # rejection sampling for the targeted region (cheap: no policy queries)
+        if args.min_obj_height is not None or args.max_obj_height is not None:
+            o = rs.objects["obj"]
+            try:
+                oh = float(o.top_offset[2] - o.bottom_offset[2])
+            except Exception:
+                oh = None
+            in_band = (oh is not None
+                       and (args.min_obj_height is None or oh >= args.min_obj_height)
+                       and (args.max_obj_height is None or oh <= args.max_obj_height))
+            if not in_band:
+                attempts += 1
+                print(f"[attempt {attempts}] rejected (obj height={oh}) — outside target band")
+                env.close()
+                continue
+
         task_lang = obs["annotation.human.task_description"]
         model_xml = rs.model.get_xml()
         ep_meta = json.dumps(rs.get_ep_meta())
@@ -138,6 +160,8 @@ def main():
                               model_file=model_xml, ep_meta=ep_meta))
             print(f"[attempt {attempts}] SUCCESS ({len(actions)} steps) "
                   f"-> {len(demos)}/{args.n_success} demos")
+            if len(demos) % 10 == 0:  # crash-safe periodic flush
+                write_demos(out, demos, env_info, args.task)
         else:
             print(f"[attempt {attempts}] fail")
         env.close()
@@ -146,7 +170,13 @@ def main():
         print("No successful demos collected. Aborting.")
         return
 
-    # write gather-format hdf5
+    write_demos(out, demos, env_info, args.task)
+    convert_to_robomimic_format(out)
+    print("Converted to robomimic format (env_args set).")
+
+
+def write_demos(out, demos, env_info, task):
+    """Write demos in collect_demos gather-format hdf5 (overwrites)."""
     now = datetime.datetime.now()
     f = h5py.File(out, "w")
     grp = f.create_group("data")
@@ -156,7 +186,7 @@ def main():
     grp.attrs["robocasa_version"] = robocasa.__version__
     grp.attrs["robosuite_version"] = robosuite.__version__
     grp.attrs["mujoco_version"] = mujoco.__version__
-    grp.attrs["env"] = args.task
+    grp.attrs["env"] = task
     grp.attrs["env_info"] = env_info
     for i, d in enumerate(demos):
         g = grp.create_group(f"demo_{i + 1}")
@@ -167,9 +197,6 @@ def main():
         g.create_dataset("actions", data=d["actions"])
     f.close()
     print(f"Wrote {len(demos)} demos to {out}")
-
-    convert_to_robomimic_format(out)
-    print("Converted to robomimic format (env_args set).")
 
 
 if __name__ == "__main__":
