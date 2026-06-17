@@ -18,7 +18,7 @@ have full context of today's work.
 
 ## What's in here
 - `H100_HANDOFF.md` — the plan + DP training setup + experiment steps (read this).
-- `results_log.md`, `daily_update.md`, `model_triage.md` — today's results.
+- `results_log.md`, `model_triage.md` — results.
 - `policy_analysis/` — the weak-region detector + triage tool (analyze_pi0_weakregions.py, compare_models.py, analysis.py, …).
 - `weakregion/` — pi0's weak-region report (the concrete targeting signal).
 - `mimicgen_src/` — example pi0 source demos + the validated LeRobot dataset (regenerable).
