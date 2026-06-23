@@ -1,5 +1,7 @@
 # H100 Handoff — RoboCasa targeted-data IL experiment
 
+> **STATUS 2026-06-11 — SETUP COMPLETE on the 2×H100-NVL box.** Fresh build (not a shared FS); everything lives under `/data/xinyua11` (NOT `~`). conda env `robocasa` (py3.11, torch 2.7.1+cu126), forks at `/data/xinyua11/{robosuite,robocasa_pkg,diffusion_policy,robomimic,mimicgen}` (the robocasa **package** is `robocasa_pkg` because `robocasa` = this bundle), patches applied, assets+dataset+DP-ckpt downloaded, DP smoke-test verified end-to-end (~8.3 it/s). All caches off `/home` (20GB cap). Full details + how-to-train: Claude memory `h100-setup-complete`. Next = the experiment (section 3): build a single-task PickPlaceCounterToSink soup and train the baseline.
+
 Written 2026-06-10 from the 4070 dev box. Goal of the H100 work: **train diffusion policies** for the targeted-vs-random data-efficiency experiment. All dev/eval/data-generation infra already works on the 4070 box; the H100 is for **training only** (the DP fork recommends 24GB+; 4070's 12GB can't train the default config).
 
 If a fresh Claude Code session starts on the H100 and `~` is the **same shared filesystem**, it inherits all of this automatically (memory at `~/.claude/projects/-home-asurite-ad-asu-edu-xinyua11-robocasa/memory/`, the repos, the datasets). Read that memory first — especially `dp-model-smoketest-status`, `expert-data-generation-loop`, `pi0-groot-local-eval-setup`, `first-experiment-pickplace-sink`.

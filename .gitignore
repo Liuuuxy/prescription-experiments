@@ -13,3 +13,6 @@ phase1_data/*.hdf5
 phase1_data/
 # rollout videos (incidental)
 weakregion/**/media/
+
+# Claude Code local config
+.claude/

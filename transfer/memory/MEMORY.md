@@ -10,3 +10,5 @@
 - [pi0 weak-region finding](pi0-weakregion-finding.md) — pi0 fails at GRASP (76% never-touched); object HEIGHT is a real but WEAK predictor (R²~0.08); NOT an embodiment limit; geometry too weak to target → use uncertainty/instance signals
 - [Cross-policy weak-region](cross-policy-weakregion.md) — GR00T replicates pi0 almost exactly (same rate/mode/height effect, AUC 0.63) → tall-object grasp weakness is UNIVERSAL + data-addressable (shared data gap, not embodiment)
 - [H100 handoff](../../../robocasa_experiments/H100_HANDOFF.md) — (in robocasa_experiments/) training setup + experiment plan + transfer/ bundle for moving to the H100
+- [H100 setup complete](h100-setup-complete.md) — H100 DP train/eval stack BUILT + VERIFIED; exact /data/xinyua11 paths, conda env, the cached-loader + lang-encoder-deadlock fix (~3min/epoch), 3-seed run status, first eval (our seed0 ep400 = 2% n=50, NOT the published 10%)
+- [H100 progress report](../../H100_PROGRESS.md) — reverse-handoff doc (H100 → dev box): full setup state, dataloader fix, run status, eval result + caveat, next steps

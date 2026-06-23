@@ -1,0 +1,60 @@
+diff --git a/diffusion_policy/dataset/lerobot_dataset.py b/diffusion_policy/dataset/lerobot_dataset.py
+index d690887..636be25 100644
+--- a/diffusion_policy/dataset/lerobot_dataset.py
++++ b/diffusion_policy/dataset/lerobot_dataset.py
+@@ -32,7 +32,7 @@ from typing import Dict, List
+ from robocasa.utils.dataset_registry import DATASET_SOUP_REGISTRY
+ 
+ 
+-from robocasa.utils.groot_utils.groot_dataset import LeRobotSingleDataset, LE_ROBOT_MODALITY_FILENAME, ModalityConfig, LE_ROBOT_EPISODE_FILENAME, LeRobotMixtureDataset
++from robocasa.utils.groot_utils.groot_dataset import LeRobotSingleDataset, CachedLeRobotSingleDataset, LE_ROBOT_MODALITY_FILENAME, ModalityConfig, LE_ROBOT_EPISODE_FILENAME, LeRobotMixtureDataset
+ import pathlib
+ 
+ def get_modality_keys(dataset_path: pathlib.Path) -> dict[str, list[str]]:
+@@ -53,7 +53,7 @@ def get_modality_keys(dataset_path: pathlib.Path) -> dict[str, list[str]]:
+             modality_dict[key].append(f"{key}.{modality}")
+     return modality_dict
+ 
+-class LerobotDataset(LeRobotSingleDataset, BaseImageDataset):
++class LerobotDataset(CachedLeRobotSingleDataset, BaseImageDataset):
+     def __init__(self,
+             shape_meta: dict,
+             dataset_path: str,
+@@ -101,12 +101,18 @@ class LerobotDataset(LeRobotSingleDataset, BaseImageDataset):
+             ),
+         }
+ 
+-        LeRobotSingleDataset.__init__(
++        # Use the cached variant: decode all video frames into RAM once at init,
++        # then serve samples by array indexing. The on-the-fly mp4 decode in the
++        # base class starves the GPU (0% util) and makes multi-epoch training
++        # ~10x slower. img_resize=None keeps native 256x256.
++        CachedLeRobotSingleDataset.__init__(
+             self,
++            img_resize=None,
+             dataset_path=dataset_path,
+             filter_key=filter_key,
+             embodiment_tag="oxe_droid",
+             modality_configs=modality_configs,
++            video_backend="pyav",  # get_all_frames supports pyav/decord/torchvision_av; base default 'opencv' is unsupported there
+         )
+         self.start_indices = np.cumsum(self.trajectory_lengths) - self.trajectory_lengths
+         rgb_keys = dict()
+@@ -327,6 +333,17 @@ class LerobotCotrainingDataset(LeRobotMixtureDataset, BaseImageDataset):
+             ) for ds_meta in dataset_soup_list
+         ]
+         del lang_encoder
++        # Drop the live CUDA lang-encoder from every sub-dataset. Embeddings are
++        # already precomputed (numpy), and the model is unused in __getitem__.
++        # Leaving a CUDA module on the dataset deadlocks DataLoader workers
++        # (fork after CUDA init) -> cached training hangs at the first batch.
++        for _d in datasets:
++            if getattr(_d, "_lang_encoder", None) is not None:
++                _d._lang_encoder = None
++        import gc as _gc
++        _gc.collect()
++        if torch.cuda.is_available():
++            torch.cuda.empty_cache()
+         self.abs_action = abs_action
+         assert not self.abs_action, "abs_action is not supported in LerobotCotrainingDataset"
+         assert ds_weights is None or len(ds_weights) == len(datasets), \
