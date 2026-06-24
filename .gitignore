@@ -16,3 +16,4 @@ weakregion/**/media/
 
 # Claude Code local config
 .claude/
+weakregion/emb_*.npy
