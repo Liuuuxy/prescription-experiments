@@ -40,25 +40,36 @@ def target_meta(rs):
     return cat, split, abs_xy, abs_xy - base, ep.get("layout_id"), ep.get("style_id")
 
 
+def build_pi0_element(obs, lang, resize):
+    def prep(k):
+        return image_tools.convert_to_uint8(
+            image_tools.resize_with_pad(np.ascontiguousarray(obs[k]), resize, resize))
+    return {
+        "observation/image": prep("video.robot0_agentview_left"),
+        "observation/wrist_image": prep("video.robot0_eye_in_hand"),
+        "observation/right_image": prep("video.robot0_agentview_right"),
+        "observation/state": np.concatenate((
+            obs["state.end_effector_position_relative"],
+            obs["state.end_effector_rotation_relative"],
+            obs["state.base_position"],
+            obs["state.base_rotation"],
+            obs["state.gripper_qpos"]), axis=0),
+        "prompt": lang,
+    }
+
+
 def pi0_action(client, obs, plan, lang, resize, replan):
     if not plan:
-        def prep(k):
-            return image_tools.convert_to_uint8(
-                image_tools.resize_with_pad(np.ascontiguousarray(obs[k]), resize, resize))
-        element = {
-            "observation/image": prep("video.robot0_agentview_left"),
-            "observation/wrist_image": prep("video.robot0_eye_in_hand"),
-            "observation/right_image": prep("video.robot0_agentview_right"),
-            "observation/state": np.concatenate((
-                obs["state.end_effector_position_relative"],
-                obs["state.end_effector_rotation_relative"],
-                obs["state.base_position"],
-                obs["state.base_rotation"],
-                obs["state.gripper_qpos"]), axis=0),
-            "prompt": lang,
-        }
-        plan.extend(client.infer(element)["actions"][:replan])
+        plan.extend(client.infer(build_pi0_element(obs, lang, resize))["actions"][:replan])
     return plan.popleft()
+
+
+def pi0_uncertainty(client, obs, lang, resize, k):
+    """K action-chunk samples at the SAME state -> mean per-coord std (epistemic).
+    pi0 is a stochastic flow policy, so repeated infer() calls differ."""
+    el = build_pi0_element(obs, lang, resize)
+    samples = [np.asarray(client.infer(el)["actions"], dtype=np.float64) for _ in range(k)]
+    return float(np.stack(samples, 0).std(axis=0).mean())
 
 
 def main():
@@ -71,6 +82,8 @@ def main():
     p.add_argument("--resize_size", type=int, default=224)
     p.add_argument("--replan_steps", type=int, default=5)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("-k", "--k_unc", type=int, default=0,
+                   help="K action samples at first state -> per-episode pi0 uncertainty (0=off)")
     p.add_argument("--out_dir", default="/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/weakregion/pi0_PickPlaceCounterToSink")
     args = p.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
@@ -84,6 +97,8 @@ def main():
         obs, info = env.reset()
         lang = obs["annotation.human.task_description"]
         cat, osplit, xy_abs, xy_rel, layout, style = target_meta(rs)
+        uncertainty = (pi0_uncertainty(client, obs, lang, args.resize_size, args.k_unc)
+                       if args.k_unc else None)
 
         # per-episode object geometry (direct, not category-averaged) for the
         # failure predictor: height + width of the target object.
@@ -140,10 +155,15 @@ def main():
             obj_width=(round(obj_w, 4) if obj_w is not None else None),
             obj_xy_abs=[float(xy_abs[0]), float(xy_abs[1])],
             obj_xy_rel=[float(xy_rel[0]), float(xy_rel[1])],
-            layout_id=layout, style_id=style))
+            layout_id=layout, style_id=style,
+            uncertainty=(round(uncertainty, 5) if uncertainty is not None else None)))
         print(f"[ep {i+1}/{args.n}] success={success} phase={phase} obj={cat} "
-              f"rel=({xy_rel[0]:.2f},{xy_rel[1]:.2f}) layout={layout} style={style}")
+              f"unc={uncertainty} rel=({xy_rel[0]:.2f},{xy_rel[1]:.2f}) layout={layout} style={style}")
         env.close()
+        if (i + 1) % 20 == 0:  # crash-safe partial dump (full summary written at end)
+            json.dump({"task": args.task, "split": args.split, "policy": "pi0",
+                       "n": i + 1, "episodes": records},
+                      open(os.path.join(args.out_dir, "weakregion.json"), "w"), indent=2)
 
     # failure-mode breakdown (among failed episodes)
     fails = [r for r in records if not r["success"]]

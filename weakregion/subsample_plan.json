@@ -1,0 +1,16 @@
+{
+  "budget": 200,
+  "use_uncertainty": false,
+  "allocation": {
+    "juice": 29,
+    "spray": 28,
+    "pitcher": 24,
+    "cream_cheese_stick": 15,
+    "canned_food": 21,
+    "soap_dispenser": 19,
+    "tupperware": 17,
+    "cheese_grater": 16,
+    "ice_cube": 16,
+    "jar": 15
+  }
+}
