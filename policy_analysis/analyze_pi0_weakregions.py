@@ -84,9 +84,17 @@ def main():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("-k", "--k_unc", type=int, default=0,
                    help="K action samples at first state -> per-episode pi0 uncertainty (0=off)")
+    p.add_argument("--categories", default=None,
+                   help="comma-sep object categories to RESTRICT eval to (stratified/powered eval); "
+                        "scenes with other objects are skipped (cheap reset, no rollout)")
+    p.add_argument("--per_cat", type=int, default=0,
+                   help="with --categories: stop once every listed category has this many episodes")
     p.add_argument("--out_dir", default="/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/weakregion/pi0_PickPlaceCounterToSink")
     args = p.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
+
+    target_cats = (set(c.strip().lower() for c in args.categories.split(",")) if args.categories else None)
+    cat_count = collections.defaultdict(int)
 
     horizon = int(get_task_horizon(args.task))
     client = _wcp.WebsocketClientPolicy(args.host, args.port)
@@ -97,6 +105,15 @@ def main():
         obs, info = env.reset()
         lang = obs["annotation.human.task_description"]
         cat, osplit, xy_abs, xy_rel, layout, style = target_meta(rs)
+        # stratified eval: only spend a (600-step) rollout on a targeted category that isn't full yet
+        if target_cats is not None:
+            cn = (cat or "").lower()
+            if cn not in target_cats or (args.per_cat and cat_count[cn] >= args.per_cat):
+                env.close()
+                if args.per_cat and all(cat_count[c] >= args.per_cat for c in target_cats):
+                    break
+                continue
+            cat_count[cn] += 1
         uncertainty = (pi0_uncertainty(client, obs, lang, args.resize_size, args.k_unc)
                        if args.k_unc else None)
 
