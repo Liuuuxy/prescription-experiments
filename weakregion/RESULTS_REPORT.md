@@ -3,7 +3,7 @@
 **Log entry:** 2026-06-24 · H100 box · run by Xinyuan
 **Experiment:** targeted (core) vs random data selection — pi0 LoRA fine-tune, per-category eval
 **Student policy:** pi0 (openpi, robocasa-pretrained `pi0_robocasa_pretrain_human300`, step 75000, ~55% baseline)
-**TL;DR:** core **59.3%** vs random **56.3%** overall; on the 10 targeted categories core **43.2%** vs random **28.2%** (+15 pp), coverage preserved — **directional win, underpowered at n=300.**
+**TL;DR:** core **59.3%** vs random **56.3%** overall; on the 10 targeted categories core **43.2%** vs random **28.2%** (+15 pp), coverage preserved — **directional win, underpowered at n=300.** Third arm **coverage** (same 200-demo budget spread across the top-**25** failure categories instead of the top-**10**): matches core on the targeted categories (42.9%) but **regresses on the non-targeted majority** (52.8% vs core 61.6%, z=−2.04, p<0.05) → **worst overall (51.7%)**. **Spreading the targeted budget HURTS; concentration on the top-10 wins.**
 
 ---
 
@@ -44,109 +44,116 @@ Adding training demos **where the policy fails** improves it more — per demo �
 
 ## 4. Headline results (n=300 each)
 
-| | overall | **targeted (10-cat aggregate)** | non-targeted (coverage) |
+| | overall | **targeted (10-cat aggregate)** | non-targeted (the other ~69 cats) |
 |---|---|---|---|
 | **baseline** (pi0, no FT) | 58.0% (174/300) | 33.3% (13/39) | 61.7% (161/261) |
-| **core** (base+targeted) | **59.3% (178/300)** | **43.2% (16/37)** | 61.6% (162/263) |
+| **core** (base+targeted, top-10) | **59.3% (178/300)** | **43.2% (16/37)** | 61.6% (162/263) |
 | **random** (base+random) | 56.3% (169/300) | 28.2% (11/39) | 60.5% (158/261) |
+| **coverage** (base+targeted, top-25) | 51.7% (155/300) | 42.9% (15/35) | 52.8% (140/265) |
 
-Overall CI95: baseline [52.3, 63.4], core [53.7, 64.7], random [50.7, 61.8].
+Overall CI95: baseline [52.3, 63.4], core [53.7, 64.7], random [50.7, 61.8], coverage [46.0, 57.3].
 
-**All three checks point the hypothesized way:**
+**All three core-vs-random checks point the hypothesized way:**
 1. **core > random on the targeted categories: +15.0 pp** (43.2% vs 28.2%).
 2. **core lifts the targeted regions** (+9.9 pp over baseline); **random does not** (−5.1 pp vs baseline — random data didn't help where the policy is weak).
-3. **Coverage preserved** — core ≈ baseline on the 67 non-targeted categories (61.6% vs 61.7%); it didn't trade away the rest.
-4. Overall: core (59.3%) > baseline (58.0%) > random (56.3%).
+3. **Coverage preserved** — core ≈ baseline on the 69 non-targeted categories (61.6% vs 61.7%); it didn't trade away the rest.
+4. Overall: core (59.3%) > baseline (58.0%) > random (56.3%) > coverage (51.7%).
 
 Per-category win/loss on the 10 targeted: **core beats random on 5, loses on 2, ties on 3.**
 
+**Coverage arm (top-25 spread of the same 200-demo budget):**
+5. **Targeting still works** — coverage matches core on the shared targeted-10 (42.9% vs 43.2%, z=−0.03) and beats random there (+14.7 pp, z=+1.32), so spreading didn't lose the targeted benefit.
+6. **But it triggers collateral forgetting** — coverage drops to **52.8%** on the non-targeted majority vs core's 61.6% (**z=−2.04, p<0.05**) — the only statistically solid effect in the study.
+7. Net: that non-targeted regression sinks coverage to the **worst overall (51.7%)**, below random (vs core overall z=−1.89, borderline). **Concentrating the budget on the top-10 (~20 demos/cat) is surgical; thin-spreading across top-25 (~8 demos/cat) perturbs the policy more broadly without extra targeted gain.**
+
 ## 5. Win condition
-**Met directionally:** core > random, concentrated on the targeted categories, without hurting the others. **Not statistically conclusive** — see §7.
+- **core vs random — met directionally:** core > random, concentrated on the targeted categories, without hurting the others. **Not statistically conclusive** — see §7.
+- **coverage vs random — NOT met overall** (51.7% < 56.3%); coverage only wins on the targeted subset it was designed for. **coverage vs core — spreading HURTS** (overall −7.7 pp; significant non-targeted regression). Verdict: **budget concentration (top-10) beats broad coverage (top-25).**
 
 ## 6. Full per-category accuracy (all categories, n=300 each; cell = success% successes/n)
 
-| category | baseline | core | random |
-|---|---|---|---|
-| apple | 33% 1/3 | 25% 1/4 | 75% 3/4 |
-| avocado | 100% 2/2 | 100% 3/3 | 67% 2/3 |
-| banana | 67% 2/3 | 75% 3/4 | 75% 3/4 |
-| bar_soap | 100% 3/3 | 100% 3/3 | 100% 4/4 |
-| beer | 67% 2/3 | 67% 2/3 | 50% 1/2 |
-| bell_pepper | 100% 4/4 | 100% 3/3 | 75% 3/4 |
-| blender_jug | 50% 2/4 | 0% 0/4 | 0% 0/4 |
-| bottled_drink | 40% 2/5 | 50% 3/6 | 60% 3/5 |
-| bottled_water | 67% 4/6 | 50% 3/6 | 0% 0/5 |
-| bowl | 67% 2/3 | 50% 1/2 | 33% 1/3 |
-| boxed_drink | 33% 1/3 | 67% 2/3 | 33% 1/3 |
-| broccoli | 67% 2/3 | 50% 2/4 | 75% 3/4 |
-| can | 67% 2/3 | 100% 4/4 | 75% 3/4 |
-| **canned_food** ⊛ | 100% 1/1 | 100% 1/1 | 100% 1/1 |
-| carrot | 67% 2/3 | 67% 2/3 | 67% 2/3 |
-| cheese | 60% 3/5 | 83% 5/6 | 80% 4/5 |
-| **cheese_grater** ⊛ | 0% 0/3 | 0% 0/2 | 0% 0/3 |
-| chicken_drumstick | 80% 4/5 | 100% 5/5 | 60% 3/5 |
-| colander | 67% 4/6 | 83% 5/6 | 25% 1/4 |
-| condiment_bottle | 100% 3/3 | 100% 3/3 | 0% 0/3 |
-| corn | 90% 9/10 | 89% 8/9 | 60% 6/10 |
-| **cream_cheese_stick** ⊛ | 20% 1/5 | 20% 1/5 | 0% 0/5 |
-| cucumber | 60% 3/5 | 100% 4/4 | 100% 6/6 |
-| cup | 50% 2/4 | 50% 2/4 | 75% 3/4 |
-| dish_brush | 100% 3/3 | 100% 2/2 | 100% 2/2 |
-| egg | 100% 2/2 | 100% 2/2 | 100% 2/2 |
-| eggplant | 100% 7/7 | 86% 6/7 | 57% 4/7 |
-| fish | 50% 1/2 | 100% 2/2 | 100% 2/2 |
-| garlic | 100% 3/3 | 100% 4/4 | 75% 3/4 |
-| glass_cup | 100% 2/2 | 0% 0/2 | 33% 1/3 |
-| **ice_cube** ⊛ | 50% 3/6 | 43% 3/7 | 12% 1/8 |
-| jam | 20% 1/5 | 40% 2/5 | 50% 2/4 |
-| **jar** ⊛ | 0% 0/3 | 50% 1/2 | 100% 2/2 |
-| jug | 50% 2/4 | 0% 0/6 | 25% 1/4 |
-| jug_wide_opening | 50% 2/4 | 25% 1/4 | 20% 1/5 |
-| **juice** ⊛ | 0% 0/1 | 0% 0/1 | 0% 0/1 |
-| ketchup | 0% 0/2 | 0% 0/2 | 50% 1/2 |
-| kettle_non_electric | 0% 0/1 | 0% 0/1 | 0% 0/1 |
-| kiwi | 50% 1/2 | 100% 2/2 | 100% 1/1 |
-| ladle | 80% 4/5 | 83% 5/6 | 60% 3/5 |
-| lemon | 75% 3/4 | 100% 3/3 | 100% 3/3 |
-| lemon_wedge | 80% 4/5 | 60% 3/5 | 20% 1/5 |
-| lime | 0% 0/3 | 33% 1/3 | 67% 2/3 |
-| mango | 100% 3/3 | 75% 3/4 | 67% 2/3 |
-| measuring_cup | 80% 4/5 | 0% 0/2 | 100% 5/5 |
-| milk | 50% 1/2 | 0% 0/2 | 50% 1/2 |
-| mug | 100% 1/1 | 50% 1/2 | 100% 1/1 |
-| mushroom | 67% 2/3 | 75% 3/4 | 100% 4/4 |
-| onion | 50% 2/4 | 80% 4/5 | 67% 4/6 |
-| orange | 75% 3/4 | 20% 1/5 | 67% 2/3 |
-| peach | 75% 6/8 | 67% 4/6 | 71% 5/7 |
-| pear | 57% 4/7 | 86% 6/7 | 75% 6/8 |
-| peeler | 67% 2/3 | 100% 2/2 | 67% 2/3 |
-| **pitcher** ⊛ | 57% 4/7 | 60% 3/5 | 20% 1/5 |
-| pizza_cutter | 0% 0/1 | – | – |
-| potato | 80% 4/5 | 80% 4/5 | 100% 5/5 |
-| reamer | 0% 0/4 | 25% 1/4 | 0% 0/4 |
-| rolling_pin | 50% 2/4 | 100% 3/3 | 100% 2/2 |
-| salt_and_pepper_shaker | 67% 2/3 | 50% 1/2 | 100% 1/1 |
-| saucepan | 60% 3/5 | 20% 1/5 | 0% 0/5 |
-| saucepan_lid | 25% 1/4 | 33% 1/3 | 0% 0/4 |
-| shrimp | 33% 1/3 | 25% 1/4 | 25% 1/4 |
-| **soap_dispenser** ⊛ | 60% 3/5 | 60% 3/5 | 17% 1/6 |
-| sponge | 33% 2/6 | 83% 5/6 | 83% 5/6 |
-| **spray** ⊛ | 0% 0/2 | 100% 1/1 | 0% 0/1 |
-| squash | 100% 2/2 | 100% 3/3 | 50% 1/2 |
-| steak | 0% 0/1 | 0% 0/2 | 100% 1/1 |
-| strainer | 75% 3/4 | 75% 3/4 | 75% 3/4 |
-| straw | 0% 0/3 | 33% 1/3 | 67% 2/3 |
-| sweet_potato | 83% 5/6 | 50% 3/6 | 86% 6/7 |
-| tangerine | 100% 3/3 | 75% 3/4 | 50% 2/4 |
-| teapot | 50% 1/2 | 50% 1/2 | 0% 0/2 |
-| tomato | 67% 2/3 | 67% 2/3 | 100% 2/2 |
-| tongs | 0% 0/5 | 80% 4/5 | 60% 3/5 |
-| **tupperware** ⊛ | 17% 1/6 | 38% 3/8 | 71% 5/7 |
-| water_bottle | 0% 0/1 | 0% 0/2 | 0% 0/1 |
-| whisk | 50% 2/4 | 0% 0/1 | 100% 2/2 |
-| wine | 0% 0/3 | 25% 1/4 | 100% 3/3 |
-| wooden_spoon | 50% 2/4 | 25% 1/4 | 60% 3/5 |
-| yogurt | 80% 4/5 | 50% 2/4 | 60% 3/5 |
+| category | baseline | core | random | coverage |
+|---|---|---|---|---|
+| apple | 33% 1/3 | 25% 1/4 | 75% 3/4 | 33% 1/3 |
+| avocado | 100% 2/2 | 100% 3/3 | 67% 2/3 | 33% 1/3 |
+| banana | 67% 2/3 | 75% 3/4 | 75% 3/4 | 33% 1/3 |
+| bar_soap | 100% 3/3 | 100% 3/3 | 100% 4/4 | 25% 1/4 |
+| beer | 67% 2/3 | 67% 2/3 | 50% 1/2 | 50% 1/2 |
+| bell_pepper | 100% 4/4 | 100% 3/3 | 75% 3/4 | 100% 3/3 |
+| blender_jug | 50% 2/4 | 0% 0/4 | 0% 0/4 | 50% 2/4 |
+| bottled_drink | 40% 2/5 | 50% 3/6 | 60% 3/5 | 40% 2/5 |
+| bottled_water | 67% 4/6 | 50% 3/6 | 0% 0/5 | 0% 0/6 |
+| bowl | 67% 2/3 | 50% 1/2 | 33% 1/3 | 100% 1/1 |
+| boxed_drink | 33% 1/3 | 67% 2/3 | 33% 1/3 | 0% 0/3 |
+| broccoli | 67% 2/3 | 50% 2/4 | 75% 3/4 | 33% 1/3 |
+| can | 67% 2/3 | 100% 4/4 | 75% 3/4 | 50% 2/4 |
+| **canned_food** ⊛ | 100% 1/1 | 100% 1/1 | 100% 1/1 | 100% 1/1 |
+| carrot | 67% 2/3 | 67% 2/3 | 67% 2/3 | 100% 4/4 |
+| cheese | 60% 3/5 | 83% 5/6 | 80% 4/5 | 60% 3/5 |
+| **cheese_grater** ⊛ | 0% 0/3 | 0% 0/2 | 0% 0/3 | 0% 0/2 |
+| chicken_drumstick | 80% 4/5 | 100% 5/5 | 60% 3/5 | 60% 3/5 |
+| colander | 67% 4/6 | 83% 5/6 | 25% 1/4 | 40% 2/5 |
+| condiment_bottle | 100% 3/3 | 100% 3/3 | 0% 0/3 | 67% 2/3 |
+| corn | 90% 9/10 | 89% 8/9 | 60% 6/10 | 70% 7/10 |
+| **cream_cheese_stick** ⊛ | 20% 1/5 | 20% 1/5 | 0% 0/5 | 60% 3/5 |
+| cucumber | 60% 3/5 | 100% 4/4 | 100% 6/6 | 80% 4/5 |
+| cup | 50% 2/4 | 50% 2/4 | 75% 3/4 | 100% 4/4 |
+| dish_brush | 100% 3/3 | 100% 2/2 | 100% 2/2 | 100% 3/3 |
+| egg | 100% 2/2 | 100% 2/2 | 100% 2/2 | 100% 2/2 |
+| eggplant | 100% 7/7 | 86% 6/7 | 57% 4/7 | 62% 5/8 |
+| fish | 50% 1/2 | 100% 2/2 | 100% 2/2 | 75% 3/4 |
+| garlic | 100% 3/3 | 100% 4/4 | 75% 3/4 | 75% 3/4 |
+| glass_cup | 100% 2/2 | 0% 0/2 | 33% 1/3 | 33% 1/3 |
+| **ice_cube** ⊛ | 50% 3/6 | 43% 3/7 | 12% 1/8 | 57% 4/7 |
+| jam | 20% 1/5 | 40% 2/5 | 50% 2/4 | 50% 2/4 |
+| **jar** ⊛ | 0% 0/3 | 50% 1/2 | 100% 2/2 | 0% 0/2 |
+| jug | 50% 2/4 | 0% 0/6 | 25% 1/4 | 33% 2/6 |
+| jug_wide_opening | 50% 2/4 | 25% 1/4 | 20% 1/5 | 25% 1/4 |
+| **juice** ⊛ | 0% 0/1 | 0% 0/1 | 0% 0/1 | 0% 0/1 |
+| ketchup | 0% 0/2 | 0% 0/2 | 50% 1/2 | 0% 0/2 |
+| kettle_non_electric | 0% 0/1 | 0% 0/1 | 0% 0/1 | 0% 0/2 |
+| kiwi | 50% 1/2 | 100% 2/2 | 100% 1/1 | 100% 1/1 |
+| ladle | 80% 4/5 | 83% 5/6 | 60% 3/5 | 40% 2/5 |
+| lemon | 75% 3/4 | 100% 3/3 | 100% 3/3 | 67% 2/3 |
+| lemon_wedge | 80% 4/5 | 60% 3/5 | 20% 1/5 | 40% 2/5 |
+| lime | 0% 0/3 | 33% 1/3 | 67% 2/3 | 67% 2/3 |
+| mango | 100% 3/3 | 75% 3/4 | 67% 2/3 | 75% 3/4 |
+| measuring_cup | 80% 4/5 | 0% 0/2 | 100% 5/5 | 33% 1/3 |
+| milk | 50% 1/2 | 0% 0/2 | 50% 1/2 | 50% 1/2 |
+| mug | 100% 1/1 | 50% 1/2 | 100% 1/1 | 100% 1/1 |
+| mushroom | 67% 2/3 | 75% 3/4 | 100% 4/4 | 60% 3/5 |
+| onion | 50% 2/4 | 80% 4/5 | 67% 4/6 | 60% 3/5 |
+| orange | 75% 3/4 | 20% 1/5 | 67% 2/3 | 0% 0/3 |
+| peach | 75% 6/8 | 67% 4/6 | 71% 5/7 | 83% 5/6 |
+| pear | 57% 4/7 | 86% 6/7 | 75% 6/8 | 38% 3/8 |
+| peeler | 67% 2/3 | 100% 2/2 | 67% 2/3 | 75% 3/4 |
+| **pitcher** ⊛ | 57% 4/7 | 60% 3/5 | 20% 1/5 | 40% 2/5 |
+| pizza_cutter | 0% 0/1 | – | – | 100% 1/1 |
+| potato | 80% 4/5 | 80% 4/5 | 100% 5/5 | 100% 5/5 |
+| reamer | 0% 0/4 | 25% 1/4 | 0% 0/4 | 75% 3/4 |
+| rolling_pin | 50% 2/4 | 100% 3/3 | 100% 2/2 | 75% 3/4 |
+| salt_and_pepper_shaker | 67% 2/3 | 50% 1/2 | 100% 1/1 | 0% 0/1 |
+| saucepan | 60% 3/5 | 20% 1/5 | 0% 0/5 | 40% 2/5 |
+| saucepan_lid | 25% 1/4 | 33% 1/3 | 0% 0/4 | 33% 1/3 |
+| shrimp | 33% 1/3 | 25% 1/4 | 25% 1/4 | 67% 2/3 |
+| **soap_dispenser** ⊛ | 60% 3/5 | 60% 3/5 | 17% 1/6 | 50% 2/4 |
+| sponge | 33% 2/6 | 83% 5/6 | 83% 5/6 | 33% 2/6 |
+| **spray** ⊛ | 0% 0/2 | 100% 1/1 | 0% 0/1 | 50% 1/2 |
+| squash | 100% 2/2 | 100% 3/3 | 50% 1/2 | 100% 3/3 |
+| steak | 0% 0/1 | 0% 0/2 | 100% 1/1 | 0% 0/1 |
+| strainer | 75% 3/4 | 75% 3/4 | 75% 3/4 | 25% 1/4 |
+| straw | 0% 0/3 | 33% 1/3 | 67% 2/3 | 33% 1/3 |
+| sweet_potato | 83% 5/6 | 50% 3/6 | 86% 6/7 | 62% 5/8 |
+| tangerine | 100% 3/3 | 75% 3/4 | 50% 2/4 | 67% 2/3 |
+| teapot | 50% 1/2 | 50% 1/2 | 0% 0/2 | 50% 1/2 |
+| tomato | 67% 2/3 | 67% 2/3 | 100% 2/2 | 0% 0/2 |
+| tongs | 0% 0/5 | 80% 4/5 | 60% 3/5 | 40% 2/5 |
+| **tupperware** ⊛ | 17% 1/6 | 38% 3/8 | 71% 5/7 | 33% 2/6 |
+| water_bottle | 0% 0/1 | 0% 0/2 | 0% 0/1 | 0% 0/2 |
+| whisk | 50% 2/4 | 0% 0/1 | 100% 2/2 | 50% 1/2 |
+| wine | 0% 0/3 | 25% 1/4 | 100% 3/3 | 50% 2/4 |
+| wooden_spoon | 50% 2/4 | 25% 1/4 | 60% 3/5 | 75% 3/4 |
+| yogurt | 80% 4/5 | 50% 2/4 | 60% 3/5 | 20% 1/5 |
 
 ⊛ = one of the 10 targeted categories.
 
@@ -155,8 +162,11 @@ Per-category win/loss on the 10 targeted: **core beats random on 5, loses on 2, 
 - **Significance.** The +15 pp targeted effect (core vs random) has SE ≈ 11 pp (≈1.4σ) — **directional, not significant.** Overall CIs overlap heavily.
 - **Consistency is the encouraging part:** the same direction shows up in *all four* summaries (targeted aggregate, vs-baseline lift, coverage preserved, overall), which is more than a single noisy number — but it needs more episodes (n≥800, or a targeted-category-stratified eval) to be defensible.
 - **Uncertainty term was inert** (per the core-algorithm report): the selection here is effectively **competence-based** (P(fail) only).
+- **Coverage's targeted wins are equally underpowered** (targeted-10 n=35; coverage-vs-random +14.7 pp is z=+1.32, n.s.). The *robust* coverage finding is the **non-targeted regression vs core (z=−2.04, p<0.05)** and the overall drop (z=−1.89). One fine-tune run per arm, one task, one seed batch — directional, not definitive; replicates (or stratified eval) needed.
 
 ## 8. Status / notes
-- A third arm, **`coverage`** (diversity guard), was fine-tuned in parallel and is being evaluated separately (`pi0_ppc2sink_coverage`); it can be folded into this table when done.
-- Artifacts: eval JSON/reports in `weakregion/eval_{baseline,core,random}/`; fine-tune checkpoints in `openpi/checkpoints/pi0_ppc2sink_{core,random}/{core,random}_v1/19999`; datasets in `/data/xinyua11/ft_arms/`.
-- Invariant held: identical recipe across arms; only the +200 demos differ.
+- **Third arm `coverage` folded in (2026-06-24, n=300).** Spreading the same 200-demo budget across the top-**25** failure categories (vs core's top-**10**): same targeted benefit, but **collateral forgetting on the non-targeted majority → worst overall (51.7%).** Takeaway: **budget concentration on the top failure modes beats broad coverage.**
+- Coverage dataset = **596 demos** (400 base + 201 coverage-core, 5 of which overlapped base → de-duped), vs 600 for core/random — a ~0.7% size difference, negligible. Norm stats byte-identical across all arms (`meta/stats.json` md5 `2dafcf81…`).
+- Eval is ~**87% scene-paired** across arms at seed 100000 (env reset has minor nondeterminism); aggregate rates are the reliable signal, single tiny cells are noise.
+- Artifacts: eval JSON/reports in `weakregion/eval_{baseline,core,random,coverage}/`; fine-tune checkpoints in `openpi/checkpoints/pi0_ppc2sink_{core,random,coverage}/{core,random,coverage}_v1/19999`; datasets in `/data/xinyua11/ft_arms/`; aggregator `/data/xinyua11/tmp/aggregate_eval4.py`.
+- Invariant held: identical recipe across all three FT arms; only the +200 demos differ.
