@@ -5,7 +5,9 @@ that reduces loss on pi0's high-failure categories (the "targeted-10"), then sel
 top-N -> weakregion/influence_core.json {"core_episodes": [...]}.
 
 Algorithm (LESS):
-  * Checkpoints: average influence across the trained core LoRA checkpoints (5k/10k/15k/19999).
+  * Reference checkpoints: average influence across a NEUTRAL reference -- the base-only LoRA
+    warmup from pretrained pi0 (2k/4k/6k), the shared common prefix of every arm's fine-tune
+    trajectory. NOT the core checkpoints (those bake in the failure-targeted selection -> biased).
   * Per-demo gradient g_t(z) = normalize( grad of the pi0 flow-matching loss w.r.t. the chosen
     trainable params at checkpoint t, over K frames sampled from demo z ). g(z) = mean_t g_t(z).
   * Failure direction g_val: D_val = held-out pool demos in the targeted-10 categories (held out
@@ -56,6 +58,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 import flax.nnx as nnx
+import optax
 
 import openpi.training.config as _config
 import openpi.training.data_loader as _data_loader
@@ -67,11 +70,16 @@ REAL_ACTION_DIM = 12  # robocasa action dim; pi0 pads to action_dim=32 (Robocasa
 
 TARGETED = ["juice", "spray", "pitcher", "canned_food", "soap_dispenser",
             "tupperware", "cheese_grater", "ice_cube", "cream_cheese_stick", "jar"]
-CKPT_STEPS = [5000, 10000, 15000, 19999]
+# Reference checkpoints to differentiate at. MUST be NEUTRAL w.r.t. which 200 we select:
+# the base-only LoRA warmup from pretrained pi0 (the shared common prefix of every arm's
+# trajectory, in the correct fine-tuning regime). Do NOT use pi0_ppc2sink_core checkpoints --
+# those already fine-tuned on a candidate selection (failure-targeted), so failure-region demos
+# are absorbed there (low loss -> tiny/noisy normalized grads) and the score is biased.
+CKPT_STEPS = [2000, 4000, 6000]
 MG_DEFAULT = ("/data/xinyua11/robocasa_pkg/datasets/v1.0/pretrain/atomic/"
               "PickPlaceCounterToSink/20250819/mg/demo/2025-08-20-22-32-27/lerobot")
-CKPT_BASE = "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_core/core_v1"
-BASE_CONFIG = "pi0_ppc2sink_core"
+CKPT_BASE = "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_basewarmup/warmup_v1"
+BASE_CONFIG = "pi0_ppc2sink_core"  # only for model arch + data transforms (same LoRA arch); ckpts loaded from CKPT_BASE
 
 
 # ----------------------------------------------------------------------------- data / categories
@@ -224,29 +232,47 @@ def grad_unit(gfn, model, ep, step, obs, act):
 
 
 # ----------------------------------------------------------------------------- splits
-def make_splits(mg_dir, base_file, n_val_per_cat, seed):
-    """D_val (held-out targeted), candidate pool (categorized - base - D_val), and category map."""
+def make_splits(mg_dir, base_file, seed, dval_mode="targeted", n_val_per_cat=8, n_val=120):
+    """Build D_val, the candidate pool (categorized - base - D_val), and the category map.
+
+    dval_mode:
+      targeted : D_val = held-out demos from the targeted-10 failure categories
+                 (FAILURE-region influence; up to n_val_per_cat per category).
+      balanced : D_val = CLASS-BALANCED held-out sample across ALL object categories -- up to
+                 n_val_per_cat per category, capped by availability (VALUE influence). Mirrors the
+                 balanced/stratified eval (per-category average), NOT the pool frequency.
+      uniform  : D_val = a frequency-uniform random sample of n_val held-out demos over the whole
+                 pool (over-weights common categories; kept for ablation, not the default value run).
+    """
     ep_cat = episode_categories(mg_dir)
     base = set()
     if base_file and os.path.exists(base_file):
         b = json.load(open(base_file))
         base = set(b["base_episodes"] if isinstance(b, dict) else b)
     rng = np.random.RandomState(seed)
+    pool = sorted(ep for ep, c in ep_cat.items() if c is not None and ep not in base)
     by_cat = defaultdict(list)
-    for ep, c in ep_cat.items():
-        if c is not None and ep not in base:
-            by_cat[c].append(ep)
-    for c in by_cat:
-        by_cat[c].sort()
-    dval = []
-    for c in TARGETED:
-        avail = by_cat.get(c, [])
-        k = min(n_val_per_cat, max(1, len(avail) // 3))
-        dval += list(rng.choice(avail, size=min(k, len(avail)), replace=False))
-    dval = sorted(int(x) for x in dval)
+    for ep in pool:
+        by_cat[ep_cat[ep]].append(ep)
+    if dval_mode == "uniform":
+        dval = sorted(int(x) for x in rng.choice(pool, size=min(n_val, len(pool)), replace=False))
+    elif dval_mode == "balanced":
+        dval = []
+        for c in sorted(by_cat):  # ALL categories, equal-ish, capped by availability
+            avail = sorted(by_cat[c])
+            dval += list(rng.choice(avail, size=min(n_val_per_cat, len(avail)), replace=False))
+        dval = sorted(int(x) for x in dval)
+    elif dval_mode == "targeted":
+        dval = []
+        for c in TARGETED:
+            avail = sorted(by_cat.get(c, []))
+            k = min(n_val_per_cat, max(1, len(avail) // 3))
+            dval += list(rng.choice(avail, size=min(k, len(avail)), replace=False))
+        dval = sorted(int(x) for x in dval)
+    else:
+        raise ValueError(dval_mode)
     dval_set = set(dval)
-    candidates = sorted(ep for ep, c in ep_cat.items()
-                        if c is not None and ep not in base and ep not in dval_set)
+    candidates = [ep for ep in pool if ep not in dval_set]
     return ep_cat, base, dval, candidates
 
 
@@ -311,7 +337,7 @@ def _auc_report(tag, hs, es):
 def run_smoke(args):
     cfg, raw, tds = build_dataset(args.mg_dir)
     starts = episode_frame_starts(raw)
-    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.n_val_per_cat, args.seed)
+    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.seed, args.dval, args.n_val_per_cat, args.n_val)
     rng = np.random.RandomState(args.seed + 1)
     hard_all = [e for e in candidates if ep_cat[e] in TARGETED]
     easy_all = [e for e in candidates if ep_cat[e] not in TARGETED]
@@ -381,38 +407,40 @@ def _accumulate_mean(gfn, model, step, cache):
 def run_full(args):
     cfg, raw, tds = build_dataset(args.mg_dir)
     starts = episode_frame_starts(raw)
-    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.n_val_per_cat, args.seed)
+    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.seed, args.dval, args.n_val_per_cat, args.n_val)
     steps = [int(s) for s in args.steps.split(",")]
     rng_np = np.random.RandomState(args.seed + 7)
-    ref = sorted(rng_np.choice([e for e in candidates if e not in set(dval)],
-                               size=min(args.n_ref, len(candidates)), replace=False).tolist())
+    use_ref = args.gval == "contrast"  # plain g_val (VALUE influence) doesn't need a reference
+    ref = (sorted(rng_np.choice([e for e in candidates if e not in set(dval)],
+                                size=min(args.n_ref, len(candidates)), replace=False).tolist())
+           if use_ref else [])
     if args.limit:
         candidates = candidates[:args.limit]
-    print(f"[full] mode={args.mode_grad} gval={args.gval} D_val={len(dval)} ref={len(ref)} "
+    print(f"[full] mode={args.mode_grad} gval={args.gval} dval={args.dval} D_val={len(dval)} ref={len(ref)} "
           f"candidates={len(candidates)} ckpts={steps} k={args.k} real_dim={args.real_dim}", flush=True)
 
     print("[full] decoding D_val + ref ...", flush=True)
     val_cache = _decode_cache(tds, starts, dval, args.k)
-    ref_cache = _decode_cache(tds, starts, ref, args.k)
+    ref_cache = _decode_cache(tds, starts, ref, args.k) if use_ref else {}
     print("[full] decoding candidate pool (slow) ...", flush=True)
     cand_cache = _decode_cache(tds, starts, candidates, args.k)
 
     gfn = make_grad_fn(args.mode_grad, args.real_dim)
 
-    # ---- pass 1: build g_val direction (hard mean, and reference mean for contrast) ----
+    # ---- pass 1: build g_val direction (D_val mean; + reference mean for contrast) ----
     acc_hard = acc_ref = None
     for s in steps:
         t0 = time.time()
         model = load_model(cfg, s)
         ah = _accumulate_mean(gfn, model, s, val_cache)
-        ar = _accumulate_mean(gfn, model, s, ref_cache)
         acc_hard = ah if acc_hard is None else acc_hard + ah
-        acc_ref = ar if acc_ref is None else acc_ref + ar
+        if use_ref:
+            ar = _accumulate_mean(gfn, model, s, ref_cache)
+            acc_ref = ar if acc_ref is None else acc_ref + ar
         del model
         print(f"[full] pass1 ckpt {s} ({time.time()-t0:.0f}s)", flush=True)
     mean_hard = acc_hard / (len(steps) * len(dval))
-    mean_ref = acc_ref / (len(steps) * len(ref))
-    g_val = (mean_hard - mean_ref) if args.gval == "contrast" else mean_hard
+    g_val = (mean_hard - acc_ref / (len(steps) * len(ref))) if use_ref else mean_hard
     g_val = _unit(g_val)
     g_val = jax.device_put(g_val)  # keep resident
     print(f"[full] g_val built (dim={g_val.size}); scoring candidates ...", flush=True)
@@ -447,6 +475,8 @@ def run_full(args):
         "k_frames": args.k,
         "real_dim": args.real_dim,
         "gval": args.gval,
+        "dval": args.dval,
+        "ckpt_base": CKPT_BASE,
         "n_dval": len(dval),
         "n_ref": len(ref),
         "dval_episodes": dval,
@@ -462,30 +492,162 @@ def run_full(args):
     print(f"[full] selected mix (top 15): {dict(list(out['selected_mix'].items())[:15])}")
 
 
+# ----------------------------------------------------------------------------- value smoke
+def _grad_filter(mode):
+    if mode == "lastlayer":
+        return nnx.All(nnx.Param, nnx_utils.PathRegex(r".*action_out_proj.*"))
+    if mode == "lora":
+        return nnx.All(nnx.Param, nnx_utils.PathRegex(r".*lora.*"))
+    if mode == "heads":
+        return nnx.All(nnx.Param, nnx.Not(nnx_utils.PathRegex(r".*llm.*")), nnx.Not(nnx_utils.PathRegex(r".*img.*")))
+    if mode == "lora_heads":
+        return nnx.All(nnx.Param, nnx.Any(nnx_utils.PathRegex(r".*lora.*"),
+                       nnx.All(nnx.Not(nnx_utils.PathRegex(r".*llm.*")), nnx.Not(nnx_utils.PathRegex(r".*img.*")))))
+    raise ValueError(mode)
+
+
+def _scalar_loss(real_dim):
+    if real_dim and real_dim > 0:
+        return lambda model, rng, obs, act: masked_flow_loss(model, rng, obs, act, real_dim)
+    return lambda model, rng, obs, act: jnp.mean(model.compute_loss(rng, obs, act, train=False))
+
+
+def run_vsmoke(args):
+    """Value-influence sanity: do the TOP-scored demos, applied as a 1-step SGD update, reduce
+    D_val loss MORE than random demos? Validates the influence sign/scale + the pipeline. D_val is
+    a uniform held-out sample (the test distribution), g_val = plain mean (VALUE, not failure)."""
+    cfg, raw, tds = build_dataset(args.mg_dir)
+    starts = episode_frame_starts(raw)
+    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.seed,
+                                                 args.dval, args.n_val_per_cat, args.n_val)
+    rng = np.random.RandomState(args.seed + 3)
+    cand_sample = sorted(rng.choice(candidates, size=min(args.vsmoke_cand, len(candidates)), replace=False).tolist())
+    step = args.vsmoke_ckpt
+    print(f"[vsmoke] dval({args.dval})={len(dval)} cand_sample={len(cand_sample)} ckpt={step} "
+          f"group_k={args.group_k} lr={args.lr} mode={args.mode_grad}", flush=True)
+
+    val_cache = _decode_cache(tds, starts, dval, args.k)
+    cand_cache = _decode_cache(tds, starts, cand_sample, args.k)
+
+    gfn = make_grad_fn(args.mode_grad, args.real_dim)              # flat unit grads -> scoring
+    filt = _grad_filter(args.mode_grad)
+    loss_fn = _scalar_loss(args.real_dim)
+    diff = nnx.DiffState(0, filt)
+
+    @nnx.jit
+    def grad_state(model, rng, obs, act):                         # nnx grad State -> 1-step update
+        return nnx.grad(loss_fn, argnums=diff)(model, rng, obs, act)
+
+    @nnx.jit
+    def loss_at(model, rng, obs, act):
+        return loss_fn(model, rng, obs, act)
+
+    # 1) score candidates by value = <unit grad(z), g_val>, g_val = plain mean over D_val (1 ckpt)
+    model = load_model(cfg, step)
+    val_vecs = {}
+    for ep, batch in val_cache.items():
+        obs, act = batch_to_inputs(batch)
+        val_vecs[ep] = grad_unit(gfn, model, ep, step, obs, act)
+    g_val = np.mean(np.stack(list(val_vecs.values())), axis=0)
+    g_val = g_val / (np.linalg.norm(g_val) + 1e-12)
+    scores = {}
+    for ep, batch in cand_cache.items():
+        obs, act = batch_to_inputs(batch)
+        scores[ep] = float(grad_unit(gfn, model, ep, step, obs, act) @ g_val)
+    order = sorted(cand_sample, key=lambda e: -scores[e])
+    top_group = order[:args.group_k]
+    bot_group = order[-args.group_k:]
+
+    # baseline D_val loss
+    def dval_loss(m):
+        tot = 0.0
+        for ep, batch in val_cache.items():
+            obs, act = batch_to_inputs(batch)
+            tot += float(loss_at(m, jax.random.fold_in(jax.random.key(int(ep)), 999), obs, act))
+        return tot / len(val_cache)
+
+    base_loss = dval_loss(model)
+    print(f"[vsmoke] base D_val loss = {base_loss:.5f}", flush=True)
+
+    # group mean gradient (batched, 2 frames/demo) -> SGD step -> measure D_val loss delta.
+    # normalize=True scales the group gradient to unit norm first, so EVERY group takes the same
+    # step size -> the test isolates DIRECTION (what the cosine score selects on), removing the
+    # confound that high-cosine demos can have small gradient norms (tiny raw updates).
+    def group_update_delta(eps, normalize):
+        gi = []
+        for ep in eps:
+            s, L = starts[ep]
+            gi += frame_indices(s, L, 2)               # 2 frames/demo keeps the batch modest
+        batch = stack_batch(tds, gi)
+        obs, act = batch_to_inputs(batch)
+        m = load_model(cfg, step)                      # fresh copy
+        g = grad_state(m, jax.random.key(int(eps[0])), obs, act)
+        if normalize:
+            gnorm = optax.global_norm(g)
+            g = jax.tree.map(lambda x: x / (gnorm + 1e-12), g)
+        params = nnx.state(m, filt)
+        tx = optax.sgd(args.lr)
+        updates, _ = tx.update(g, tx.init(params), params)
+        nnx.update(m, optax.apply_updates(params, updates))
+        return dval_loss(m) - base_loss
+
+    for normalize in (True, False):
+        tag = "unit-norm step (DIRECTION test)" if normalize else "raw 1-step update (sign+scale)"
+        d_top = group_update_delta(top_group, normalize)
+        d_bot = group_update_delta(bot_group, normalize)
+        d_rand = np.array([group_update_delta(rng.choice(cand_sample, size=args.group_k, replace=False).tolist(),
+                                              normalize) for _ in range(args.n_rand_groups)])
+        better = (d_top < d_rand.mean()) and (d_top < d_bot)
+        print(f"\n[vsmoke] ΔD_val loss -- {tag} (negative = improvement):")
+        print(f"  TOP-{args.group_k} value : {d_top:+.6f}")
+        print(f"  BOTTOM-{args.group_k}    : {d_bot:+.6f}")
+        print(f"  random groups     : mean {d_rand.mean():+.6f}  (min {d_rand.min():+.6f}, max {d_rand.max():+.6f})")
+        print(f"  -> {'PASS' if better else 'WEAK'} (top better than random AND than bottom)")
+
+
 def main():
+    global CKPT_BASE  # declared up-front: --ckpt_base default reads it, then we rebind it below
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["probe", "smoke", "full"])
+    ap.add_argument("mode", choices=["probe", "smoke", "vsmoke", "full"])
     ap.add_argument("--mg_dir", default=MG_DEFAULT)
     ap.add_argument("--base_file", default="weakregion/arms.json")
     ap.add_argument("--mode_grad", choices=["lastlayer", "heads", "lora", "lora_heads"], default="lastlayer")
     ap.add_argument("--real_dim", type=int, default=REAL_ACTION_DIM,
                     help="mask flow loss to first N action dims (0=all 32, incl. zero-padding)")
     ap.add_argument("--k", type=int, default=8, help="frames sampled per demo")
+    ap.add_argument("--ckpt_base", default=CKPT_BASE,
+                    help="dir holding the NEUTRAL reference checkpoints (<step>/params); default = base warmup")
     ap.add_argument("--steps", default=",".join(str(s) for s in CKPT_STEPS))
-    ap.add_argument("--n_val_per_cat", type=int, default=8)
+    ap.add_argument("--dval", choices=["targeted", "balanced", "uniform"], default="targeted",
+                    help="D_val: targeted=failure categories (failure influence); "
+                         "balanced=class-balanced over ALL categories (VALUE influence, matches "
+                         "stratified eval); uniform=frequency-uniform sample (ablation)")
+    ap.add_argument("--n_val_per_cat", type=int, default=8, help="dval=targeted: held-out demos/category")
+    ap.add_argument("--n_val", type=int, default=120, help="dval=uniform: held-out demos in D_val")
     ap.add_argument("--n_test", type=int, default=100, help="smoke: hard/easy test demos each")
     ap.add_argument("--n_ref", type=int, default=100, help="random reference demos (common-mode)")
     ap.add_argument("--gval", choices=["plain", "contrast"], default="contrast",
-                    help="full: g_val direction (contrast = mean_hard - mean_ref, cancels common mode)")
+                    help="full: g_val direction (contrast = mean_hard - mean_ref, cancels common mode; "
+                         "plain = mean over D_val, for VALUE influence)")
     ap.add_argument("--n_select", type=int, default=200)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--limit", type=int, default=0, help="full: cap candidates (debug)")
     ap.add_argument("--out", default="weakregion/influence_core.json")
+    # vsmoke (value 1-step loss-reduction test) knobs:
+    ap.add_argument("--vsmoke_ckpt", type=int, default=10000, help="vsmoke: checkpoint to update")
+    ap.add_argument("--vsmoke_cand", type=int, default=300, help="vsmoke: candidates to score")
+    ap.add_argument("--group_k", type=int, default=25, help="vsmoke: demos per update group")
+    ap.add_argument("--lr", type=float, default=0.05, help="vsmoke: 1-step SGD lr")
+    ap.add_argument("--n_rand_groups", type=int, default=5, help="vsmoke: random groups to compare")
     args = ap.parse_args()
+    CKPT_BASE = args.ckpt_base  # load_model() reads this module global (declared global at top)
+    print(f"[ref] differentiating at checkpoints: {CKPT_BASE} steps={args.steps}", flush=True)
     if args.mode == "probe":
         run_probe(args)
     elif args.mode == "smoke":
         run_smoke(args)
+    elif args.mode == "vsmoke":
+        run_vsmoke(args)
     else:
         run_full(args)
 
