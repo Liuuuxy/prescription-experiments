@@ -1,0 +1,40 @@
+=== ROBOCASA magnitude-aware menu (old labels) ===
+[off] cand (9036, 4096) (hard 610/9036) | dval (313, 4096) | raw=True
+
+variant                             AUC(hard>easy)  top200 targeted%
+  plain  cos(z, mean Dval)                   0.518              6.5%
+  contrast cos(z, hard-ret)                  0.583             15.0%
+  contrast cos(z, Dval-ret)                  0.563             10.5%
+  max-over-targets                           0.534              7.0%
+  top5 targets (mean)                        0.542             10.5%
+  coverage top3 (all modes)                  0.545             10.5%
+  coverage top3 (HARD modes)                 0.594             17.5%
+  cos(z, g_hard) only                        0.568             12.5%
+  WHITEN k=30 (g_hard)                       0.595             22.5%
+  MAG raw-dot  <z, mean Dval>                0.548             14.0%
+  MAG projection on g_hard                   0.572             17.0%
+  grad-norm only (||z||)                     0.543             10.5%
+
+AUC 0.5 = no separation; >0.6 = real signal. (hard=targeted-10 cand, easy=non-targeted)
+targeted% = fraction of the top-200 in the failure categories.
+=== ROBOCASA magnitude-aware menu (rebalanced labels) ===
+[off] using hard set: ['bottled_water', 'cheese_grater', 'colander', 'jar', 'jug', 'juice', 'pitcher', 'reamer', 'spray', 'yogurt']
+[off] cand (9036, 4096) (hard 639/9036) | dval (313, 4096) | raw=True
+
+variant                             AUC(hard>easy)  top200 targeted%
+  plain  cos(z, mean Dval)                   0.530              6.5%
+  contrast cos(z, hard-ret)                  0.586             14.0%
+  contrast cos(z, Dval-ret)                  0.490              5.0%
+  max-over-targets                           0.470              3.0%
+  top5 targets (mean)                        0.471              4.5%
+  coverage top3 (all modes)                  0.518             10.0%
+  coverage top3 (HARD modes)                 0.604             15.5%
+  cos(z, g_hard) only                        0.605             16.5%
+  WHITEN k=30 (g_hard)                       0.655             33.5%
+  MAG raw-dot  <z, mean Dval>                0.607             15.5%
+  MAG projection on g_hard                   0.639             21.0%
+  grad-norm only (||z||)                     0.628             15.5%
+
+AUC 0.5 = no separation; >0.6 = real signal. (hard=targeted-10 cand, easy=non-targeted)
+targeted% = fraction of the top-200 in the failure categories.
+DONE_MAG_MENU

@@ -1,0 +1,744 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "split": "pretrain",
+  "policy": "pi0",
+  "n": 240,
+  "episodes": [
+    {
+      "episode": 14,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.588,
+      "object_category": "ice_cube",
+      "object_split": "pretrain",
+      "obj_height": 0.029,
+      "obj_width": 0.0435,
+      "obj_xy_abs": [
+        3.618175987504237,
+        -2.4514909744946
+      ],
+      "obj_xy_rel": [
+        0.5234267008698996,
+        -0.21035811829810136
+      ],
+      "layout_id": 56,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 30,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.736,
+      "object_category": "cream_cheese_stick",
+      "object_split": "pretrain",
+      "obj_height": 0.0418,
+      "obj_width": 0.1532,
+      "obj_xy_abs": [
+        3.5680018279144696,
+        -0.4744654453843511
+      ],
+      "obj_xy_rel": [
+        -0.5139567637484483,
+        0.35310141346601986
+      ],
+      "layout_id": 58,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 42,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.459,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        -0.5040844426384967,
+        -1.7129838823141201
+      ],
+      "obj_xy_rel": [
+        0.32388313986610007,
+        0.6577711475548738
+      ],
+      "layout_id": 57,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 45,
+      "success": true,
+      "steps_to_success": 260,
+      "failure_phase": "success",
+      "max_lift": 0.092,
+      "min_sink_dist": 0.081,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0603,
+      "obj_width": 0.2067,
+      "obj_xy_abs": [
+        -0.4537132132876305,
+        -1.7810174103915832
+      ],
+      "obj_xy_rel": [
+        0.31634893485004323,
+        0.4333327787228156
+      ],
+      "layout_id": 57,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 52,
+      "success": true,
+      "steps_to_success": 365,
+      "failure_phase": "success",
+      "max_lift": 0.204,
+      "min_sink_dist": 0.039,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0457,
+      "obj_width": 0.1783,
+      "obj_xy_abs": [
+        0.489013231845537,
+        -2.3137929055051742
+      ],
+      "obj_xy_rel": [
+        -0.3594864575069927,
+        -0.6926549839425387
+      ],
+      "layout_id": 36,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 66,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.412,
+      "object_category": "cream_cheese_stick",
+      "object_split": "pretrain",
+      "obj_height": 0.0418,
+      "obj_width": 0.1532,
+      "obj_xy_abs": [
+        2.117699559767593,
+        -2.1695781118760085
+      ],
+      "obj_xy_rel": [
+        -0.42454835277546543,
+        0.49542660187198084
+      ],
+      "layout_id": 43,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 72,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.459,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2376,
+      "obj_width": 0.2256,
+      "obj_xy_abs": [
+        3.431198016151928,
+        -4.682807327435301
+      ],
+      "obj_xy_rel": [
+        -0.341353988240936,
+        -0.361657086604402
+      ],
+      "layout_id": 26,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 80,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.027,
+      "min_sink_dist": 0.72,
+      "object_category": "ice_cube",
+      "object_split": "pretrain",
+      "obj_height": 0.029,
+      "obj_width": 0.0435,
+      "obj_xy_abs": [
+        3.403653163643924,
+        -0.48685596766888933
+      ],
+      "obj_xy_rel": [
+        -0.49933987280336467,
+        0.2932359927084082
+      ],
+      "layout_id": 51,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 89,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.056,
+      "min_sink_dist": 0.644,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0514,
+      "obj_width": 0.2345,
+      "obj_xy_abs": [
+        1.2160019882492592,
+        -0.4016008924612511
+      ],
+      "obj_xy_rel": [
+        -0.4526003501558258,
+        0.4193881231527218
+      ],
+      "layout_id": 38,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 98,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.702,
+      "object_category": "ice_cube",
+      "object_split": "pretrain",
+      "obj_height": 0.0498,
+      "obj_width": 0.0705,
+      "obj_xy_abs": [
+        0.3110846789039644,
+        -1.1900029082552888
+      ],
+      "obj_xy_rel": [
+        -0.47993433332907054,
+        0.6021270469973199
+      ],
+      "layout_id": 20,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 103,
+      "success": true,
+      "steps_to_success": 256,
+      "failure_phase": "success",
+      "max_lift": 0.075,
+      "min_sink_dist": 0.096,
+      "object_category": "soap_dispenser",
+      "object_split": "pretrain",
+      "obj_height": 0.1365,
+      "obj_width": 0.0788,
+      "obj_xy_abs": [
+        2.77258061357213,
+        -1.514098978939723
+      ],
+      "obj_xy_rel": [
+        0.29658999481690396,
+        -0.35236143492481276
+      ],
+      "layout_id": 52,
+      "style_id": 18,
+      "uncertainty": null
+    },
+    {
+      "episode": 104,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.439,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        0.3172570135511922,
+        -1.1016330527085856
+      ],
+      "obj_xy_rel": [
+        -0.5241162831590602,
+        0.5645851529102497
+      ],
+      "layout_id": 36,
+      "style_id": 59,
+      "uncertainty": null
+    },
+    {
+      "episode": 111,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.504,
+      "object_category": "canned_food",
+      "object_split": "pretrain",
+      "obj_height": 0.0759,
+      "obj_width": 0.1064,
+      "obj_xy_abs": [
+        3.345238800056826,
+        -2.5141128648309854
+      ],
+      "obj_xy_rel": [
+        0.3747740374536406,
+        -0.630324534417698
+      ],
+      "layout_id": 40,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 114,
+      "success": true,
+      "steps_to_success": 267,
+      "failure_phase": "success",
+      "max_lift": 0.081,
+      "min_sink_dist": 0.044,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        3.6450613839035557,
+        -0.4429991276385106
+      ],
+      "obj_xy_rel": [
+        -0.5676507518790284,
+        0.3972141031471235
+      ],
+      "layout_id": 58,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 124,
+      "success": true,
+      "steps_to_success": 381,
+      "failure_phase": "success",
+      "max_lift": 0.087,
+      "min_sink_dist": 0.138,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        0.45328471071598814,
+        -2.5974844542192
+      ],
+      "obj_xy_rel": [
+        -0.39056427562657353,
+        -0.4425603612036202
+      ],
+      "layout_id": 19,
+      "style_id": 11,
+      "uncertainty": null
+    },
+    {
+      "episode": 128,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.865,
+      "object_category": "soap_dispenser",
+      "object_split": "pretrain",
+      "obj_height": 0.1926,
+      "obj_width": 0.1153,
+      "obj_xy_abs": [
+        3.2381555654674954,
+        -2.5695754513697233
+      ],
+      "obj_xy_rel": [
+        0.3247569051991679,
+        -0.8139271707689038
+      ],
+      "layout_id": 40,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 132,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.026,
+      "min_sink_dist": 1.079,
+      "object_category": "ice_cube",
+      "object_split": "pretrain",
+      "obj_height": 0.029,
+      "obj_width": 0.0435,
+      "obj_xy_abs": [
+        3.344655759105037,
+        -2.6554184394074625
+      ],
+      "obj_xy_rel": [
+        0.34013830744475104,
+        -0.7639684251900776
+      ],
+      "layout_id": 40,
+      "style_id": 42,
+      "uncertainty": null
+    },
+    {
+      "episode": 135,
+      "success": true,
+      "steps_to_success": 292,
+      "failure_phase": "success",
+      "max_lift": 0.131,
+      "min_sink_dist": 0.097,
+      "object_category": "cream_cheese_stick",
+      "object_split": "pretrain",
+      "obj_height": 0.0157,
+      "obj_width": 0.1403,
+      "obj_xy_abs": [
+        3.277639935974006,
+        -2.2775785046908665
+      ],
+      "obj_xy_rel": [
+        0.25703491254859756,
+        -0.6181669130578786
+      ],
+      "layout_id": 30,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 142,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.802,
+      "object_category": "cream_cheese_stick",
+      "object_split": "pretrain",
+      "obj_height": 0.0157,
+      "obj_width": 0.1403,
+      "obj_xy_abs": [
+        3.526973390210249,
+        -1.0046642361937765
+      ],
+      "obj_xy_rel": [
+        0.521023756875747,
+        0.48898240213930344
+      ],
+      "layout_id": 30,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 145,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.355,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        2.7937199445627496,
+        -0.4970794460229697
+      ],
+      "obj_xy_rel": [
+        0.2614226835554101,
+        0.34702828168225897
+      ],
+      "layout_id": 12,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 154,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.027,
+      "min_sink_dist": 0.258,
+      "object_category": "soap_dispenser",
+      "object_split": "pretrain",
+      "obj_height": 0.1567,
+      "obj_width": 0.0628,
+      "obj_xy_abs": [
+        4.647686350577277,
+        -0.5334299828818254
+      ],
+      "obj_xy_rel": [
+        0.5785878595802316,
+        0.395027198622634
+      ],
+      "layout_id": 55,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 170,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.577,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        2.5613141819818774,
+        -2.1229573248960927
+      ],
+      "obj_xy_rel": [
+        0.328129787566513,
+        0.5628854923638813
+      ],
+      "layout_id": 16,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 188,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.454,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.219,
+      "obj_width": 0.2127,
+      "obj_xy_abs": [
+        2.525606723267531,
+        -0.5139850466478608
+      ],
+      "obj_xy_rel": [
+        -0.5032636606570158,
+        0.31452830301560675
+      ],
+      "layout_id": 32,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 194,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.015,
+      "min_sink_dist": 0.499,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        2.629282805785832,
+        -0.4697040960502312
+      ],
+      "obj_xy_rel": [
+        -0.43610909301413114,
+        0.32558249816446494
+      ],
+      "layout_id": 32,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 197,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.518,
+      "object_category": "ice_cube",
+      "object_split": "pretrain",
+      "obj_height": 0.0498,
+      "obj_width": 0.0705,
+      "obj_xy_abs": [
+        3.579122434735062,
+        -2.731641403548053
+      ],
+      "obj_xy_rel": [
+        0.5234507527346284,
+        -0.4690915755003493
+      ],
+      "layout_id": 56,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 198,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.012,
+      "min_sink_dist": 0.421,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        1.515137469495124,
+        -3.6162335181224345
+      ],
+      "obj_xy_rel": [
+        0.26383185411087773,
+        0.7150611670636287
+      ],
+      "layout_id": 29,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 203,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.971,
+      "object_category": "soap_dispenser",
+      "object_split": "pretrain",
+      "obj_height": 0.1926,
+      "obj_width": 0.1153,
+      "obj_xy_abs": [
+        5.079563739425812,
+        -2.971523808202977
+      ],
+      "obj_xy_rel": [
+        0.6589252625742867,
+        -0.2859149050844856
+      ],
+      "layout_id": 46,
+      "style_id": 15,
+      "uncertainty": null
+    },
+    {
+      "episode": 207,
+      "success": true,
+      "steps_to_success": 270,
+      "failure_phase": "success",
+      "max_lift": 0.292,
+      "min_sink_dist": 0.038,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0514,
+      "obj_width": 0.2345,
+      "obj_xy_abs": [
+        3.231792623155543,
+        -0.462338461383393
+      ],
+      "obj_xy_rel": [
+        0.7053588891951961,
+        0.3305677622917332
+      ],
+      "layout_id": 41,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 224,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.429,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0514,
+      "obj_width": 0.2345,
+      "obj_xy_abs": [
+        2.7842451361613283,
+        -2.1341284962502955
+      ],
+      "obj_xy_rel": [
+        0.6762256244466123,
+        -0.37099188514680326
+      ],
+      "layout_id": 33,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 231,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.603,
+      "object_category": "tupperware",
+      "object_split": "pretrain",
+      "obj_height": 0.0603,
+      "obj_width": 0.2067,
+      "obj_xy_abs": [
+        2.5517543723240714,
+        -0.5424358955413251
+      ],
+      "obj_xy_rel": [
+        -0.6413475814330054,
+        0.28417929755745885
+      ],
+      "layout_id": 32,
+      "style_id": 11,
+      "uncertainty": null
+    },
+    {
+      "episode": 236,
+      "success": true,
+      "steps_to_success": 413,
+      "failure_phase": "success",
+      "max_lift": 0.108,
+      "min_sink_dist": 0.163,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1495,
+      "obj_width": 0.1344,
+      "obj_xy_abs": [
+        3.5489681607461945,
+        -0.5548885766318916
+      ],
+      "obj_xy_rel": [
+        0.7212141396395952,
+        0.245649804719424
+      ],
+      "layout_id": 44,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 239,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.672,
+      "object_category": "cream_cheese_stick",
+      "object_split": "pretrain",
+      "obj_height": 0.0157,
+      "obj_width": 0.1403,
+      "obj_xy_abs": [
+        3.3223424646978215,
+        -2.369007733567177
+      ],
+      "obj_xy_rel": [
+        0.33256936141650284,
+        -0.5623978783592976
+      ],
+      "layout_id": 40,
+      "style_id": 24,
+      "uncertainty": null
+    }
+  ]
+}
