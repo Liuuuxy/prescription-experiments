@@ -1,0 +1,7000 @@
+{
+  "task": "PickPlaceCounterToSink",
+  "split": "pretrain",
+  "policy": "pi0",
+  "n": 2620,
+  "episodes": [
+    {
+      "episode": 10,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.531,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.7522137541314673,
+        -3.2778089037013545
+      ],
+      "obj_xy_rel": [
+        0.5506681204540063,
+        -0.7283467082942177
+      ],
+      "layout_id": 16,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 31,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.032,
+      "min_sink_dist": 0.45,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1236,
+      "obj_width": 0.3624,
+      "obj_xy_abs": [
+        4.7514573783094,
+        -0.47236648466249487
+      ],
+      "obj_xy_rel": [
+        0.5568741819256946,
+        0.4578671299982845
+      ],
+      "layout_id": 55,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 35,
+      "success": true,
+      "steps_to_success": 264,
+      "failure_phase": "success",
+      "max_lift": 0.039,
+      "min_sink_dist": 0.282,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.186,
+      "obj_width": 0.0673,
+      "obj_xy_abs": [
+        3.031500751559533,
+        -2.149226092741837
+      ],
+      "obj_xy_rel": [
+        0.5335943444578524,
+        0.4780243264016035
+      ],
+      "layout_id": 37,
+      "style_id": 24,
+      "uncertainty": null
+    },
+    {
+      "episode": 43,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.245,
+      "min_sink_dist": 0.181,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.6473763142306495,
+        -2.1117161331089997
+      ],
+      "obj_xy_rel": [
+        -0.8199318407390646,
+        -0.3543492672836135
+      ],
+      "layout_id": 24,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 44,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.501,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0953,
+      "obj_width": 0.205,
+      "obj_xy_abs": [
+        3.457051999094584,
+        -0.3632120718586955
+      ],
+      "obj_xy_rel": [
+        0.4140583724194751,
+        0.45649829796372005
+      ],
+      "layout_id": 44,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 49,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.543,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        1.9619729125727516,
+        -1.6654521895047159
+      ],
+      "obj_xy_rel": [
+        -0.3902014917579242,
+        0.4834572636928931
+      ],
+      "layout_id": 60,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 72,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.012,
+      "min_sink_dist": 0.45,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2376,
+      "obj_width": 0.2256,
+      "obj_xy_abs": [
+        3.431198016151928,
+        -4.682807327435301
+      ],
+      "obj_xy_rel": [
+        -0.341353988240936,
+        -0.361657086604402
+      ],
+      "layout_id": 26,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 104,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.655,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        0.31725684193464254,
+        -2.312360889024168
+      ],
+      "obj_xy_rel": [
+        -0.5241164547756099,
+        -0.6461426834053328
+      ],
+      "layout_id": 36,
+      "style_id": 59,
+      "uncertainty": null
+    },
+    {
+      "episode": 109,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.344,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0953,
+      "obj_width": 0.205,
+      "obj_xy_abs": [
+        2.4602644216473095,
+        -1.8484543470775527
+      ],
+      "obj_xy_rel": [
+        -0.52051987881724,
+        -0.31292998563192254
+      ],
+      "layout_id": 14,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 114,
+      "success": true,
+      "steps_to_success": 266,
+      "failure_phase": "success",
+      "max_lift": 0.1,
+      "min_sink_dist": 0.153,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        4.763792916588572,
+        -0.4429997277549125
+      ],
+      "obj_xy_rel": [
+        0.5510807808059877,
+        0.39721350303072167
+      ],
+      "layout_id": 58,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 116,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.729,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        3.514682459941319,
+        -0.5617837308154385
+      ],
+      "obj_xy_rel": [
+        0.6297116638978983,
+        0.25741024155723435
+      ],
+      "layout_id": 44,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 120,
+      "success": true,
+      "steps_to_success": 358,
+      "failure_phase": "success",
+      "max_lift": 0.047,
+      "min_sink_dist": 0.015,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        1.9395766366451246,
+        -0.5215407115120609
+      ],
+      "obj_xy_rel": [
+        -0.4066801877235766,
+        0.31884372551901297
+      ],
+      "layout_id": 12,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 131,
+      "success": true,
+      "steps_to_success": 246,
+      "failure_phase": "success",
+      "max_lift": 0.119,
+      "min_sink_dist": 0.091,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        3.6194559469994,
+        -0.45499161934704463
+      ],
+      "obj_xy_rel": [
+        0.6785407426912897,
+        0.30264675458689044
+      ],
+      "layout_id": 44,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 134,
+      "success": true,
+      "steps_to_success": 366,
+      "failure_phase": "success",
+      "max_lift": 0.083,
+      "min_sink_dist": 0.195,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2646,
+      "obj_width": 0.123,
+      "obj_xy_abs": [
+        4.734277588376267,
+        -0.5134807905498568
+      ],
+      "obj_xy_rel": [
+        0.5886202977128203,
+        0.4135774969275332
+      ],
+      "layout_id": 55,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 136,
+      "success": true,
+      "steps_to_success": 380,
+      "failure_phase": "success",
+      "max_lift": 0.136,
+      "min_sink_dist": 0.194,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1634,
+      "obj_width": 0.0731,
+      "obj_xy_abs": [
+        6.511241269069071,
+        -3.048341515284678
+      ],
+      "obj_xy_rel": [
+        0.3855077652819219,
+        -0.7393482272837075
+      ],
+      "layout_id": 47,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 147,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.708,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2797,
+      "obj_width": 0.3478,
+      "obj_xy_abs": [
+        2.7914369749045087,
+        -3.669998191671192
+      ],
+      "obj_xy_rel": [
+        -0.3680245821824948,
+        0.6434765585715438
+      ],
+      "layout_id": 31,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 149,
+      "success": true,
+      "steps_to_success": 301,
+      "failure_phase": "success",
+      "max_lift": 0.11,
+      "min_sink_dist": 0.036,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0988,
+      "obj_width": 0.3515,
+      "obj_xy_abs": [
+        0.36694594620284904,
+        -1.8358432457962268
+      ],
+      "obj_xy_rel": [
+        -0.48041534231579397,
+        0.3228741195064686
+      ],
+      "layout_id": 22,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 155,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.57,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        3.445671864826457,
+        -0.5443695194407598
+      ],
+      "obj_xy_rel": [
+        -0.8488823322840315,
+        0.2504673209790671
+      ],
+      "layout_id": 58,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 168,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.475,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        2.003133380884349,
+        -2.9347034484410743
+      ],
+      "obj_xy_rel": [
+        -0.30734516987488947,
+        -0.6822261622395218
+      ],
+      "layout_id": 60,
+      "style_id": 22,
+      "uncertainty": null
+    },
+    {
+      "episode": 170,
+      "success": true,
+      "steps_to_success": 320,
+      "failure_phase": "success",
+      "max_lift": 0.051,
+      "min_sink_dist": 0.248,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        2.561299831571049,
+        -3.182276155252507
+      ],
+      "obj_xy_rel": [
+        0.3281154371556845,
+        -0.4964333379925332
+      ],
+      "layout_id": 16,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 173,
+      "success": true,
+      "steps_to_success": 250,
+      "failure_phase": "success",
+      "max_lift": 0.145,
+      "min_sink_dist": 0.006,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1134,
+      "obj_width": 0.3637,
+      "obj_xy_abs": [
+        5.695001298640899,
+        -2.5127923507523215
+      ],
+      "obj_xy_rel": [
+        0.35891585751010613,
+        -0.5946679268344524
+      ],
+      "layout_id": 49,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 194,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.523,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        2.629282805785832,
+        -0.4697040960502312
+      ],
+      "obj_xy_rel": [
+        -0.43610909301413114,
+        0.32558249816446494
+      ],
+      "layout_id": 32,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 198,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.014,
+      "min_sink_dist": 1.037,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        1.515137515837382,
+        -4.926233524326849
+      ],
+      "obj_xy_rel": [
+        0.26383190045313576,
+        -0.5949388391407862
+      ],
+      "layout_id": 29,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 200,
+      "success": true,
+      "steps_to_success": 243,
+      "failure_phase": "success",
+      "max_lift": 0.148,
+      "min_sink_dist": 0.179,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        0.4496118774878687,
+        -2.323608443858829
+      ],
+      "obj_xy_rel": [
+        -0.34032693482827703,
+        -0.5367517212963038
+      ],
+      "layout_id": 11,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 207,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.58,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2646,
+      "obj_width": 0.123,
+      "obj_xy_abs": [
+        0.4131071180807608,
+        -1.1333795888907956
+      ],
+      "obj_xy_rel": [
+        -0.3548234585767069,
+        0.7490048304652965
+      ],
+      "layout_id": 11,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 217,
+      "success": true,
+      "steps_to_success": 318,
+      "failure_phase": "success",
+      "max_lift": 0.049,
+      "min_sink_dist": 0.205,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1637,
+      "obj_width": 0.079,
+      "obj_xy_abs": [
+        0.2913220312806531,
+        -1.1348792450288492
+      ],
+      "obj_xy_rel": [
+        -0.5483157220267705,
+        0.628553468548011
+      ],
+      "layout_id": 20,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 220,
+      "success": true,
+      "steps_to_success": 340,
+      "failure_phase": "success",
+      "max_lift": 0.07,
+      "min_sink_dist": 0.023,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1634,
+      "obj_width": 0.0731,
+      "obj_xy_abs": [
+        2.505677349763035,
+        -0.29539528089432654
+      ],
+      "obj_xy_rel": [
+        -0.5563081928729319,
+        0.5223140735422395
+      ],
+      "layout_id": 32,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 233,
+      "success": true,
+      "steps_to_success": 166,
+      "failure_phase": "success",
+      "max_lift": 0.104,
+      "min_sink_dist": 0.126,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        3.4373285742562367,
+        -2.636118598862772
+      ],
+      "obj_xy_rel": [
+        0.5281430365732058,
+        -0.3996376969356761
+      ],
+      "layout_id": 56,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 234,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.507,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        2.8214126934445765,
+        -1.6192778665036331
+      ],
+      "obj_xy_rel": [
+        0.3845011315933551,
+        -0.4449554985783182
+      ],
+      "layout_id": 52,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 236,
+      "success": true,
+      "steps_to_success": 403,
+      "failure_phase": "success",
+      "max_lift": 0.106,
+      "min_sink_dist": 0.213,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1495,
+      "obj_width": 0.1344,
+      "obj_xy_abs": [
+        3.5489681607461945,
+        -0.5548885766318916
+      ],
+      "obj_xy_rel": [
+        0.7212141396395952,
+        0.245649804719424
+      ],
+      "layout_id": 44,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 238,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.637,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        1.905466044417284,
+        -0.3967472505975734
+      ],
+      "obj_xy_rel": [
+        0.669900083019001,
+        0.44135856658285827
+      ],
+      "layout_id": 21,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 250,
+      "success": true,
+      "steps_to_success": 269,
+      "failure_phase": "success",
+      "max_lift": 0.045,
+      "min_sink_dist": 0.124,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2417,
+      "obj_width": 0.1174,
+      "obj_xy_abs": [
+        3.618297414355674,
+        -0.42030017984949186
+      ],
+      "obj_xy_rel": [
+        0.5946487734812802,
+        0.4103097784674351
+      ],
+      "layout_id": 28,
+      "style_id": 53,
+      "uncertainty": null
+    },
+    {
+      "episode": 269,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.566,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1134,
+      "obj_width": 0.3637,
+      "obj_xy_abs": [
+        2.4590968339456496,
+        -1.9349454681010019
+      ],
+      "obj_xy_rel": [
+        -0.5871365373549549,
+        -0.4371992434955163
+      ],
+      "layout_id": 14,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 287,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.471,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1637,
+      "obj_width": 0.079,
+      "obj_xy_abs": [
+        0.32433995753651484,
+        -1.1937188206251161
+      ],
+      "obj_xy_rel": [
+        -0.4683629591719601,
+        0.6979999993060362
+      ],
+      "layout_id": 25,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 288,
+      "success": true,
+      "steps_to_success": 415,
+      "failure_phase": "success",
+      "max_lift": 0.12,
+      "min_sink_dist": 0.044,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0675,
+      "obj_xy_abs": [
+        3.316040461530348,
+        -0.31153975047927873
+      ],
+      "obj_xy_rel": [
+        0.6687083075987377,
+        0.4436314236459331
+      ],
+      "layout_id": 45,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 290,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.012,
+      "min_sink_dist": 0.513,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        -0.5097058918701471,
+        -1.8031755908666542
+      ],
+      "obj_xy_rel": [
+        0.30690602597784844,
+        0.4801681388313095
+      ],
+      "layout_id": 57,
+      "style_id": 18,
+      "uncertainty": null
+    },
+    {
+      "episode": 293,
+      "success": true,
+      "steps_to_success": 259,
+      "failure_phase": "success",
+      "max_lift": 0.054,
+      "min_sink_dist": 0.617,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        0.2889498493561458,
+        -1.1504592008825723
+      ],
+      "obj_xy_rel": [
+        -0.5512074695685245,
+        0.5251499377194093
+      ],
+      "layout_id": 11,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 296,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.474,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2677,
+      "obj_width": 0.1688,
+      "obj_xy_abs": [
+        2.2693608431357073,
+        -2.2988217972515788
+      ],
+      "obj_xy_rel": [
+        -0.26844879879079064,
+        0.4045882543178281
+      ],
+      "layout_id": 43,
+      "style_id": 50,
+      "uncertainty": null
+    },
+    {
+      "episode": 314,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.448,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        4.750205805535349,
+        -0.4449490202331556
+      ],
+      "obj_xy_rel": [
+        0.6054302464221601,
+        0.3829451131620963
+      ],
+      "layout_id": 58,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 320,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.405,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2539,
+      "obj_width": 0.144,
+      "obj_xy_abs": [
+        2.4057313702404155,
+        -0.51060945121964
+      ],
+      "obj_xy_rel": [
+        -0.7430981677814974,
+        0.3334662744325263
+      ],
+      "layout_id": 28,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 352,
+      "success": true,
+      "steps_to_success": 259,
+      "failure_phase": "success",
+      "max_lift": 0.076,
+      "min_sink_dist": 0.179,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        1.8653984845471663,
+        -0.3686602012838122
+      ],
+      "obj_xy_rel": [
+        0.5756622522261123,
+        0.4201478494198874
+      ],
+      "layout_id": 21,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 353,
+      "success": true,
+      "steps_to_success": 326,
+      "failure_phase": "success",
+      "max_lift": 0.06,
+      "min_sink_dist": 0.113,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        4.74686267264834,
+        -1.8350461102896585
+      ],
+      "obj_xy_rel": [
+        0.27862137571167356,
+        0.4399914715541189
+      ],
+      "layout_id": 35,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 354,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.376,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.182,
+      "obj_width": 0.1576,
+      "obj_xy_abs": [
+        2.601276775537332,
+        -3.66293845443462
+      ],
+      "obj_xy_rel": [
+        0.498400141286381,
+        -0.516359501308636
+      ],
+      "layout_id": 34,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 355,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.496,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1636,
+      "obj_width": 0.0783,
+      "obj_xy_abs": [
+        2.9171197959554616,
+        -1.6479120395373927
+      ],
+      "obj_xy_rel": [
+        0.42993552437710747,
+        -0.6327172185003647
+      ],
+      "layout_id": 52,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 362,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.718,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.157,
+      "obj_width": 0.2089,
+      "obj_xy_abs": [
+        2.054663630077819,
+        -0.41951264910573155
+      ],
+      "obj_xy_rel": [
+        -0.7536929066747686,
+        0.34158201212495226
+      ],
+      "layout_id": 23,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 364,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.418,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        2.721157962990309,
+        -3.6555378784320283
+      ],
+      "obj_xy_rel": [
+        -0.4125930736940093,
+        0.6485462575529839
+      ],
+      "layout_id": 31,
+      "style_id": 23,
+      "uncertainty": null
+    },
+    {
+      "episode": 365,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.396,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        1.457014233574717,
+        -0.5144896698595228
+      ],
+      "obj_xy_rel": [
+        -0.21513069436593102,
+        0.31592886277984755
+      ],
+      "layout_id": 38,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 379,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.028,
+      "min_sink_dist": 0.457,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0889,
+      "obj_width": 0.2389,
+      "obj_xy_abs": [
+        2.695416552134724,
+        -0.5047647700571615
+      ],
+      "obj_xy_rel": [
+        -0.6185427490225597,
+        0.3361893120155982
+      ],
+      "layout_id": 32,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 380,
+      "success": true,
+      "steps_to_success": 327,
+      "failure_phase": "success",
+      "max_lift": 0.208,
+      "min_sink_dist": 0.094,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.5984521949277872,
+        -0.3639291570708269
+      ],
+      "obj_xy_rel": [
+        0.7550413497438622,
+        0.4124292180877848
+      ],
+      "layout_id": 13,
+      "style_id": 53,
+      "uncertainty": null
+    },
+    {
+      "episode": 427,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.675,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        3.1049504531903667,
+        -0.36699919025181515
+      ],
+      "obj_xy_rel": [
+        0.5999941460286244,
+        0.40542329698550805
+      ],
+      "layout_id": 12,
+      "style_id": 32,
+      "uncertainty": null
+    },
+    {
+      "episode": 433,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_reached_sink_no_place",
+      "max_lift": 0.505,
+      "min_sink_dist": 0.088,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        3.2878200644600595,
+        -4.855480928101373
+      ],
+      "obj_xy_rel": [
+        -0.7262508688750371,
+        -0.5641436599984635
+      ],
+      "layout_id": 26,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 434,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.747,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        0.48668062816110286,
+        -2.2544617085376806
+      ],
+      "obj_xy_rel": [
+        -0.29099172937266665,
+        -0.5710147619625761
+      ],
+      "layout_id": 36,
+      "style_id": 55,
+      "uncertainty": null
+    },
+    {
+      "episode": 436,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.686,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        2.770318332695239,
+        -3.561121579743726
+      ],
+      "obj_xy_rel": [
+        -0.40013725972550596,
+        0.6528096551035354
+      ],
+      "layout_id": 31,
+      "style_id": 32,
+      "uncertainty": null
+    },
+    {
+      "episode": 438,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.996,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.245,
+      "obj_width": 0.2175,
+      "obj_xy_abs": [
+        3.682204813070391,
+        -0.5131888502526201
+      ],
+      "obj_xy_rel": [
+        0.6206389221043191,
+        0.29221027885691386
+      ],
+      "layout_id": 44,
+      "style_id": 25,
+      "uncertainty": null
+    },
+    {
+      "episode": 441,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.863,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        1.8546337581165018,
+        -2.844464040339928
+      ],
+      "obj_xy_rel": [
+        -0.4901768532541464,
+        -0.5031161186398694
+      ],
+      "layout_id": 60,
+      "style_id": 15,
+      "uncertainty": null
+    },
+    {
+      "episode": 461,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.432,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.182,
+      "obj_width": 0.1576,
+      "obj_xy_abs": [
+        1.5919937080872353,
+        -4.776422662545256
+      ],
+      "obj_xy_rel": [
+        0.4023975844372212,
+        -0.578813770416903
+      ],
+      "layout_id": 29,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 467,
+      "success": true,
+      "steps_to_success": 461,
+      "failure_phase": "success",
+      "max_lift": 0.03,
+      "min_sink_dist": 0.219,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        2.9066956512894753,
+        -1.635798379797837
+      ],
+      "obj_xy_rel": [
+        0.44235348220951654,
+        -0.5336121132008482
+      ],
+      "layout_id": 52,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 469,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.057,
+      "min_sink_dist": 0.423,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        2.4540741189779136,
+        -1.8465776866579278
+      ],
+      "obj_xy_rel": [
+        -0.7099027122244732,
+        -0.3012153322116342
+      ],
+      "layout_id": 14,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 497,
+      "success": true,
+      "steps_to_success": 310,
+      "failure_phase": "success",
+      "max_lift": 0.116,
+      "min_sink_dist": 0.122,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        0.4270606574553628,
+        -1.471031924621475
+      ],
+      "obj_xy_rel": [
+        -0.4155796664314906,
+        0.5404859354923586
+      ],
+      "layout_id": 19,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 498,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.749,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1547,
+      "obj_width": 0.2479,
+      "obj_xy_abs": [
+        2.322735499236802,
+        -2.684877398145946
+      ],
+      "obj_xy_rel": [
+        -0.5423074629919471,
+        -0.4207623248818275
+      ],
+      "layout_id": 56,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 516,
+      "success": true,
+      "steps_to_success": 305,
+      "failure_phase": "success",
+      "max_lift": 0.084,
+      "min_sink_dist": 0.146,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.212,
+      "obj_width": 0.1384,
+      "obj_xy_abs": [
+        1.7512529561388932,
+        -0.5282092279498081
+      ],
+      "obj_xy_rel": [
+        0.558514147656876,
+        0.3017917946095865
+      ],
+      "layout_id": 27,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 519,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.791,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1547,
+      "obj_width": 0.2479,
+      "obj_xy_abs": [
+        4.166931908597876,
+        -3.070912237225153
+      ],
+      "obj_xy_rel": [
+        0.45517342243582304,
+        -0.5942827930152648
+      ],
+      "layout_id": 48,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 521,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.348,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2411,
+      "obj_width": 0.1871,
+      "obj_xy_abs": [
+        3.3552942276025757,
+        -0.4067550769229585
+      ],
+      "obj_xy_rel": [
+        0.4506542778228191,
+        0.4100383718811444
+      ],
+      "layout_id": 13,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 528,
+      "success": true,
+      "steps_to_success": 428,
+      "failure_phase": "success",
+      "max_lift": 0.081,
+      "min_sink_dist": 0.121,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        1.959117956303068,
+        -0.4262942956044431
+      ],
+      "obj_xy_rel": [
+        -0.5313475593600787,
+        0.414357098758382
+      ],
+      "layout_id": 41,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 546,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.467,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        0.3999780016978522,
+        -1.4199689996108211
+      ],
+      "obj_xy_rel": [
+        -0.41663738171823356,
+        0.369571575046177
+      ],
+      "layout_id": 25,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 548,
+      "success": true,
+      "steps_to_success": 283,
+      "failure_phase": "success",
+      "max_lift": 0.075,
+      "min_sink_dist": 0.154,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1637,
+      "obj_width": 0.079,
+      "obj_xy_abs": [
+        3.353017648444139,
+        -2.434204546583373
+      ],
+      "obj_xy_rel": [
+        0.4230945527357206,
+        -0.5818300844129931
+      ],
+      "layout_id": 40,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 557,
+      "success": true,
+      "steps_to_success": 420,
+      "failure_phase": "success",
+      "max_lift": 0.085,
+      "min_sink_dist": 0.029,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2646,
+      "obj_width": 0.123,
+      "obj_xy_abs": [
+        4.228119877406658,
+        -2.5918040640852817
+      ],
+      "obj_xy_rel": [
+        0.4754690260137897,
+        -0.5275509090602721
+      ],
+      "layout_id": 59,
+      "style_id": 13,
+      "uncertainty": null
+    },
+    {
+      "episode": 559,
+      "success": true,
+      "steps_to_success": 284,
+      "failure_phase": "success",
+      "max_lift": 0.083,
+      "min_sink_dist": 0.53,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.4205676725088576,
+        -1.9848750267436364
+      ],
+      "obj_xy_rel": [
+        -0.49429668439909147,
+        -0.478787445673327
+      ],
+      "layout_id": 14,
+      "style_id": 19,
+      "uncertainty": null
+    },
+    {
+      "episode": 561,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.466,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2439,
+      "obj_width": 0.152,
+      "obj_xy_abs": [
+        2.7060588022088865,
+        -2.2771607977332367
+      ],
+      "obj_xy_rel": [
+        -0.5760893335642341,
+        -0.4617218082054384
+      ],
+      "layout_id": 24,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 584,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.014,
+      "min_sink_dist": 0.692,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1236,
+      "obj_width": 0.3624,
+      "obj_xy_abs": [
+        4.881482747527055,
+        -0.4821074395919937
+      ],
+      "obj_xy_rel": [
+        0.5794710417361015,
+        0.32832080772576483
+      ],
+      "layout_id": 50,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 593,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.086,
+      "min_sink_dist": 0.289,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2417,
+      "obj_width": 0.1174,
+      "obj_xy_abs": [
+        2.9088999228961963,
+        -1.7572186431111034
+      ],
+      "obj_xy_rel": [
+        0.46178405390136446,
+        -0.5052616897537707
+      ],
+      "layout_id": 52,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 594,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.424,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1134,
+      "obj_width": 0.3637,
+      "obj_xy_abs": [
+        2.572572300117499,
+        -0.4408747742860257
+      ],
+      "obj_xy_rel": [
+        -0.5092373069353013,
+        0.3927634030947756
+      ],
+      "layout_id": 32,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 601,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.025,
+      "min_sink_dist": 0.504,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2797,
+      "obj_width": 0.3478,
+      "obj_xy_abs": [
+        4.818926804644086,
+        -0.5756382092658393
+      ],
+      "obj_xy_rel": [
+        0.7399747405604673,
+        0.38648281489054936
+      ],
+      "layout_id": 55,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 641,
+      "success": true,
+      "steps_to_success": 245,
+      "failure_phase": "success",
+      "max_lift": 0.087,
+      "min_sink_dist": 0.166,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        2.05409042083595,
+        -0.4141616580742267
+      ],
+      "obj_xy_rel": [
+        -0.559844869619297,
+        0.37428343569179506
+      ],
+      "layout_id": 41,
+      "style_id": 55,
+      "uncertainty": null
+    },
+    {
+      "episode": 654,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.456,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2279,
+      "obj_width": 0.1406,
+      "obj_xy_abs": [
+        3.396281746761143,
+        -0.3022976275650552
+      ],
+      "obj_xy_rel": [
+        0.549725496406416,
+        0.45613530111866296
+      ],
+      "layout_id": 13,
+      "style_id": 18,
+      "uncertainty": null
+    },
+    {
+      "episode": 659,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.393,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        5.794465685301164,
+        -1.3122210193555104
+      ],
+      "obj_xy_rel": [
+        0.4902965772032548,
+        0.6858951318671791
+      ],
+      "layout_id": 49,
+      "style_id": 25,
+      "uncertainty": null
+    },
+    {
+      "episode": 671,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.708,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        2.170694531404256,
+        -2.5083950470061174
+      ],
+      "obj_xy_rel": [
+        0.519157769440431,
+        0.5455150216002815
+      ],
+      "layout_id": 15,
+      "style_id": 57,
+      "uncertainty": null
+    },
+    {
+      "episode": 672,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.531,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        2.3989089337095417,
+        -0.36463612753739866
+      ],
+      "obj_xy_rel": [
+        -0.7291029679524494,
+        0.4724638427817717
+      ],
+      "layout_id": 28,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 682,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.609,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2364,
+      "obj_width": 0.1187,
+      "obj_xy_abs": [
+        2.1923925592132187,
+        -2.18703039496172
+      ],
+      "obj_xy_rel": [
+        -0.34120962785338893,
+        0.6008316724490981
+      ],
+      "layout_id": 43,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 688,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.555,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.219,
+      "obj_width": 0.2127,
+      "obj_xy_abs": [
+        3.354225644667996,
+        -4.66279981958672
+      ],
+      "obj_xy_rel": [
+        -0.6708636960653322,
+        -0.37964491380000887
+      ],
+      "layout_id": 26,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 689,
+      "success": true,
+      "steps_to_success": 318,
+      "failure_phase": "success",
+      "max_lift": 0.096,
+      "min_sink_dist": 0.145,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0889,
+      "obj_width": 0.2389,
+      "obj_xy_abs": [
+        3.90773726905635,
+        -0.3669763106235646
+      ],
+      "obj_xy_rel": [
+        0.3843531096855277,
+        0.48401480665890717
+      ],
+      "layout_id": 53,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 690,
+      "success": true,
+      "steps_to_success": 241,
+      "failure_phase": "success",
+      "max_lift": 0.143,
+      "min_sink_dist": 0.033,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        1.9114101711900606,
+        -0.3954460641851191
+      ],
+      "obj_xy_rel": [
+        0.6973220983004829,
+        0.4078664991988633
+      ],
+      "layout_id": 27,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 692,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.014,
+      "min_sink_dist": 0.741,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        6.47193279722915,
+        -3.054663695964355
+      ],
+      "obj_xy_rel": [
+        0.36368391324808336,
+        -0.6953316347181904
+      ],
+      "layout_id": 47,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 696,
+      "success": true,
+      "steps_to_success": 241,
+      "failure_phase": "success",
+      "max_lift": 0.116,
+      "min_sink_dist": 0.114,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        3.446001296748829,
+        -0.4447203219660661
+      ],
+      "obj_xy_rel": [
+        -0.45658763299312666,
+        0.39035439803443955
+      ],
+      "layout_id": 51,
+      "style_id": 27,
+      "uncertainty": null
+    },
+    {
+      "episode": 700,
+      "success": true,
+      "steps_to_success": 334,
+      "failure_phase": "success",
+      "max_lift": 0.053,
+      "min_sink_dist": 0.05,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2364,
+      "obj_width": 0.1187,
+      "obj_xy_abs": [
+        1.2457006006783644,
+        -0.4592871728741559
+      ],
+      "obj_xy_rel": [
+        -0.6948787382341586,
+        0.33863573607372877
+      ],
+      "layout_id": 38,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 710,
+      "success": true,
+      "steps_to_success": 518,
+      "failure_phase": "success",
+      "max_lift": 0.088,
+      "min_sink_dist": 0.086,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        1.9010689763804094,
+        -0.5042557497956456
+      ],
+      "obj_xy_rel": [
+        0.6052702780898742,
+        0.3289894401038299
+      ],
+      "layout_id": 27,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 727,
+      "success": true,
+      "steps_to_success": 269,
+      "failure_phase": "success",
+      "max_lift": 0.063,
+      "min_sink_dist": 0.124,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        0.3788170539374572,
+        -2.293636285195044
+      ],
+      "obj_xy_rel": [
+        -0.37462617334307563,
+        -0.6518204974902964
+      ],
+      "layout_id": 20,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 733,
+      "success": true,
+      "steps_to_success": 205,
+      "failure_phase": "success",
+      "max_lift": 0.11,
+      "min_sink_dist": 0.174,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        3.2695537682456917,
+        -2.4986676727236965
+      ],
+      "obj_xy_rel": [
+        0.2702487616055502,
+        -0.510189779324566
+      ],
+      "layout_id": 40,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 743,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.53,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2279,
+      "obj_width": 0.1406,
+      "obj_xy_abs": [
+        4.184382735595559,
+        -1.842434440649513
+      ],
+      "obj_xy_rel": [
+        0.4098565271307901,
+        0.7077703988362429
+      ],
+      "layout_id": 48,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 747,
+      "success": true,
+      "steps_to_success": 464,
+      "failure_phase": "success",
+      "max_lift": 0.232,
+      "min_sink_dist": 0.027,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        0.3621996495082558,
+        -1.6214045301998818
+      ],
+      "obj_xy_rel": [
+        -0.43794183650655705,
+        0.5759901995223284
+      ],
+      "layout_id": 22,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 751,
+      "success": true,
+      "steps_to_success": 267,
+      "failure_phase": "success",
+      "max_lift": 0.18,
+      "min_sink_dist": 0.094,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        4.958314397515364,
+        -3.1362138535754314
+      ],
+      "obj_xy_rel": [
+        0.5525711792823316,
+        -0.464895348769955
+      ],
+      "layout_id": 46,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 772,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.027,
+      "min_sink_dist": 0.49,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2797,
+      "obj_width": 0.3478,
+      "obj_xy_abs": [
+        2.8424463379619254,
+        -1.701738944033921
+      ],
+      "obj_xy_rel": [
+        0.3998773355892631,
+        -0.6906324695496346
+      ],
+      "layout_id": 52,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 780,
+      "success": true,
+      "steps_to_success": 236,
+      "failure_phase": "success",
+      "max_lift": 0.044,
+      "min_sink_dist": 0.308,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        2.917036431141021,
+        -3.2506082375705527
+      ],
+      "obj_xy_rel": [
+        0.37526249690435565,
+        -0.7223022790742415
+      ],
+      "layout_id": 37,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 785,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.242,
+      "min_sink_dist": 0.295,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        1.8774520971327477,
+        -0.4224072434902819
+      ],
+      "obj_xy_rel": [
+        0.6293611159179073,
+        0.4155614668562444
+      ],
+      "layout_id": 21,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 811,
+      "success": true,
+      "steps_to_success": 254,
+      "failure_phase": "success",
+      "max_lift": 0.046,
+      "min_sink_dist": 0.196,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        2.1527806583781097,
+        -0.4568685524461521
+      ],
+      "obj_xy_rel": [
+        -0.41465733934451476,
+        0.3604872498739483
+      ],
+      "layout_id": 41,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 816,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.45,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2169,
+      "obj_width": 0.1435,
+      "obj_xy_abs": [
+        3.4336054284673616,
+        -0.5676724831999349
+      ],
+      "obj_xy_rel": [
+        0.5565678269820644,
+        0.1931143652454539
+      ],
+      "layout_id": 44,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 825,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.505,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2909,
+      "obj_width": 0.169,
+      "obj_xy_abs": [
+        1.8988799437409742,
+        -0.5535977846105354
+      ],
+      "obj_xy_rel": [
+        -0.8359603473331236,
+        0.264703793372159
+      ],
+      "layout_id": 41,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 831,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.021,
+      "min_sink_dist": 0.43,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        2.8072561199384123,
+        -2.101289393401919
+      ],
+      "obj_xy_rel": [
+        0.7349735199345595,
+        -0.2903518030635337
+      ],
+      "layout_id": 33,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 839,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.486,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        1.4133586576560258,
+        -0.4930461225811962
+      ],
+      "obj_xy_rel": [
+        -0.513968188241664,
+        0.2774793628427936
+      ],
+      "layout_id": 38,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 849,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.436,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        5.161846908735099,
+        -2.562649239691557
+      ],
+      "obj_xy_rel": [
+        0.20662321383604354,
+        -0.6759061113390759
+      ],
+      "layout_id": 54,
+      "style_id": 24,
+      "uncertainty": null
+    },
+    {
+      "episode": 855,
+      "success": true,
+      "steps_to_success": 198,
+      "failure_phase": "success",
+      "max_lift": 0.084,
+      "min_sink_dist": 0.068,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        1.7959833598057813,
+        -0.3355282250070468
+      ],
+      "obj_xy_rel": [
+        -0.6574783617857047,
+        0.507297493019725
+      ],
+      "layout_id": 12,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 862,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.556,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        4.943757433439061,
+        -0.51791426500871
+      ],
+      "obj_xy_rel": [
+        0.5356052456787719,
+        0.2916192117618541
+      ],
+      "layout_id": 50,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 866,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.499,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        0.5003224828223013,
+        -2.593074209038289
+      ],
+      "obj_xy_rel": [
+        -0.3323404829015195,
+        -0.5176933639383225
+      ],
+      "layout_id": 19,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 883,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.344,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        4.146440507797542,
+        -1.8341891613826191
+      ],
+      "obj_xy_rel": [
+        0.40623165852422227,
+        0.77203268021487
+      ],
+      "layout_id": 48,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 884,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.388,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2279,
+      "obj_width": 0.1406,
+      "obj_xy_abs": [
+        2.853851392885583,
+        -4.858561283711863
+      ],
+      "obj_xy_rel": [
+        -0.24635156961953042,
+        -0.6785373928638698
+      ],
+      "layout_id": 31,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 890,
+      "success": true,
+      "steps_to_success": 190,
+      "failure_phase": "success",
+      "max_lift": 0.056,
+      "min_sink_dist": 0.112,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        1.6889644793530412,
+        -0.3971074332498449
+      ],
+      "obj_xy_rel": [
+        0.38604934880351593,
+        0.3540965427211695
+      ],
+      "layout_id": 27,
+      "style_id": 50,
+      "uncertainty": null
+    },
+    {
+      "episode": 905,
+      "success": true,
+      "steps_to_success": 218,
+      "failure_phase": "success",
+      "max_lift": 0.064,
+      "min_sink_dist": 0.288,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        0.33162590011694315,
+        -2.67222630166483
+      ],
+      "obj_xy_rel": [
+        -0.5069698144865333,
+        -0.3140820509207578
+      ],
+      "layout_id": 22,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 931,
+      "success": true,
+      "steps_to_success": 235,
+      "failure_phase": "success",
+      "max_lift": 0.122,
+      "min_sink_dist": 0.16,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1233,
+      "obj_width": 0.3609,
+      "obj_xy_abs": [
+        4.816522525999073,
+        -0.5835948943278294
+      ],
+      "obj_xy_rel": [
+        0.7267571509455246,
+        0.3572723216779775
+      ],
+      "layout_id": 55,
+      "style_id": 57,
+      "uncertainty": null
+    },
+    {
+      "episode": 941,
+      "success": true,
+      "steps_to_success": 526,
+      "failure_phase": "success",
+      "max_lift": 0.062,
+      "min_sink_dist": 0.166,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2364,
+      "obj_width": 0.1187,
+      "obj_xy_abs": [
+        2.513093295372377,
+        -1.924445862806967
+      ],
+      "obj_xy_rel": [
+        -0.3753600325856512,
+        -0.41996181818447575
+      ],
+      "layout_id": 14,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 952,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.585,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2169,
+      "obj_width": 0.1435,
+      "obj_xy_abs": [
+        6.368989966744498,
+        -2.8740923321760694
+      ],
+      "obj_xy_rel": [
+        0.21884035988661754,
+        -0.5075741171725947
+      ],
+      "layout_id": 47,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 954,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.505,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1233,
+      "obj_width": 0.3609,
+      "obj_xy_abs": [
+        1.561429008818107,
+        -3.618827528921567
+      ],
+      "obj_xy_rel": [
+        0.39419115623693646,
+        0.46092598267231155
+      ],
+      "layout_id": 29,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 956,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.572,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        2.2525356180050253,
+        -0.40110393760029583
+      ],
+      "obj_xy_rel": [
+        0.5498372552964903,
+        0.42849076920641604
+      ],
+      "layout_id": 38,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 960,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.569,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        1.8413083037302584,
+        -0.4739397240529544
+      ],
+      "obj_xy_rel": [
+        -0.5774582963032784,
+        0.35976770887240056
+      ],
+      "layout_id": 12,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 966,
+      "success": true,
+      "steps_to_success": 323,
+      "failure_phase": "success",
+      "max_lift": 0.072,
+      "min_sink_dist": 0.032,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1768,
+      "obj_width": 0.2185,
+      "obj_xy_abs": [
+        6.58878802632659,
+        -1.895229852047956
+      ],
+      "obj_xy_rel": [
+        0.44010925288083413,
+        0.39930114184375554
+      ],
+      "layout_id": 47,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 973,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.451,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        0.4034663142685781,
+        -2.8239798934268316
+      ],
+      "obj_xy_rel": [
+        -0.4229460490406149,
+        -0.6285946822866175
+      ],
+      "layout_id": 22,
+      "style_id": 51,
+      "uncertainty": null
+    },
+    {
+      "episode": 977,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.052,
+      "min_sink_dist": 0.531,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        1.7540042812221472,
+        -0.5182781043772167
+      ],
+      "obj_xy_rel": [
+        0.4125763963975426,
+        0.28225805765224143
+      ],
+      "layout_id": 21,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 986,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.526,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.175,
+      "obj_width": 0.1579,
+      "obj_xy_abs": [
+        3.6590911469018508,
+        -0.5526822346150697
+      ],
+      "obj_xy_rel": [
+        -0.6142697949159501,
+        0.2887726448266086
+      ],
+      "layout_id": 58,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1014,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.906,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        2.468369275811613,
+        -2.5466756709655067
+      ],
+      "obj_xy_rel": [
+        0.21176304773612298,
+        0.6798301544383554
+      ],
+      "layout_id": 18,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1021,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.336,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1487,
+      "obj_width": 0.1981,
+      "obj_xy_abs": [
+        4.010285520669347,
+        -0.37263510604471256
+      ],
+      "obj_xy_rel": [
+        0.6241938263090181,
+        0.4405334449232819
+      ],
+      "layout_id": 53,
+      "style_id": 53,
+      "uncertainty": null
+    },
+    {
+      "episode": 1022,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.101,
+      "min_sink_dist": 0.23,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        1.8927355103327967,
+        -3.6078895799995534
+      ],
+      "obj_xy_rel": [
+        0.23019431531684909,
+        -0.5822720209023653
+      ],
+      "layout_id": 15,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1030,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.798,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        1.9842144586686872,
+        -0.33097373548734327
+      ],
+      "obj_xy_rel": [
+        -0.6040530071734862,
+        0.5093131941928537
+      ],
+      "layout_id": 41,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 1031,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.687,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        1.4459409596360828,
+        -4.845654670365784
+      ],
+      "obj_xy_rel": [
+        0.18811554715144396,
+        -0.7218606280408046
+      ],
+      "layout_id": 29,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1033,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.847,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2417,
+      "obj_width": 0.1174,
+      "obj_xy_abs": [
+        2.032996342783427,
+        -2.1155349661167997
+      ],
+      "obj_xy_rel": [
+        -0.4889301059298954,
+        0.46161248608376315
+      ],
+      "layout_id": 43,
+      "style_id": 19,
+      "uncertainty": null
+    },
+    {
+      "episode": 1043,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.024,
+      "min_sink_dist": 0.554,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1547,
+      "obj_width": 0.2479,
+      "obj_xy_abs": [
+        3.1654419709801753,
+        -3.5782819155547148
+      ],
+      "obj_xy_rel": [
+        -0.3435937621057543,
+        0.525991063296479
+      ],
+      "layout_id": 42,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 1047,
+      "success": true,
+      "steps_to_success": 418,
+      "failure_phase": "success",
+      "max_lift": 0.136,
+      "min_sink_dist": 0.006,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        4.666115768089718,
+        -0.4474149819431015
+      ],
+      "obj_xy_rel": [
+        0.5590905554420846,
+        0.3273608395945746
+      ],
+      "layout_id": 51,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 1053,
+      "success": true,
+      "steps_to_success": 413,
+      "failure_phase": "success",
+      "max_lift": 0.171,
+      "min_sink_dist": 0.091,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        3.30406638449764,
+        -1.469749373195675
+      ],
+      "obj_xy_rel": [
+        0.3403644712794116,
+        0.47175584175157526
+      ],
+      "layout_id": 40,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 1062,
+      "success": true,
+      "steps_to_success": 255,
+      "failure_phase": "success",
+      "max_lift": 0.131,
+      "min_sink_dist": 0.068,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        4.9397956460581405,
+        -1.6287229245483992
+      ],
+      "obj_xy_rel": [
+        0.4409378696455164,
+        0.49989100113902496
+      ],
+      "layout_id": 35,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 1067,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.524,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        2.7224544466932423,
+        -4.760602743220661
+      ],
+      "obj_xy_rel": [
+        -0.4207983373889257,
+        -0.39531889304413603
+      ],
+      "layout_id": 31,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 1082,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.358,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1636,
+      "obj_width": 0.0783,
+      "obj_xy_abs": [
+        3.0049285829156362,
+        -0.31516586721763573
+      ],
+      "obj_xy_rel": [
+        0.7240439318821319,
+        0.5343898352929789
+      ],
+      "layout_id": 12,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 1097,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.014,
+      "min_sink_dist": 0.738,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0953,
+      "obj_width": 0.205,
+      "obj_xy_abs": [
+        2.81461679548922,
+        -1.7013096279444668
+      ],
+      "obj_xy_rel": [
+        0.32919011480485816,
+        -0.5405978731203056
+      ],
+      "layout_id": 52,
+      "style_id": 46,
+      "uncertainty": null
+    },
+    {
+      "episode": 1108,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.622,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        5.268390183576074,
+        -2.5368851142742646
+      ],
+      "obj_xy_rel": [
+        0.3500753429929615,
+        -0.601145701055527
+      ],
+      "layout_id": 54,
+      "style_id": 11,
+      "uncertainty": null
+    },
+    {
+      "episode": 1111,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.485,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        1.888443323192892,
+        -0.4541553849212524
+      ],
+      "obj_xy_rel": [
+        0.5951312743929589,
+        0.3454968667315108
+      ],
+      "layout_id": 21,
+      "style_id": 19,
+      "uncertainty": null
+    },
+    {
+      "episode": 1125,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.414,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        2.043041137455719,
+        -0.36019475509736204
+      ],
+      "obj_xy_rel": [
+        -0.6483099289620555,
+        0.41636858520732084
+      ],
+      "layout_id": 45,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 1129,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_reached_sink_no_place",
+      "max_lift": 0.055,
+      "min_sink_dist": 0.112,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2618,
+      "obj_width": 0.218,
+      "obj_xy_abs": [
+        3.5863701509968244,
+        -0.4982028061430459
+      ],
+      "obj_xy_rel": [
+        0.5194733403255416,
+        0.28501448144034314
+      ],
+      "layout_id": 44,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1182,
+      "success": true,
+      "steps_to_success": 284,
+      "failure_phase": "success",
+      "max_lift": 0.114,
+      "min_sink_dist": 0.122,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        2.126149700354191,
+        -2.1299632522479883
+      ],
+      "obj_xy_rel": [
+        -0.38519924071650324,
+        0.5498849514818991
+      ],
+      "layout_id": 43,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 1192,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.337,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        5.290658686907261,
+        -2.792208258295593
+      ],
+      "obj_xy_rel": [
+        0.4345588962292144,
+        -0.6980355649603665
+      ],
+      "layout_id": 17,
+      "style_id": 13,
+      "uncertainty": null
+    },
+    {
+      "episode": 1196,
+      "success": true,
+      "steps_to_success": 292,
+      "failure_phase": "success",
+      "max_lift": 0.028,
+      "min_sink_dist": 0.002,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2677,
+      "obj_width": 0.1688,
+      "obj_xy_abs": [
+        5.250172493636943,
+        -1.7903169177644969
+      ],
+      "obj_xy_rel": [
+        0.4069697899604039,
+        0.45726638054125623
+      ],
+      "layout_id": 17,
+      "style_id": 36,
+      "uncertainty": null
+    },
+    {
+      "episode": 1197,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_reached_sink_no_place",
+      "max_lift": 0.167,
+      "min_sink_dist": 0.054,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        2.8233782174491098,
+        -1.7858087281631867
+      ],
+      "obj_xy_rel": [
+        0.3701857485856035,
+        -0.7713477201219694
+      ],
+      "layout_id": 52,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1205,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.409,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2142,
+      "obj_width": 0.1407,
+      "obj_xy_abs": [
+        0.529133434133376,
+        -2.3452084397368664
+      ],
+      "obj_xy_rel": [
+        -0.2289482665942988,
+        -0.6403513471617701
+      ],
+      "layout_id": 36,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 1223,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.933,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        4.874132673225321,
+        -0.6144663939930434
+      ],
+      "obj_xy_rel": [
+        0.6574742138883654,
+        0.35498164395859655
+      ],
+      "layout_id": 55,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 1225,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.378,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        2.978328062539094,
+        -3.139389255088269
+      ],
+      "obj_xy_rel": [
+        0.4359698626210813,
+        -0.5721228692331435
+      ],
+      "layout_id": 37,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1228,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.578,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.0656,
+      "obj_xy_abs": [
+        0.508535680768829,
+        -1.1893703678247576
+      ],
+      "obj_xy_rel": [
+        -0.33309339629841894,
+        0.47108327335397693
+      ],
+      "layout_id": 36,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 1263,
+      "success": true,
+      "steps_to_success": 269,
+      "failure_phase": "success",
+      "max_lift": 0.059,
+      "min_sink_dist": 0.178,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.566431291911923,
+        -0.32414909562182453
+      ],
+      "obj_xy_rel": [
+        0.5680723552760196,
+        0.4692672151848137
+      ],
+      "layout_id": 13,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 1264,
+      "success": true,
+      "steps_to_success": 540,
+      "failure_phase": "success",
+      "max_lift": 0.115,
+      "min_sink_dist": 0.229,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        1.836129970900811,
+        -0.563360295790713
+      ],
+      "obj_xy_rel": [
+        0.6001020095345093,
+        0.26730608870605777
+      ],
+      "layout_id": 21,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 1265,
+      "success": true,
+      "steps_to_success": 331,
+      "failure_phase": "success",
+      "max_lift": 0.147,
+      "min_sink_dist": 0.01,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2677,
+      "obj_width": 0.1688,
+      "obj_xy_abs": [
+        4.1164143923643834,
+        -1.8344418268572837
+      ],
+      "obj_xy_rel": [
+        0.35223364433561866,
+        0.5365070010857409
+      ],
+      "layout_id": 48,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 1273,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.093,
+      "min_sink_dist": 0.503,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.182,
+      "obj_width": 0.1576,
+      "obj_xy_abs": [
+        3.1429530194514026,
+        -3.4337460142485154
+      ],
+      "obj_xy_rel": [
+        -0.30929497986080134,
+        0.5454327582152954
+      ],
+      "layout_id": 42,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 1277,
+      "success": true,
+      "steps_to_success": 305,
+      "failure_phase": "success",
+      "max_lift": 0.072,
+      "min_sink_dist": 0.154,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        3.4917484383004815,
+        -0.47795034149858406
+      ],
+      "obj_xy_rel": [
+        0.41830735008880815,
+        0.3164981461919938
+      ],
+      "layout_id": 44,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 1278,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.474,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        0.4355614525871309,
+        -1.632094447855762
+      ],
+      "obj_xy_rel": [
+        -0.3808009210267646,
+        0.5989910581490963
+      ],
+      "layout_id": 22,
+      "style_id": 57,
+      "uncertainty": null
+    },
+    {
+      "episode": 1288,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.702,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0988,
+      "obj_width": 0.3515,
+      "obj_xy_abs": [
+        3.2838897766890534,
+        -4.772452192929902
+      ],
+      "obj_xy_rel": [
+        -0.5983456289351494,
+        -0.45414472586707877
+      ],
+      "layout_id": 26,
+      "style_id": 11,
+      "uncertainty": null
+    },
+    {
+      "episode": 1294,
+      "success": true,
+      "steps_to_success": 389,
+      "failure_phase": "success",
+      "max_lift": 0.121,
+      "min_sink_dist": 0.148,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.1142,
+      "obj_width": 0.0713,
+      "obj_xy_abs": [
+        3.5564999854342707,
+        -2.1600162881142073
+      ],
+      "obj_xy_rel": [
+        0.5180501897669076,
+        -0.6799402467366287
+      ],
+      "layout_id": 30,
+      "style_id": 59,
+      "uncertainty": null
+    },
+    {
+      "episode": 1295,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.586,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.157,
+      "obj_width": 0.2089,
+      "obj_xy_abs": [
+        -0.49217261875732077,
+        -1.6415407743688688
+      ],
+      "obj_xy_rel": [
+        0.32139843526882095,
+        0.702959865491479
+      ],
+      "layout_id": 57,
+      "style_id": 44,
+      "uncertainty": null
+    },
+    {
+      "episode": 1309,
+      "success": true,
+      "steps_to_success": 248,
+      "failure_phase": "success",
+      "max_lift": 0.071,
+      "min_sink_dist": 0.157,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2067,
+      "obj_width": 0.1095,
+      "obj_xy_abs": [
+        5.1238531802207055,
+        -2.716494135168574
+      ],
+      "obj_xy_rel": [
+        0.25892820995966215,
+        -0.4357037400340298
+      ],
+      "layout_id": 17,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 1323,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.669,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2067,
+      "obj_width": 0.1095,
+      "obj_xy_abs": [
+        4.8232759928479245,
+        -1.6834781178993374
+      ],
+      "obj_xy_rel": [
+        0.3559508317899027,
+        0.4619840344427053
+      ],
+      "layout_id": 35,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 1336,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.028,
+      "min_sink_dist": 0.244,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        0.43455775044174894,
+        -1.2706515953382687
+      ],
+      "obj_xy_rel": [
+        -0.37362425388760634,
+        0.35616244790405727
+      ],
+      "layout_id": 36,
+      "style_id": 50,
+      "uncertainty": null
+    },
+    {
+      "episode": 1337,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.028,
+      "min_sink_dist": 0.45,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        4.9569834858415724,
+        -2.7588331321453747
+      ],
+      "obj_xy_rel": [
+        0.4141631299953792,
+        -0.5904158534137807
+      ],
+      "layout_id": 35,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 1339,
+      "success": true,
+      "steps_to_success": 225,
+      "failure_phase": "success",
+      "max_lift": 0.163,
+      "min_sink_dist": 0.162,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1134,
+      "obj_width": 0.3637,
+      "obj_xy_abs": [
+        0.396011061324024,
+        -2.315414132921822
+      ],
+      "obj_xy_rel": [
+        -0.4151644231897081,
+        -0.5164544314111972
+      ],
+      "layout_id": 20,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 1344,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.021,
+      "min_sink_dist": 0.554,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        0.4810452328495093,
+        -2.4457082319612473
+      ],
+      "obj_xy_rel": [
+        -0.32881273569688607,
+        -0.3931596760377398
+      ],
+      "layout_id": 25,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1358,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.388,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1531,
+      "obj_width": 0.2253,
+      "obj_xy_abs": [
+        2.221076690806338,
+        -0.5146327096976865
+      ],
+      "obj_xy_rel": [
+        0.4671904749641478,
+        0.29860941911835814
+      ],
+      "layout_id": 38,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 1366,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.961,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2752,
+      "obj_width": 0.273,
+      "obj_xy_abs": [
+        2.208784435859888,
+        -2.068549095044984
+      ],
+      "obj_xy_rel": [
+        -0.3079870925549586,
+        0.7434833104735881
+      ],
+      "layout_id": 43,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 1376,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.442,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        6.566705833306471,
+        -3.11742255706827
+      ],
+      "obj_xy_rel": [
+        0.4056385933332658,
+        -0.724757079678962
+      ],
+      "layout_id": 47,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 1380,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.706,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        3.2694898294065347,
+        -0.4352314475743198
+      ],
+      "obj_xy_rel": [
+        0.4999852797282225,
+        0.34496474315250353
+      ],
+      "layout_id": 45,
+      "style_id": 23,
+      "uncertainty": null
+    },
+    {
+      "episode": 1387,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.764,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2677,
+      "obj_width": 0.1688,
+      "obj_xy_abs": [
+        3.0462904215195588,
+        -0.3518536722328782
+      ],
+      "obj_xy_rel": [
+        0.7229548915150752,
+        0.47723775926465917
+      ],
+      "layout_id": 12,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 1388,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.873,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        3.9502975049392592,
+        -0.46284089978543125
+      ],
+      "obj_xy_rel": [
+        0.6997003356445846,
+        0.3477772065038642
+      ],
+      "layout_id": 39,
+      "style_id": 25,
+      "uncertainty": null
+    },
+    {
+      "episode": 1391,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.491,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.3416371845506667,
+        -2.628623037248961
+      ],
+      "obj_xy_rel": [
+        0.25368578431086286,
+        0.7982334412187524
+      ],
+      "layout_id": 34,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 1401,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.618,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        1.143862506779467,
+        -0.36772710154399746
+      ],
+      "obj_xy_rel": [
+        -0.7689102581178069,
+        0.43034794630666284
+      ],
+      "layout_id": 38,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 1420,
+      "success": true,
+      "steps_to_success": 314,
+      "failure_phase": "success",
+      "max_lift": 0.156,
+      "min_sink_dist": 0.056,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        2.557272532091477,
+        -2.6018106067806728
+      ],
+      "obj_xy_rel": [
+        0.37647983260339757,
+        0.5624668965195005
+      ],
+      "layout_id": 34,
+      "style_id": 32,
+      "uncertainty": null
+    },
+    {
+      "episode": 1426,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.036,
+      "min_sink_dist": 0.804,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.157,
+      "obj_width": 0.2089,
+      "obj_xy_abs": [
+        3.261842294497631,
+        -1.2394155491475143
+      ],
+      "obj_xy_rel": [
+        0.3519825629989737,
+        0.5308189542679647
+      ],
+      "layout_id": 40,
+      "style_id": 23,
+      "uncertainty": null
+    },
+    {
+      "episode": 1428,
+      "success": true,
+      "steps_to_success": 323,
+      "failure_phase": "success",
+      "max_lift": 0.219,
+      "min_sink_dist": 0.121,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1634,
+      "obj_width": 0.0731,
+      "obj_xy_abs": [
+        5.0221600973277045,
+        -0.3875331497765795
+      ],
+      "obj_xy_rel": [
+        0.7305240124931345,
+        0.39272479534137494
+      ],
+      "layout_id": 50,
+      "style_id": 44,
+      "uncertainty": null
+    },
+    {
+      "episode": 1432,
+      "success": true,
+      "steps_to_success": 348,
+      "failure_phase": "success",
+      "max_lift": 0.066,
+      "min_sink_dist": 0.269,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0889,
+      "obj_width": 0.2389,
+      "obj_xy_abs": [
+        4.259448119730122,
+        -2.507732334302388
+      ],
+      "obj_xy_rel": [
+        0.6748215727245439,
+        -0.43129588579681677
+      ],
+      "layout_id": 59,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 1446,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.444,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        3.2017944306569337,
+        -0.393471842871234
+      ],
+      "obj_xy_rel": [
+        0.5239105104328385,
+        0.402558541656637
+      ],
+      "layout_id": 23,
+      "style_id": 50,
+      "uncertainty": null
+    },
+    {
+      "episode": 1448,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.015,
+      "min_sink_dist": 0.632,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        0.47317983538276565,
+        -1.4160443953458888
+      ],
+      "obj_xy_rel": [
+        -0.3280874082426388,
+        0.47738297030864785
+      ],
+      "layout_id": 19,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 1460,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.406,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        3.5585479234310085,
+        -0.5655489800209803
+      ],
+      "obj_xy_rel": [
+        0.388535241029214,
+        0.22415082438961076
+      ],
+      "layout_id": 28,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 1461,
+      "success": true,
+      "steps_to_success": 241,
+      "failure_phase": "success",
+      "max_lift": 0.121,
+      "min_sink_dist": 0.124,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        0.42883133163724396,
+        -1.1572705105414096
+      ],
+      "obj_xy_rel": [
+        -0.3612182824053506,
+        0.4355378923154991
+      ],
+      "layout_id": 20,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 1473,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.914,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.2480930868048996,
+        -2.7681393882514773
+      ],
+      "obj_xy_rel": [
+        -0.6868413664979456,
+        -0.5354076101184448
+      ],
+      "layout_id": 56,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 1475,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.843,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        2.8711188002691537,
+        -2.150179536247762
+      ],
+      "obj_xy_rel": [
+        0.6669096968571151,
+        -0.39658751729271335
+      ],
+      "layout_id": 33,
+      "style_id": 57,
+      "uncertainty": null
+    },
+    {
+      "episode": 1479,
+      "success": true,
+      "steps_to_success": 256,
+      "failure_phase": "success",
+      "max_lift": 0.038,
+      "min_sink_dist": 0.25,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.212,
+      "obj_width": 0.1384,
+      "obj_xy_abs": [
+        5.612677421266598,
+        -2.4120758840166125
+      ],
+      "obj_xy_rel": [
+        0.321427142085402,
+        -0.4115591856679144
+      ],
+      "layout_id": 49,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 1505,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.734,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2565,
+      "obj_width": 0.1501,
+      "obj_xy_abs": [
+        2.8299927517367753,
+        -2.011903245294295
+      ],
+      "obj_xy_rel": [
+        -0.3865247980672213,
+        -0.2831939388899243
+      ],
+      "layout_id": 24,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 1506,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.732,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        0.4788705565440565,
+        -2.346146355913482
+      ],
+      "obj_xy_rel": [
+        -0.2929107220908995,
+        -0.5720648020659327
+      ],
+      "layout_id": 11,
+      "style_id": 27,
+      "uncertainty": null
+    },
+    {
+      "episode": 1518,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.666,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.245,
+      "obj_width": 0.2175,
+      "obj_xy_abs": [
+        4.789033815364204,
+        -0.5223873985466702
+      ],
+      "obj_xy_rel": [
+        0.4319027702725222,
+        0.4410594661257401
+      ],
+      "layout_id": 55,
+      "style_id": 15,
+      "uncertainty": null
+    },
+    {
+      "episode": 1519,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.515,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        2.4723238536468988,
+        -0.3760775811580483
+      ],
+      "obj_xy_rel": [
+        -0.6926939330495192,
+        0.3974818972404916
+      ],
+      "layout_id": 32,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 1520,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.493,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2142,
+      "obj_width": 0.1407,
+      "obj_xy_abs": [
+        3.305607721939891,
+        -4.724492934807822
+      ],
+      "obj_xy_rel": [
+        -0.5742508934695021,
+        -0.4117701771709523
+      ],
+      "layout_id": 26,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1541,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.284,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2439,
+      "obj_width": 0.152,
+      "obj_xy_abs": [
+        1.5865156538315015,
+        -3.6720779324655304
+      ],
+      "obj_xy_rel": [
+        0.33350673928910823,
+        0.6639625359264612
+      ],
+      "layout_id": 29,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 1553,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.534,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.951726826760905,
+        -0.5230889810253229
+      ],
+      "obj_xy_rel": [
+        0.568026615929893,
+        0.2957544277723967
+      ],
+      "layout_id": 53,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 1557,
+      "success": true,
+      "steps_to_success": 290,
+      "failure_phase": "success",
+      "max_lift": 0.115,
+      "min_sink_dist": 0.012,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1775,
+      "obj_width": 0.2062,
+      "obj_xy_abs": [
+        3.0475572081720714,
+        -0.5195968850277984
+      ],
+      "obj_xy_rel": [
+        0.5442991043586298,
+        0.2666589777227425
+      ],
+      "layout_id": 12,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1562,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.015,
+      "min_sink_dist": 0.425,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2618,
+      "obj_width": 0.218,
+      "obj_xy_abs": [
+        2.057164230760279,
+        -3.6291630890093485
+      ],
+      "obj_xy_rel": [
+        0.4387628015422864,
+        -0.6363638474317197
+      ],
+      "layout_id": 15,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 1568,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.599,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1233,
+      "obj_width": 0.3609,
+      "obj_xy_abs": [
+        2.4775347827763277,
+        -0.4637037845262954
+      ],
+      "obj_xy_rel": [
+        -0.4882507755083001,
+        0.28919808733577795
+      ],
+      "layout_id": 13,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 1572,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.415,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1134,
+      "obj_width": 0.3637,
+      "obj_xy_abs": [
+        3.021050883532827,
+        -3.4194626274607396
+      ],
+      "obj_xy_rel": [
+        -0.39528994270219897,
+        0.7112264864232225
+      ],
+      "layout_id": 42,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 1573,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.684,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        3.378535352727933,
+        -2.433225208641715
+      ],
+      "obj_xy_rel": [
+        0.43846335646191115,
+        -0.5795835318551663
+      ],
+      "layout_id": 40,
+      "style_id": 24,
+      "uncertainty": null
+    },
+    {
+      "episode": 1574,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.739,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        3.5961444515974526,
+        -0.3816950943892612
+      ],
+      "obj_xy_rel": [
+        0.6398575200107643,
+        0.4358886035432624
+      ],
+      "layout_id": 13,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 1578,
+      "success": true,
+      "steps_to_success": 319,
+      "failure_phase": "success",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.038,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.212,
+      "obj_width": 0.1384,
+      "obj_xy_abs": [
+        2.6918685106573323,
+        -1.940101913352073
+      ],
+      "obj_xy_rel": [
+        -0.4337565696694048,
+        -0.43027567358123475
+      ],
+      "layout_id": 14,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 1585,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.439,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2752,
+      "obj_width": 0.273,
+      "obj_xy_abs": [
+        4.84936820579497,
+        -1.8065740063830715
+      ],
+      "obj_xy_rel": [
+        0.3355469659659569,
+        0.38196156154734484
+      ],
+      "layout_id": 35,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 1590,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.012,
+      "min_sink_dist": 0.43,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        4.634767217937419,
+        -0.4004378245748361
+      ],
+      "obj_xy_rel": [
+        0.5825787693039057,
+        0.4439337973817542
+      ],
+      "layout_id": 51,
+      "style_id": 13,
+      "uncertainty": null
+    },
+    {
+      "episode": 1603,
+      "success": true,
+      "steps_to_success": 353,
+      "failure_phase": "success",
+      "max_lift": 0.113,
+      "min_sink_dist": 0.075,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        4.856217447447244,
+        -2.9083687170414048
+      ],
+      "obj_xy_rel": [
+        0.46879834919110674,
+        -0.2620737807496214
+      ],
+      "layout_id": 46,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 1607,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.016,
+      "min_sink_dist": 0.56,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        3.0789886002645757,
+        -0.4837662737857791
+      ],
+      "obj_xy_rel": [
+        0.5289726439943658,
+        0.33130591017119493
+      ],
+      "layout_id": 41,
+      "style_id": 50,
+      "uncertainty": null
+    },
+    {
+      "episode": 1612,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.608,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        2.3103187357713444,
+        -0.4742337858723562
+      ],
+      "obj_xy_rel": [
+        -0.7871851284891438,
+        0.3301134371330213
+      ],
+      "layout_id": 13,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1625,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.673,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2547,
+      "obj_width": 0.1133,
+      "obj_xy_abs": [
+        0.4350502434939594,
+        -1.5081246332751739
+      ],
+      "obj_xy_rel": [
+        -0.3430627574507218,
+        0.6011395608422088
+      ],
+      "layout_id": 19,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 1629,
+      "success": true,
+      "steps_to_success": 416,
+      "failure_phase": "success",
+      "max_lift": 0.072,
+      "min_sink_dist": 0.511,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        3.73313912907235,
+        -2.9875567306479187
+      ],
+      "obj_xy_rel": [
+        -0.5336146382046967,
+        -0.31506598044502576
+      ],
+      "layout_id": 46,
+      "style_id": 19,
+      "uncertainty": null
+    },
+    {
+      "episode": 1632,
+      "success": true,
+      "steps_to_success": 390,
+      "failure_phase": "success",
+      "max_lift": 0.08,
+      "min_sink_dist": 0.002,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2142,
+      "obj_width": 0.1407,
+      "obj_xy_abs": [
+        4.151924978859087,
+        -1.9674714421570543
+      ],
+      "obj_xy_rel": [
+        0.4421572445897599,
+        0.4153250296301718
+      ],
+      "layout_id": 48,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1633,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.308,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.6957293551505983,
+        -0.4001894045361749
+      ],
+      "obj_xy_rel": [
+        0.7244347158460172,
+        0.3972319924810117
+      ],
+      "layout_id": 28,
+      "style_id": 15,
+      "uncertainty": null
+    },
+    {
+      "episode": 1637,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.301,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        2.6559385477534385,
+        -3.709892765219284
+      ],
+      "obj_xy_rel": [
+        -0.47579845084875005,
+        0.5814200616244141
+      ],
+      "layout_id": 31,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 1652,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.452,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        3.2829128392309275,
+        -1.969265858183362
+      ],
+      "obj_xy_rel": [
+        0.30675187116226477,
+        -0.47774389791731275
+      ],
+      "layout_id": 30,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 1663,
+      "success": true,
+      "steps_to_success": 248,
+      "failure_phase": "success",
+      "max_lift": 0.078,
+      "min_sink_dist": 0.137,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        4.8989420432134745,
+        -2.6319088756490183
+      ],
+      "obj_xy_rel": [
+        0.3822511713936825,
+        -0.285004830148623
+      ],
+      "layout_id": 35,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 1666,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.51,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        1.7352179330070785,
+        -0.3567226147836571
+      ],
+      "obj_xy_rel": [
+        0.5889689220896093,
+        0.44159979242573444
+      ],
+      "layout_id": 21,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 1667,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.501,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        0.4188830440009261,
+        -2.6168828979403838
+      ],
+      "obj_xy_rel": [
+        -0.4266758132063693,
+        -0.6302027790538962
+      ],
+      "layout_id": 19,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 1694,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.389,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        3.3650926039831988,
+        -0.307630049387445
+      ],
+      "obj_xy_rel": [
+        -0.8031888930806201,
+        0.5328546666100681
+      ],
+      "layout_id": 51,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 1716,
+      "success": true,
+      "steps_to_success": 236,
+      "failure_phase": "success",
+      "max_lift": 0.102,
+      "min_sink_dist": 0.092,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        3.147591179880575,
+        -2.4943520256070038
+      ],
+      "obj_xy_rel": [
+        -0.6349807434708663,
+        -0.4139896453195422
+      ],
+      "layout_id": 59,
+      "style_id": 53,
+      "uncertainty": null
+    },
+    {
+      "episode": 1725,
+      "success": true,
+      "steps_to_success": 404,
+      "failure_phase": "success",
+      "max_lift": 0.173,
+      "min_sink_dist": 0.076,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        1.18019079350657,
+        -0.5253450999498797
+      ],
+      "obj_xy_rel": [
+        -0.7627096214172937,
+        0.3071783990133259
+      ],
+      "layout_id": 38,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 1727,
+      "success": true,
+      "steps_to_success": 232,
+      "failure_phase": "success",
+      "max_lift": 0.043,
+      "min_sink_dist": 0.065,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2417,
+      "obj_width": 0.1174,
+      "obj_xy_abs": [
+        0.48965324889490663,
+        -1.3006603610077319
+      ],
+      "obj_xy_rel": [
+        -0.27823725957966244,
+        0.47474967050133543
+      ],
+      "layout_id": 11,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 1729,
+      "success": true,
+      "steps_to_success": 304,
+      "failure_phase": "success",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.05,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0675,
+      "obj_xy_abs": [
+        2.733663977821061,
+        -4.706938933737546
+      ],
+      "obj_xy_rel": [
+        -0.3690299673323665,
+        -0.4839813579379104
+      ],
+      "layout_id": 31,
+      "style_id": 35,
+      "uncertainty": null
+    },
+    {
+      "episode": 1734,
+      "success": true,
+      "steps_to_success": 259,
+      "failure_phase": "success",
+      "max_lift": 0.032,
+      "min_sink_dist": 0.076,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1637,
+      "obj_width": 0.079,
+      "obj_xy_abs": [
+        3.113949187397565,
+        -3.5896812705452144
+      ],
+      "obj_xy_rel": [
+        -0.33052893323918564,
+        0.5563888876861736
+      ],
+      "layout_id": 42,
+      "style_id": 18,
+      "uncertainty": null
+    },
+    {
+      "episode": 1741,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.717,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1487,
+      "obj_width": 0.1981,
+      "obj_xy_abs": [
+        2.9925710113659094,
+        -1.9310102124474289
+      ],
+      "obj_xy_rel": [
+        0.4732277314113267,
+        0.6618530357112269
+      ],
+      "layout_id": 37,
+      "style_id": 42,
+      "uncertainty": null
+    },
+    {
+      "episode": 1756,
+      "success": true,
+      "steps_to_success": 248,
+      "failure_phase": "success",
+      "max_lift": 0.084,
+      "min_sink_dist": 0.19,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        0.5402459629483837,
+        -1.4446389181054577
+      ],
+      "obj_xy_rel": [
+        -0.2586031921455707,
+        0.6074476707683756
+      ],
+      "layout_id": 25,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 1761,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.638,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2311,
+      "obj_width": 0.1962,
+      "obj_xy_abs": [
+        2.0114622441468413,
+        -0.5229434180673351
+      ],
+      "obj_xy_rel": [
+        -0.4771826837873112,
+        0.3101938807244218
+      ],
+      "layout_id": 41,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 1772,
+      "success": true,
+      "steps_to_success": 314,
+      "failure_phase": "success",
+      "max_lift": 0.142,
+      "min_sink_dist": 0.18,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        3.3849136801836073,
+        -2.2465670864598746
+      ],
+      "obj_xy_rel": [
+        0.3524468493896111,
+        -0.7349664353757024
+      ],
+      "layout_id": 30,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 1776,
+      "success": true,
+      "steps_to_success": 197,
+      "failure_phase": "success",
+      "max_lift": 0.059,
+      "min_sink_dist": 0.079,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        1.6394427903266768,
+        -0.37484191593804483
+      ],
+      "obj_xy_rel": [
+        0.45000928581540967,
+        0.4664135753769384
+      ],
+      "layout_id": 21,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 1779,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.127,
+      "min_sink_dist": 0.277,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2272,
+      "obj_width": 0.2233,
+      "obj_xy_abs": [
+        2.3910313640437897,
+        -2.582393339351037
+      ],
+      "obj_xy_rel": [
+        -0.7169240967001205,
+        -0.3629344965504302
+      ],
+      "layout_id": 56,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 1783,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.744,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.175,
+      "obj_width": 0.1579,
+      "obj_xy_abs": [
+        3.1073150774580194,
+        -3.404187432814393
+      ],
+      "obj_xy_rel": [
+        -0.39178859995422544,
+        0.5543752675891724
+      ],
+      "layout_id": 42,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 1802,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.041,
+      "min_sink_dist": 0.502,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1236,
+      "obj_width": 0.3624,
+      "obj_xy_abs": [
+        3.628049304956951,
+        -0.3821473957567723
+      ],
+      "obj_xy_rel": [
+        0.6648775428499345,
+        0.4333338736170373
+      ],
+      "layout_id": 28,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1806,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.034,
+      "min_sink_dist": 0.385,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2909,
+      "obj_width": 0.169,
+      "obj_xy_abs": [
+        4.774950097678601,
+        -0.5078817186150308
+      ],
+      "obj_xy_rel": [
+        0.4472852015455473,
+        0.4396828806370141
+      ],
+      "layout_id": 55,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 1809,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.796,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2565,
+      "obj_width": 0.1501,
+      "obj_xy_abs": [
+        3.7223721378462113,
+        -0.4092775807161073
+      ],
+      "obj_xy_rel": [
+        -0.5547280861347743,
+        0.421601554515485
+      ],
+      "layout_id": 50,
+      "style_id": 53,
+      "uncertainty": null
+    },
+    {
+      "episode": 1820,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.412,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2752,
+      "obj_width": 0.273,
+      "obj_xy_abs": [
+        3.3822593325847565,
+        -0.4562607461184192
+      ],
+      "obj_xy_rel": [
+        0.6179094152078415,
+        0.36576432780045315
+      ],
+      "layout_id": 45,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1850,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.269,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.212,
+      "obj_width": 0.1384,
+      "obj_xy_abs": [
+        1.288882178632451,
+        -0.3438674975052117
+      ],
+      "obj_xy_rel": [
+        -0.5989814473542183,
+        0.46368937902461393
+      ],
+      "layout_id": 38,
+      "style_id": 55,
+      "uncertainty": null
+    },
+    {
+      "episode": 1851,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.839,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2133,
+      "obj_width": 0.1303,
+      "obj_xy_abs": [
+        2.51680922847559,
+        -0.2976134652878174
+      ],
+      "obj_xy_rel": [
+        -0.6712591015984599,
+        0.5253185121802046
+      ],
+      "layout_id": 32,
+      "style_id": 13,
+      "uncertainty": null
+    },
+    {
+      "episode": 1853,
+      "success": true,
+      "steps_to_success": 326,
+      "failure_phase": "success",
+      "max_lift": 0.161,
+      "min_sink_dist": 0.086,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        4.053141977619941,
+        -2.0079726094842147
+      ],
+      "obj_xy_rel": [
+        0.6308288541699376,
+        -0.24908127620832143
+      ],
+      "layout_id": 24,
+      "style_id": 22,
+      "uncertainty": null
+    },
+    {
+      "episode": 1855,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.978,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1233,
+      "obj_width": 0.3609,
+      "obj_xy_abs": [
+        1.8812639447756043,
+        -0.4890450535979443
+      ],
+      "obj_xy_rel": [
+        0.4977487024235383,
+        0.3494764900882908
+      ],
+      "layout_id": 21,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 1861,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.035,
+      "min_sink_dist": 0.489,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        4.1983609444285985,
+        -2.430231614550804
+      ],
+      "obj_xy_rel": [
+        0.6141706325803025,
+        -0.356854250821522
+      ],
+      "layout_id": 59,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 1865,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.926,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1489,
+      "obj_width": 0.2284,
+      "obj_xy_abs": [
+        4.7722065666690865,
+        -2.837127395688154
+      ],
+      "obj_xy_rel": [
+        0.3067926339518028,
+        -0.48362215388147867
+      ],
+      "layout_id": 35,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1867,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.518,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2169,
+      "obj_width": 0.1435,
+      "obj_xy_abs": [
+        2.906085617989925,
+        -2.1822747447396362
+      ],
+      "obj_xy_rel": [
+        -0.5377307947482581,
+        -0.45523695376442275
+      ],
+      "layout_id": 24,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 1868,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.795,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.157,
+      "obj_width": 0.2089,
+      "obj_xy_abs": [
+        5.235505481721095,
+        -1.275994346579172
+      ],
+      "obj_xy_rel": [
+        0.30768593529240906,
+        0.539401815690417
+      ],
+      "layout_id": 54,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 1878,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.005,
+      "min_sink_dist": 0.538,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2067,
+      "obj_width": 0.1095,
+      "obj_xy_abs": [
+        0.47189058823958546,
+        -2.3447356696955044
+      ],
+      "obj_xy_rel": [
+        -0.3153309822424359,
+        -0.5581070240041206
+      ],
+      "layout_id": 20,
+      "style_id": 44,
+      "uncertainty": null
+    },
+    {
+      "episode": 1882,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.027,
+      "min_sink_dist": 0.327,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2279,
+      "obj_width": 0.1406,
+      "obj_xy_abs": [
+        3.229002114434322,
+        -2.576256878757598
+      ],
+      "obj_xy_rel": [
+        -0.5375181977089416,
+        -0.4814070906525343
+      ],
+      "layout_id": 59,
+      "style_id": 18,
+      "uncertainty": null
+    },
+    {
+      "episode": 1897,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.506,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0988,
+      "obj_width": 0.3515,
+      "obj_xy_abs": [
+        4.308494192482659,
+        -2.5358602719194683
+      ],
+      "obj_xy_rel": [
+        0.7078045345187172,
+        -0.42064328658420935
+      ],
+      "layout_id": 59,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 1901,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.59,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0953,
+      "obj_width": 0.205,
+      "obj_xy_abs": [
+        2.551660606382695,
+        -0.3276414850837178
+      ],
+      "obj_xy_rel": [
+        -0.5388907553796178,
+        0.46064393032683826
+      ],
+      "layout_id": 32,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 1902,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.431,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2547,
+      "obj_width": 0.1133,
+      "obj_xy_abs": [
+        2.5566731502439457,
+        -2.2167297030425672
+      ],
+      "obj_xy_rel": [
+        0.32000624252657506,
+        0.5878665873767153
+      ],
+      "layout_id": 16,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 1906,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.717,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        0.5220575241207026,
+        -2.3753873942021384
+      ],
+      "obj_xy_rel": [
+        -0.3178878652112418,
+        -0.5685502587178035
+      ],
+      "layout_id": 20,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1920,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.016,
+      "min_sink_dist": 0.851,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2565,
+      "obj_width": 0.1501,
+      "obj_xy_abs": [
+        5.558590853003196,
+        -2.4822305038880708
+      ],
+      "obj_xy_rel": [
+        0.2478672931783361,
+        -0.5746854006017299
+      ],
+      "layout_id": 49,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 1921,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.016,
+      "min_sink_dist": 0.365,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1487,
+      "obj_width": 0.1981,
+      "obj_xy_abs": [
+        3.639825704420109,
+        -2.569887993294844
+      ],
+      "obj_xy_rel": [
+        0.6271133913521534,
+        -0.33447760746536925
+      ],
+      "layout_id": 56,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 1924,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.391,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        4.748339341456527,
+        -3.0256010960619095
+      ],
+      "obj_xy_rel": [
+        0.3257806999573294,
+        -0.3722825533754044
+      ],
+      "layout_id": 46,
+      "style_id": 40,
+      "uncertainty": null
+    },
+    {
+      "episode": 1936,
+      "success": true,
+      "steps_to_success": 313,
+      "failure_phase": "success",
+      "max_lift": 0.073,
+      "min_sink_dist": 0.088,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        4.159815168069335,
+        -2.567398132251918
+      ],
+      "obj_xy_rel": [
+        0.5782525831519179,
+        -0.4905048596675021
+      ],
+      "layout_id": 59,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 1937,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.423,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        -0.4113662167103988,
+        -2.661675763391577
+      ],
+      "obj_xy_rel": [
+        0.4051326845140851,
+        -0.41811315957875594
+      ],
+      "layout_id": 57,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 1938,
+      "success": true,
+      "steps_to_success": 214,
+      "failure_phase": "success",
+      "max_lift": 0.096,
+      "min_sink_dist": 0.165,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        2.412195725069247,
+        -0.43860377400119865
+      ],
+      "obj_xy_rel": [
+        0.5746887536551313,
+        0.3275762439258816
+      ],
+      "layout_id": 38,
+      "style_id": 24,
+      "uncertainty": null
+    },
+    {
+      "episode": 1954,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.626,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0988,
+      "obj_width": 0.3515,
+      "obj_xy_abs": [
+        4.945156718550218,
+        -0.5205165420939594
+      ],
+      "obj_xy_rel": [
+        0.4547384834924362,
+        0.26199990609710977
+      ],
+      "layout_id": 50,
+      "style_id": 34,
+      "uncertainty": null
+    },
+    {
+      "episode": 1959,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.058,
+      "min_sink_dist": 0.159,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1236,
+      "obj_width": 0.3624,
+      "obj_xy_abs": [
+        6.523437443456136,
+        -1.8144582004219514
+      ],
+      "obj_xy_rel": [
+        0.39577165206739817,
+        0.6280388228147411
+      ],
+      "layout_id": 47,
+      "style_id": 52,
+      "uncertainty": null
+    },
+    {
+      "episode": 1973,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.962,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2082,
+      "obj_width": 0.2512,
+      "obj_xy_abs": [
+        0.38442060227199315,
+        -1.2270740299752572
+      ],
+      "obj_xy_rel": [
+        -0.3815046216422162,
+        0.5888685877299231
+      ],
+      "layout_id": 25,
+      "style_id": 22,
+      "uncertainty": null
+    },
+    {
+      "episode": 1976,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.009,
+      "min_sink_dist": 0.508,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.2486,
+      "obj_width": 0.2375,
+      "obj_xy_abs": [
+        0.5037675258406819,
+        -1.392876805634819
+      ],
+      "obj_xy_rel": [
+        -0.2827854739195691,
+        0.5912332335444701
+      ],
+      "layout_id": 25,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 1981,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.065,
+      "min_sink_dist": 0.408,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1636,
+      "obj_width": 0.0783,
+      "obj_xy_abs": [
+        1.6510150865820594,
+        -2.1120905167723634
+      ],
+      "obj_xy_rel": [
+        -0.44442751477871534,
+        -0.29226042563609145
+      ],
+      "layout_id": 33,
+      "style_id": 49,
+      "uncertainty": null
+    },
+    {
+      "episode": 1986,
+      "success": true,
+      "steps_to_success": 579,
+      "failure_phase": "success",
+      "max_lift": 0.068,
+      "min_sink_dist": 0.144,
+      "object_category": "pitcher",
+      "object_split": "pretrain",
+      "obj_height": 0.245,
+      "obj_width": 0.2175,
+      "obj_xy_abs": [
+        3.7707791822439582,
+        -0.4781109188390418
+      ],
+      "obj_xy_rel": [
+        -0.46633359488287107,
+        0.3077832575715147
+      ],
+      "layout_id": 50,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 2002,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.332,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1775,
+      "obj_width": 0.2062,
+      "obj_xy_abs": [
+        3.610615060293624,
+        -2.713915410109033
+      ],
+      "obj_xy_rel": [
+        0.6442138622538938,
+        -0.44691261953974326
+      ],
+      "layout_id": 56,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 2004,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.018,
+      "min_sink_dist": 0.409,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2797,
+      "obj_width": 0.3478,
+      "obj_xy_abs": [
+        5.70065506476818,
+        -1.298508552411734
+      ],
+      "obj_xy_rel": [
+        0.42643372885095143,
+        0.5051093716603741
+      ],
+      "layout_id": 49,
+      "style_id": 43,
+      "uncertainty": null
+    },
+    {
+      "episode": 2012,
+      "success": true,
+      "steps_to_success": 194,
+      "failure_phase": "success",
+      "max_lift": 0.181,
+      "min_sink_dist": 0.049,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        4.097087674275091,
+        -3.116555672795135
+      ],
+      "obj_xy_rel": [
+        0.38655192574592645,
+        -0.5400415462777399
+      ],
+      "layout_id": 48,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 2024,
+      "success": true,
+      "steps_to_success": 189,
+      "failure_phase": "success",
+      "max_lift": 0.045,
+      "min_sink_dist": 0.08,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        1.8746721494188219,
+        -0.43909530816008147
+      ],
+      "obj_xy_rel": [
+        -0.4197288448348211,
+        0.40014483149117774
+      ],
+      "layout_id": 12,
+      "style_id": 11,
+      "uncertainty": null
+    },
+    {
+      "episode": 2031,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.411,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        0.5572835633352154,
+        -2.5927881205107637
+      ],
+      "obj_xy_rel": [
+        -0.2290563419795285,
+        -0.5115228325711585
+      ],
+      "layout_id": 19,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 2038,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.017,
+      "min_sink_dist": 0.453,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1236,
+      "obj_width": 0.3624,
+      "obj_xy_abs": [
+        2.989564377652198,
+        -2.1013762962202818
+      ],
+      "obj_xy_rel": [
+        0.46924925655190775,
+        0.3663892304341734
+      ],
+      "layout_id": 37,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 2040,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.463,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2618,
+      "obj_width": 0.218,
+      "obj_xy_abs": [
+        1.969163345199422,
+        -2.5386233734745196
+      ],
+      "obj_xy_rel": [
+        0.33891804350213084,
+        0.598535000185159
+      ],
+      "layout_id": 15,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 2050,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.636,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2547,
+      "obj_width": 0.1133,
+      "obj_xy_abs": [
+        2.613311439803625,
+        -0.42131292410665827
+      ],
+      "obj_xy_rel": [
+        -0.7185161153112558,
+        0.3532476578422786
+      ],
+      "layout_id": 39,
+      "style_id": 32,
+      "uncertainty": null
+    },
+    {
+      "episode": 2074,
+      "success": true,
+      "steps_to_success": 183,
+      "failure_phase": "success",
+      "max_lift": 0.096,
+      "min_sink_dist": 0.233,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.182,
+      "obj_width": 0.1576,
+      "obj_xy_abs": [
+        2.075111929947393,
+        -3.543912077805041
+      ],
+      "obj_xy_rel": [
+        0.4152627479313358,
+        -0.45964839543498925
+      ],
+      "layout_id": 15,
+      "style_id": 33,
+      "uncertainty": null
+    },
+    {
+      "episode": 2076,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.011,
+      "min_sink_dist": 0.389,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.219,
+      "obj_width": 0.2127,
+      "obj_xy_abs": [
+        3.329541106713323,
+        -1.2087603041348634
+      ],
+      "obj_xy_rel": [
+        0.29179556314624033,
+        0.40690621106378955
+      ],
+      "layout_id": 30,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 2080,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.02,
+      "min_sink_dist": 0.387,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0941,
+      "obj_width": 0.356,
+      "obj_xy_abs": [
+        3.0460209412076553,
+        -4.655438208168084
+      ],
+      "obj_xy_rel": [
+        -0.38694348044068594,
+        -0.5698896538997857
+      ],
+      "layout_id": 42,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 2081,
+      "success": true,
+      "steps_to_success": 261,
+      "failure_phase": "success",
+      "max_lift": 0.139,
+      "min_sink_dist": 0.531,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        5.321980460709573,
+        -1.6242544024576298
+      ],
+      "obj_xy_rel": [
+        0.4519511919502115,
+        0.506690626180309
+      ],
+      "layout_id": 17,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 2127,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.458,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.2752,
+      "obj_width": 0.273,
+      "obj_xy_abs": [
+        3.352159928146386,
+        -1.1149688926929981
+      ],
+      "obj_xy_rel": [
+        0.3245648731979287,
+        0.41284031714522507
+      ],
+      "layout_id": 30,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 2149,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.047,
+      "min_sink_dist": 0.27,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        5.665571577273019,
+        -1.437261824919915
+      ],
+      "obj_xy_rel": [
+        0.36949723976878257,
+        0.5701811960467222
+      ],
+      "layout_id": 49,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 2150,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.594,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1515,
+      "obj_width": 0.1777,
+      "obj_xy_abs": [
+        2.012956671763106,
+        -0.4627101801403464
+      ],
+      "obj_xy_rel": [
+        -0.7219693226219266,
+        0.3242456423717996
+      ],
+      "layout_id": 41,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 2152,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.429,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        5.376683848603208,
+        -2.6936096161735468
+      ],
+      "obj_xy_rel": [
+        0.5414485622998226,
+        -0.48905864850355085
+      ],
+      "layout_id": 17,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 2156,
+      "success": true,
+      "steps_to_success": 358,
+      "failure_phase": "success",
+      "max_lift": 0.09,
+      "min_sink_dist": 0.141,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1367,
+      "obj_width": 0.2023,
+      "obj_xy_abs": [
+        2.702851629715463,
+        -0.4410428196990646
+      ],
+      "obj_xy_rel": [
+        -0.5079717756090907,
+        0.3798070717248377
+      ],
+      "layout_id": 39,
+      "style_id": 24,
+      "uncertainty": null
+    },
+    {
+      "episode": 2161,
+      "success": true,
+      "steps_to_success": 359,
+      "failure_phase": "success",
+      "max_lift": 0.132,
+      "min_sink_dist": 0.002,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        1.2646902368049118,
+        -0.4827452925837639
+      ],
+      "obj_xy_rel": [
+        -0.6414650959440165,
+        0.3123612770810406
+      ],
+      "layout_id": 38,
+      "style_id": 17,
+      "uncertainty": null
+    },
+    {
+      "episode": 2168,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 1.039,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        2.036539339046657,
+        -1.9687554831818421
+      ],
+      "obj_xy_rel": [
+        -0.5110207357864143,
+        0.7860498267388569
+      ],
+      "layout_id": 43,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 2174,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.013,
+      "min_sink_dist": 0.293,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        2.9350677935209992,
+        -1.789290462458718
+      ],
+      "obj_xy_rel": [
+        0.47814637554571116,
+        -0.48457534587043893
+      ],
+      "layout_id": 52,
+      "style_id": 19,
+      "uncertainty": null
+    },
+    {
+      "episode": 2180,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.004,
+      "min_sink_dist": 0.927,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0988,
+      "obj_width": 0.3515,
+      "obj_xy_abs": [
+        0.46255415869264926,
+        -1.09730733211491
+      ],
+      "obj_xy_rel": [
+        -0.3630315107028034,
+        0.7155568104740504
+      ],
+      "layout_id": 20,
+      "style_id": 21,
+      "uncertainty": null
+    },
+    {
+      "episode": 2182,
+      "success": true,
+      "steps_to_success": 242,
+      "failure_phase": "success",
+      "max_lift": 0.15,
+      "min_sink_dist": 0.14,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.089,
+      "obj_width": 0.2601,
+      "obj_xy_abs": [
+        3.0313713030541654,
+        -4.60783283174006
+      ],
+      "obj_xy_rel": [
+        -0.46103167979073456,
+        -0.4673797921789058
+      ],
+      "layout_id": 42,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 2195,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.019,
+      "min_sink_dist": 0.523,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0824,
+      "obj_width": 0.249,
+      "obj_xy_abs": [
+        6.521347947651141,
+        -1.9860233169621753
+      ],
+      "obj_xy_rel": [
+        0.3996798228959504,
+        0.44359852756667917
+      ],
+      "layout_id": 47,
+      "style_id": 20,
+      "uncertainty": null
+    },
+    {
+      "episode": 2216,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.685,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        2.01253265271936,
+        -2.528617218994999
+      ],
+      "obj_xy_rel": [
+        0.4030115735141937,
+        0.3689797103526873
+      ],
+      "layout_id": 15,
+      "style_id": 14,
+      "uncertainty": null
+    },
+    {
+      "episode": 2220,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.022,
+      "min_sink_dist": 0.39,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.0761,
+      "obj_width": 0.3441,
+      "obj_xy_abs": [
+        0.47695085651957875,
+        -1.1707379749143907
+      ],
+      "obj_xy_rel": [
+        -0.35022245103490096,
+        0.525455811049327
+      ],
+      "layout_id": 36,
+      "style_id": 27,
+      "uncertainty": null
+    },
+    {
+      "episode": 2228,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.014,
+      "min_sink_dist": 0.454,
+      "object_category": "jug",
+      "object_split": "pretrain",
+      "obj_height": 0.1813,
+      "obj_width": 0.1692,
+      "obj_xy_abs": [
+        4.05853261309766,
+        -0.453758179837022
+      ],
+      "obj_xy_rel": [
+        0.6058848810190445,
+        0.38771325310818466
+      ],
+      "layout_id": 53,
+      "style_id": 29,
+      "uncertainty": null
+    },
+    {
+      "episode": 2231,
+      "success": true,
+      "steps_to_success": 318,
+      "failure_phase": "success",
+      "max_lift": 0.103,
+      "min_sink_dist": 0.106,
+      "object_category": "reamer",
+      "object_split": "pretrain",
+      "obj_height": 0.0953,
+      "obj_width": 0.205,
+      "obj_xy_abs": [
+        4.089822978370049,
+        -0.4309267572073561
+      ],
+      "obj_xy_rel": [
+        0.5111751719445787,
+        0.4098759280902053
+      ],
+      "layout_id": 53,
+      "style_id": 27,
+      "uncertainty": null
+    },
+    {
+      "episode": 2242,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.517,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        0.36931649838667585,
+        -1.2330872078555006
+      ],
+      "obj_xy_rel": [
+        -0.4209406410003043,
+        0.7538941691770478
+      ],
+      "layout_id": 25,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 2245,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.003,
+      "min_sink_dist": 0.675,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2547,
+      "obj_width": 0.1133,
+      "obj_xy_abs": [
+        3.2651171814623403,
+        -0.9875289800836555
+      ],
+      "obj_xy_rel": [
+        0.2328808153512738,
+        0.5733772168439302
+      ],
+      "layout_id": 30,
+      "style_id": 31,
+      "uncertainty": null
+    },
+    {
+      "episode": 2264,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.305,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        -0.3423572007193619,
+        -2.8524466710166565
+      ],
+      "obj_xy_rel": [
+        0.45697998996990835,
+        -0.7136831964643222
+      ],
+      "layout_id": 57,
+      "style_id": 23,
+      "uncertainty": null
+    },
+    {
+      "episode": 2274,
+      "success": true,
+      "steps_to_success": 251,
+      "failure_phase": "success",
+      "max_lift": 0.061,
+      "min_sink_dist": 0.112,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2559,
+      "obj_width": 0.1521,
+      "obj_xy_abs": [
+        4.790920679158269,
+        -0.6520569599324958
+      ],
+      "obj_xy_rel": [
+        0.46211550458944295,
+        0.31727605702978345
+      ],
+      "layout_id": 55,
+      "style_id": 35,
+      "uncertainty": null
+    },
+    {
+      "episode": 2284,
+      "success": true,
+      "steps_to_success": 385,
+      "failure_phase": "success",
+      "max_lift": 0.148,
+      "min_sink_dist": 0.054,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.1932,
+      "obj_width": 0.1466,
+      "obj_xy_abs": [
+        2.7288900801938354,
+        -4.920300465527534
+      ],
+      "obj_xy_rel": [
+        -0.35761937952983924,
+        -0.6372373305926073
+      ],
+      "layout_id": 31,
+      "style_id": 22,
+      "uncertainty": null
+    },
+    {
+      "episode": 2298,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_grasped_no_transport",
+      "max_lift": 0.063,
+      "min_sink_dist": 0.294,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        2.0772668746218126,
+        -0.34611701766712927
+      ],
+      "obj_xy_rel": [
+        -0.555031008808065,
+        0.5006832639802135
+      ],
+      "layout_id": 41,
+      "style_id": 48,
+      "uncertainty": null
+    },
+    {
+      "episode": 2299,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.542,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        4.804442050586304,
+        -2.88505731968396
+      ],
+      "obj_xy_rel": [
+        0.33748371058967486,
+        -0.6963544879526316
+      ],
+      "layout_id": 35,
+      "style_id": 13,
+      "uncertainty": null
+    },
+    {
+      "episode": 2305,
+      "success": true,
+      "steps_to_success": 236,
+      "failure_phase": "success",
+      "max_lift": 0.048,
+      "min_sink_dist": 0.107,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0399,
+      "obj_width": 0.1058,
+      "obj_xy_abs": [
+        4.695843238090932,
+        -0.4964952905438355
+      ],
+      "obj_xy_rel": [
+        0.3751710652449374,
+        0.44653356168258634
+      ],
+      "layout_id": 55,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 2320,
+      "success": true,
+      "steps_to_success": 187,
+      "failure_phase": "success",
+      "max_lift": 0.022,
+      "min_sink_dist": 0.032,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        2.6611357765910024,
+        -2.2515157798918204
+      ],
+      "obj_xy_rel": [
+        0.36682698313525464,
+        0.39004858513685337
+      ],
+      "layout_id": 16,
+      "style_id": 26,
+      "uncertainty": null
+    },
+    {
+      "episode": 2345,
+      "success": true,
+      "steps_to_success": 234,
+      "failure_phase": "success",
+      "max_lift": 0.052,
+      "min_sink_dist": 0.011,
+      "object_category": "colander",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.4081,
+      "obj_xy_abs": [
+        2.6395508107286756,
+        -0.3739687538434798
+      ],
+      "obj_xy_rel": [
+        -0.6731147487976643,
+        0.39200294773163497
+      ],
+      "layout_id": 39,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 2352,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.615,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2295,
+      "obj_width": 0.1084,
+      "obj_xy_abs": [
+        3.412831297183719,
+        -4.6837540048867154
+      ],
+      "obj_xy_rel": [
+        -0.48034578214902757,
+        -0.37541158596727797
+      ],
+      "layout_id": 26,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 2375,
+      "success": true,
+      "steps_to_success": 326,
+      "failure_phase": "success",
+      "max_lift": 0.103,
+      "min_sink_dist": 0.107,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1753,
+      "obj_width": 0.0735,
+      "obj_xy_abs": [
+        0.4134664975193867,
+        -1.4204424136465923
+      ],
+      "obj_xy_rel": [
+        -0.38713442258186337,
+        0.47277579581501095
+      ],
+      "layout_id": 19,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 2407,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.567,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2421,
+      "obj_width": 0.139,
+      "obj_xy_abs": [
+        5.279582489278775,
+        -2.753677371898011
+      ],
+      "obj_xy_rel": [
+        0.421809836019742,
+        -0.6179215047082081
+      ],
+      "layout_id": 17,
+      "style_id": 16,
+      "uncertainty": null
+    },
+    {
+      "episode": 2408,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.008,
+      "min_sink_dist": 0.593,
+      "object_category": "cheese_grater",
+      "object_split": "pretrain",
+      "obj_height": 0.2565,
+      "obj_width": 0.1501,
+      "obj_xy_abs": [
+        5.121245832145695,
+        -1.6698106192204896
+      ],
+      "obj_xy_rel": [
+        0.27433570732166324,
+        0.6656820155879934
+      ],
+      "layout_id": 17,
+      "style_id": 45,
+      "uncertainty": null
+    },
+    {
+      "episode": 2410,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.002,
+      "min_sink_dist": 0.729,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0675,
+      "obj_xy_abs": [
+        5.287768810285035,
+        -1.2820531423931691
+      ],
+      "obj_xy_rel": [
+        0.326219344976038,
+        0.7223143598071653
+      ],
+      "layout_id": 54,
+      "style_id": 54,
+      "uncertainty": null
+    },
+    {
+      "episode": 2431,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.01,
+      "min_sink_dist": 0.596,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.2618,
+      "obj_width": 0.218,
+      "obj_xy_abs": [
+        2.8111035680820584,
+        -1.8664232651816692
+      ],
+      "obj_xy_rel": [
+        0.32454726282588675,
+        -0.8397932042535585
+      ],
+      "layout_id": 52,
+      "style_id": 12,
+      "uncertainty": null
+    },
+    {
+      "episode": 2434,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.412,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2925,
+      "obj_width": 0.1495,
+      "obj_xy_abs": [
+        2.540804935991388,
+        -0.39122424350570345
+      ],
+      "obj_xy_rel": [
+        -0.6427585012046482,
+        0.4425045279707542
+      ],
+      "layout_id": 28,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 2435,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.006,
+      "min_sink_dist": 0.565,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1366,
+      "obj_width": 0.1408,
+      "obj_xy_abs": [
+        3.360790874061176,
+        -0.4305393623002765
+      ],
+      "obj_xy_rel": [
+        -0.5347434345347133,
+        0.4188047446564332
+      ],
+      "layout_id": 51,
+      "style_id": 58,
+      "uncertainty": null
+    },
+    {
+      "episode": 2438,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.809,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2305,
+      "obj_width": 0.1271,
+      "obj_xy_abs": [
+        1.9016149097609738,
+        -0.3361549444125192
+      ],
+      "obj_xy_rel": [
+        0.7535808570051092,
+        0.49365733730944866
+      ],
+      "layout_id": 27,
+      "style_id": 55,
+      "uncertainty": null
+    },
+    {
+      "episode": 2473,
+      "success": true,
+      "steps_to_success": 280,
+      "failure_phase": "success",
+      "max_lift": 0.027,
+      "min_sink_dist": 0.214,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2067,
+      "obj_width": 0.1095,
+      "obj_xy_abs": [
+        3.7308401514967775,
+        -0.3759603898387925
+      ],
+      "obj_xy_rel": [
+        0.5657530802595372,
+        0.4720991833145625
+      ],
+      "layout_id": 39,
+      "style_id": 47,
+      "uncertainty": null
+    },
+    {
+      "episode": 2483,
+      "success": true,
+      "steps_to_success": 341,
+      "failure_phase": "success",
+      "max_lift": 0.047,
+      "min_sink_dist": 0.055,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2067,
+      "obj_width": 0.1095,
+      "obj_xy_abs": [
+        2.454880470228108,
+        -2.00906269927273
+      ],
+      "obj_xy_rel": [
+        -0.6319603098372388,
+        -0.4500207013957982
+      ],
+      "layout_id": 14,
+      "style_id": 15,
+      "uncertainty": null
+    },
+    {
+      "episode": 2508,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.007,
+      "min_sink_dist": 0.452,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "obj_height": 0.2925,
+      "obj_width": 0.1495,
+      "obj_xy_abs": [
+        4.995324081816895,
+        -1.6520324171730358
+      ],
+      "obj_xy_rel": [
+        0.47083327960354726,
+        0.6081417271401541
+      ],
+      "layout_id": 35,
+      "style_id": 60,
+      "uncertainty": null
+    },
+    {
+      "episode": 2536,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.583,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1743,
+      "obj_width": 0.0656,
+      "obj_xy_abs": [
+        3.823585811864219,
+        -0.3854179869998468
+      ],
+      "obj_xy_rel": [
+        -0.6445201352840506,
+        0.41905540777832934
+      ],
+      "layout_id": 50,
+      "style_id": 30,
+      "uncertainty": null
+    },
+    {
+      "episode": 2538,
+      "success": true,
+      "steps_to_success": 297,
+      "failure_phase": "success",
+      "max_lift": 0.063,
+      "min_sink_dist": 0.172,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        2.8087727799320588,
+        -2.0791049103262793
+      ],
+      "obj_xy_rel": [
+        -0.4333800491186892,
+        -0.33328089173926156
+      ],
+      "layout_id": 24,
+      "style_id": 56,
+      "uncertainty": null
+    },
+    {
+      "episode": 2542,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.001,
+      "min_sink_dist": 0.871,
+      "object_category": "spray",
+      "object_split": "pretrain",
+      "obj_height": 0.2646,
+      "obj_width": 0.123,
+      "obj_xy_abs": [
+        5.66551757411768,
+        -1.2889883482638398
+      ],
+      "obj_xy_rel": [
+        0.3768474879778836,
+        0.5587387492570994
+      ],
+      "layout_id": 49,
+      "style_id": 38,
+      "uncertainty": null
+    },
+    {
+      "episode": 2547,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.127,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        1.8770152357144319,
+        -1.7245806921933098
+      ],
+      "obj_xy_rel": [
+        -0.48100312878623064,
+        0.6400989307593208
+      ],
+      "layout_id": 60,
+      "style_id": 39,
+      "uncertainty": null
+    },
+    {
+      "episode": 2551,
+      "success": true,
+      "steps_to_success": 326,
+      "failure_phase": "success",
+      "max_lift": 0.119,
+      "min_sink_dist": 0.156,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        3.9485786510880345,
+        -0.5095736250651397
+      ],
+      "obj_xy_rel": [
+        0.5258704963783307,
+        0.32954992365027236
+      ],
+      "layout_id": 53,
+      "style_id": 37,
+      "uncertainty": null
+    },
+    {
+      "episode": 2581,
+      "success": true,
+      "steps_to_success": 273,
+      "failure_phase": "success",
+      "max_lift": 0.055,
+      "min_sink_dist": 0.094,
+      "object_category": "bottled_water",
+      "object_split": "pretrain",
+      "obj_height": 0.1751,
+      "obj_width": 0.0676,
+      "obj_xy_abs": [
+        2.8413082008718664,
+        -3.639598559832455
+      ],
+      "obj_xy_rel": [
+        -0.27498612575748593,
+        0.5993153902181629
+      ],
+      "layout_id": 31,
+      "style_id": 41,
+      "uncertainty": null
+    },
+    {
+      "episode": 2611,
+      "success": false,
+      "steps_to_success": null,
+      "failure_phase": "fail_no_grasp",
+      "max_lift": 0.0,
+      "min_sink_dist": 0.676,
+      "object_category": "yogurt",
+      "object_split": "pretrain",
+      "obj_height": 0.0492,
+      "obj_width": 0.0993,
+      "obj_xy_abs": [
+        5.544436433964808,
+        -1.440214740623521
+      ],
+      "obj_xy_rel": [
+        0.197047974515006,
+        0.5546592012415019
+      ],
+      "layout_id": 49,
+      "style_id": 28,
+      "uncertainty": null
+    },
+    {
+      "episode": 2619,
+      "success": true,
+      "steps_to_success": 328,
+      "failure_phase": "success",
+      "max_lift": 0.127,
+      "min_sink_dist": 0.042,
+      "object_category": "jar",
+      "object_split": "pretrain",
+      "obj_height": 0.1339,
+      "obj_width": 0.2146,
+      "obj_xy_abs": [
+        2.6067776929266984,
+        -2.194250103714268
+      ],
+      "obj_xy_rel": [
+        0.3699050793866645,
+        0.5593968931590756
+      ],
+      "layout_id": 16,
+      "style_id": 53,
+      "uncertainty": null
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "summary": {
+    "checkpoint": "/data/xinyua11/dp_runs/pickplacesink_human/seed0_noncached_partial_ep471/checkpoints/epoch=0400-test_mean_score=-1.000.ckpt",
+    "task": "PickPlaceCounterToSink",
+    "split": "pretrain",
+    "pool_n": 6,
+    "start_seed": 0,
+    "k": 8,
+    "overall_success": 0.1667,
+    "auc_uncertainty_to_failure": 0.4,
+    "by_object_category": {
+      "bell_pepper": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "juice": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "canned_food": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "kiwi": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "shrimp": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "orange": {
+        "success_rate": 1.0,
+        "n": 1
+      }
+    },
+    "by_position_bin": {
+      "near-right": {
+        "success_rate": 0.0,
+        "n": 2
+      },
+      "far-right": {
+        "success_rate": 0.0,
+        "n": 1
+      },
+      "far-left": {
+        "success_rate": 0.0,
+        "n": 2
+      },
+      "mid-right": {
+        "success_rate": 1.0,
+        "n": 1
+      }
+    },
+    "by_object_split": {
+      "pretrain": {
+        "success_rate": 0.167,
+        "n": 6
+      }
+    }
+  },
+  "records": [
+    {
+      "seed": 0,
+      "success": true,
+      "uncertainty": 0.0141824409365654,
+      "object_category": "orange",
+      "object_split": "pretrain",
+      "pos_bin": "mid-right",
+      "rel_x": 0.348,
+      "rel_y": -0.524,
+      "layout_id": 54,
+      "style_id": 58
+    },
+    {
+      "seed": 1,
+      "success": false,
+      "uncertainty": 0.017927687615156174,
+      "object_category": "bell_pepper",
+      "object_split": "pretrain",
+      "pos_bin": "near-right",
+      "rel_x": -0.717,
+      "rel_y": -0.461,
+      "layout_id": 14,
+      "style_id": 56
+    },
+    {
+      "seed": 2,
+      "success": false,
+      "uncertainty": 0.007332774344831705,
+      "object_category": "juice",
+      "object_split": "pretrain",
+      "pos_bin": "near-right",
+      "rel_x": -0.239,
+      "rel_y": -0.702,
+      "layout_id": 25,
+      "style_id": 51
+    },
+    {
+      "seed": 3,
+      "success": false,
+      "uncertainty": 0.012016545049846172,
+      "object_category": "canned_food",
+      "object_split": "pretrain",
+      "pos_bin": "far-right",
+      "rel_x": 0.422,
+      "rel_y": -0.756,
+      "layout_id": 37,
+      "style_id": 53
+    },
+    {
+      "seed": 4,
+      "success": false,
+      "uncertainty": 0.005854740273207426,
+      "object_category": "kiwi",
+      "object_split": "pretrain",
+      "pos_bin": "far-left",
+      "rel_x": 0.473,
+      "rel_y": 0.759,
+      "layout_id": 15,
+      "style_id": 27
+    },
+    {
+      "seed": 5,
+      "success": false,
+      "uncertainty": 0.022582320496439934,
+      "object_category": "shrimp",
+      "object_split": "pretrain",
+      "pos_bin": "far-left",
+      "rel_x": 0.517,
+      "rel_y": 0.481,
+      "layout_id": 44,
+      "style_id": 58
+    }
+  ]
+}
