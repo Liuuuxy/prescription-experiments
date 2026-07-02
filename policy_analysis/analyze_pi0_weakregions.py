@@ -11,6 +11,7 @@ import argparse
 import collections
 import json
 import os
+import signal
 import sys
 from datetime import datetime
 
@@ -26,6 +27,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import analysis  # noqa: E402
 
 TARGET_OBJ = "obj"
+
+
+class _RolloutTimeout(Exception):
+    pass
+
+
+def _alarm_handler(signum, frame):
+    raise _RolloutTimeout()
+
+
+signal.signal(signal.SIGALRM, _alarm_handler)  # per-episode watchdog (env build/reset can hang)
 
 
 def target_meta(rs):
@@ -90,6 +102,12 @@ def main():
     p.add_argument("--per_cat", type=int, default=0,
                    help="with --categories: stop once every listed category has this many episodes")
     p.add_argument("--out_dir", default="/home/asurite.ad.asu.edu/xinyua11/robocasa_experiments/weakregion/pi0_PickPlaceCounterToSink")
+    p.add_argument("--rollout_timeout", type=int, default=180,
+                   help="skip a scene if env build/reset exceeds this many seconds (0=off); "
+                        "guards the mujoco placement-sampling hang that can stall the eval")
+    p.add_argument("--save_obs_dir", default=None,
+                   help="if set, save each episode's initial agentview image (ep{i}.npy) for "
+                        "category-free failed-state retrieval; join to records by episode index")
     args = p.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
 
@@ -100,10 +118,23 @@ def main():
     client = _wcp.WebsocketClientPolicy(args.host, args.port)
     records = []
     for i in range(args.n):
-        env = gym.make(f"robocasa/{args.task}", split=args.split, seed=args.seed + i)
-        rs = env.unwrapped
-        obs, info = env.reset()
+        if args.rollout_timeout:
+            signal.alarm(args.rollout_timeout)
+        try:
+            env = gym.make(f"robocasa/{args.task}", split=args.split, seed=args.seed + i)
+            rs = env.unwrapped
+            obs, info = env.reset()
+        except _RolloutTimeout:
+            print(f"[timeout] seed {args.seed + i}: env build/reset > {args.rollout_timeout}s -- skip", flush=True)
+            signal.alarm(0)
+            continue
+        signal.alarm(0)  # reset survived; don't guard the bounded rollout (avoids uncaught mid-rollout raise)
         lang = obs["annotation.human.task_description"]
+        if args.save_obs_dir:
+            os.makedirs(args.save_obs_dir, exist_ok=True)
+            _img0 = obs.get("video.robot0_agentview_left")
+            if _img0 is not None:
+                np.save(os.path.join(args.save_obs_dir, f"ep{i:04d}.npy"), np.asarray(_img0))
         cat, osplit, xy_abs, xy_rel, layout, style = target_meta(rs)
         # stratified eval: only spend a (600-step) rollout on a targeted category that isn't full yet
         if target_cats is not None:

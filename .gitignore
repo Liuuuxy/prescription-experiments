@@ -17,3 +17,19 @@ weakregion/**/media/
 # Claude Code local config
 .claude/
 weakregion/emb_*.npy
+
+# large regenerable gradient/embedding artifacts (recreate: influence_score.py sketch / failretr.py)
+weakregion/rcless/
+weakregion/rcless_raw/
+weakregion/failstates/
+weakregion/failretr_demo_emb.npy
+
+# run logs (training/eval/orchestration)
+weakregion/*.log
+weakregion/**/serve.log
+
+# talk: rollout frame dumps are large + regenerable (make_filmstrip.py)
+talk/rollout_frames/
+
+# collaborator's CIFAR sandbox — standalone clone of RansML/xgradtest, not part of this repo
+xgradtest/

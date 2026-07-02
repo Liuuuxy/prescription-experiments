@@ -223,6 +223,39 @@ def make_grad_fn(mode, real_dim=0):
     return gfn
 
 
+# ----------------------------------------------------------------------------- sparse JL sketch (RC-LESS)
+def make_sparse_proj(dim_in, dim_out, nnz, seed=0):
+    """Fixed VERY-SPARSE random projection dim_in -> dim_out, materializable (idx/sgn only).
+    sketch[o] = sum_k sgn[o,k] * g[idx[o,k]]. Preserves inner products up to scale + JL distortion
+    (cosine is scale-invariant). idx [dim_out,nnz] gathers from the 50M-dim flat LoRA gradient."""
+    rng = np.random.RandomState(seed)
+    idx = rng.randint(0, dim_in, size=(dim_out, nnz)).astype(np.int32)
+    sgn = (rng.randint(0, 2, size=(dim_out, nnz)).astype(np.float32) * 2.0 - 1.0)
+    return jnp.asarray(idx), jnp.asarray(sgn)
+
+
+@nnx.jit
+def _sketch(g_flat, idx, sgn):
+    return (sgn * g_flat[idx]).sum(axis=1)
+
+
+def grad_sketch(gfn, model, ep, step, obs, act, idx, sgn):
+    """Unit gradient -> sparse sketch (numpy float32, dim_out)."""
+    rng = jax.random.fold_in(jax.random.key(int(ep)), int(step))
+    g = gfn(model, rng, obs, act)
+    g = g / (jnp.linalg.norm(g) + 1e-12)
+    return np.asarray(_sketch(g, idx, sgn))
+
+
+def grad_sketch_raw(gfn, model, ep, step, obs, act, idx, sgn):
+    """RAW (un-normalized) gradient -> (sketch, grad_norm). Keeps magnitude so offline tools can
+    compute raw dot / projection / Adam-weighting, not just direction."""
+    rng = jax.random.fold_in(jax.random.key(int(ep)), int(step))
+    g = gfn(model, rng, obs, act)
+    n = float(jnp.linalg.norm(g))
+    return np.asarray(_sketch(g, idx, sgn)), n
+
+
 def grad_unit(gfn, model, ep, step, obs, act):
     """Normalized gradient vector for one demo at one checkpoint (numpy float32)."""
     rng = jax.random.fold_in(jax.random.key(int(ep)), int(step))
@@ -492,6 +525,98 @@ def run_full(args):
     print(f"[full] selected mix (top 15): {dict(list(out['selected_mix'].items())[:15])}")
 
 
+# ----------------------------------------------------------------------------- RC-LESS sketch rescore
+def run_sketch(args):
+    """RC-LESS stage 1: save per-demo sparse JL sketches of the (unit) LoRA gradient (avg over
+    reference checkpoints) for the coverage targets (balanced D_val), a class-balanced non-targeted
+    retention set R (for g_R), and all candidates. Selection (cluster+coverage+retention+floor) is a
+    separate cheap numpy step on these sketches."""
+    cfg, raw, tds = build_dataset(args.mg_dir)
+    starts = episode_frame_starts(raw)
+    ep_cat, base, dval, candidates = make_splits(args.mg_dir, args.base_file, args.seed,
+                                                 "balanced", args.n_val_per_cat, args.n_val)
+    rng = np.random.RandomState(args.seed + 11)
+    # retention set R: class-balanced NON-targeted holdout (the majority to protect), disjoint
+    by_cat = defaultdict(list)
+    for ep in candidates:
+        if ep_cat[ep] not in TARGETED:
+            by_cat[ep_cat[ep]].append(ep)
+    ret = []
+    for c in sorted(by_cat):
+        ret += list(rng.choice(by_cat[c], size=min(2, len(by_cat[c])), replace=False))
+    ret = sorted(int(x) for x in ret)
+    cand = sorted(set(candidates) - set(ret))
+    if args.limit:
+        cand = cand[:args.limit]
+    steps = [int(s) for s in args.steps.split(",")]
+    os.makedirs(args.out_dir, exist_ok=True)
+    print(f"[sketch] dval={len(dval)} ret={len(ret)} candidates={len(cand)} ckpts={steps} "
+          f"dim_out={args.sketch_dim} nnz={args.nnz}", flush=True)
+
+    gfn = make_grad_fn(args.mode_grad, args.real_dim)
+    # determine flat grad dim, build the fixed sparse projection
+    m0 = load_model(cfg, steps[0])
+    s, L = starts[dval[0]]
+    obs0, act0 = batch_to_inputs(stack_batch(tds, frame_indices(s, L, args.k)))
+    Dflat = int(np.asarray(gfn(m0, jax.random.key(0), obs0, act0)).size)
+    idx, sgn = make_sparse_proj(Dflat, args.sketch_dim, args.nnz, seed=12345)
+    print(f"[sketch] flat grad dim={Dflat} -> sketch dim {args.sketch_dim}", flush=True)
+
+    # validation: sketch preserves inner products? (10 dval demos, true-cos vs sketch-cos @ ckpt0)
+    val_eps = dval[:10]
+    full, sk = [], []
+    for ep in val_eps:
+        s, L = starts[ep]; o, a = batch_to_inputs(stack_batch(tds, frame_indices(s, L, args.k)))
+        r = jax.random.fold_in(jax.random.key(int(ep)), int(steps[0]))
+        g = gfn(m0, r, o, a); g = g / (jnp.linalg.norm(g) + 1e-12)
+        full.append(np.asarray(g)); sk.append(np.asarray(_sketch(g, idx, sgn)))
+    full = np.stack(full); sk = np.stack(sk)
+    tc = (full @ full.T)[np.triu_indices(10, 1)]
+    scn = sk / (np.linalg.norm(sk, axis=1, keepdims=True) + 1e-12)
+    sc = (scn @ scn.T)[np.triu_indices(10, 1)]
+    print(f"[sketch] VALIDATION true-cos vs sketch-cos: corr={np.corrcoef(tc,sc)[0,1]:.3f} "
+          f"mae={np.abs(tc-sc).mean():.3f} (want corr>0.9)", flush=True)
+    del m0, full
+
+    def sketch_set(eps, tag):
+        T, n = len(steps), len(eps)
+        raw = np.zeros((T, n, args.sketch_dim), np.float32) if args.raw else None
+        nrm = np.zeros((T, n), np.float32) if args.raw else None
+        acc = {e: None for e in eps}
+        for ti, st in enumerate(steps):
+            mdl = load_model(cfg, st)
+            for i, e in enumerate(eps):
+                sp, sl = starts[e]; o, a = batch_to_inputs(stack_batch(tds, frame_indices(sp, sl, args.k)))
+                if args.raw:                      # raw sketch + grad norm (magnitude preserved)
+                    rs, gn = grad_sketch_raw(gfn, mdl, e, st, o, a, idx, sgn)
+                    raw[ti, i] = rs; nrm[ti, i] = gn
+                else:                             # unit-normalized, accumulate for the ckpt-mean
+                    v = grad_sketch(gfn, mdl, e, st, o, a, idx, sgn)
+                    acc[e] = v if acc[e] is None else acc[e] + v
+                if (i + 1) % 1000 == 0:
+                    print(f"    {tag} ckpt {st}: {i+1}/{len(eps)}", flush=True)
+            del mdl
+            print(f"  [sketch] {tag} ckpt {st} done", flush=True)
+        json.dump({"episodes": list(eps), "categories": [ep_cat[e] for e in eps]},
+                  open(os.path.join(args.out_dir, f"{tag}_meta.json"), "w"))
+        if args.raw:                              # [T,n,d] raw + [T,n] norms -> all offline variants
+            np.save(os.path.join(args.out_dir, f"{tag}_raw.npy"), raw)
+            np.save(os.path.join(args.out_dir, f"{tag}_norms.npy"), nrm)
+            print(f"  [sketch] saved {tag}: raw {raw.shape} + norms -> {args.out_dir}", flush=True)
+        else:
+            M = np.stack([acc[e] / len(steps) for e in eps]).astype(np.float32)
+            np.save(os.path.join(args.out_dir, f"{tag}_sketch.npy"), M)
+            print(f"  [sketch] saved {tag}: {M.shape} -> {args.out_dir}", flush=True)
+
+    sketch_set(dval, "dval")
+    sketch_set(ret, "ret")
+    sketch_set(cand, "cand")
+    json.dump({"sketch_dim": args.sketch_dim, "nnz": args.nnz, "Dflat": Dflat, "ckpt_steps": steps,
+               "ckpt_base": CKPT_BASE, "n_dval": len(dval), "n_ret": len(ret), "n_cand": len(cand)},
+              open(os.path.join(args.out_dir, "sketch_info.json"), "w"), indent=2)
+    print(f"[sketch] DONE -> {args.out_dir}", flush=True)
+
+
 # ----------------------------------------------------------------------------- value smoke
 def _grad_filter(mode):
     if mode == "lastlayer":
@@ -608,7 +733,7 @@ def run_vsmoke(args):
 def main():
     global CKPT_BASE  # declared up-front: --ckpt_base default reads it, then we rebind it below
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["probe", "smoke", "vsmoke", "full"])
+    ap.add_argument("mode", choices=["probe", "smoke", "vsmoke", "full", "sketch"])
     ap.add_argument("--mg_dir", default=MG_DEFAULT)
     ap.add_argument("--base_file", default="weakregion/arms.json")
     ap.add_argument("--mode_grad", choices=["lastlayer", "heads", "lora", "lora_heads"], default="lastlayer")
@@ -639,6 +764,10 @@ def main():
     ap.add_argument("--group_k", type=int, default=25, help="vsmoke: demos per update group")
     ap.add_argument("--lr", type=float, default=0.05, help="vsmoke: 1-step SGD lr")
     ap.add_argument("--n_rand_groups", type=int, default=5, help="vsmoke: random groups to compare")
+    ap.add_argument("--sketch_dim", type=int, default=2048, help="sketch: JL projection dim")
+    ap.add_argument("--nnz", type=int, default=4000, help="sketch: nonzeros per output row")
+    ap.add_argument("--out_dir", default="weakregion/rcless", help="sketch: output dir")
+    ap.add_argument("--raw", action="store_true", help="sketch: save RAW per-checkpoint sketches + grad norms (magnitude-preserving, for offline magnitude-aware scoring)")
     args = ap.parse_args()
     CKPT_BASE = args.ckpt_base  # load_model() reads this module global (declared global at top)
     print(f"[ref] differentiating at checkpoints: {CKPT_BASE} steps={args.steps}", flush=True)
@@ -648,6 +777,8 @@ def main():
         run_smoke(args)
     elif args.mode == "vsmoke":
         run_vsmoke(args)
+    elif args.mode == "sketch":
+        run_sketch(args)
     else:
         run_full(args)
 
