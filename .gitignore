@@ -33,3 +33,6 @@ talk/rollout_frames/
 
 # collaborator's CIFAR sandbox — standalone clone of RansML/xgradtest, not part of this repo
 xgradtest/
+
+# bandit_v1 ledger: regenerable snapshot/event parquets (hashes.json IS committed)
+bandit_v1/ledger/*.parquet
