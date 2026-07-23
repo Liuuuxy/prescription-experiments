@@ -11,6 +11,13 @@ FX_POOL_JSON = REPO / "weakregion/factor_analysis/fx_pool.json"
 D0_DATASET = Path("/data/xinyua11/ft_arms/ppc2sink_base_only")
 FT_ARMS_ROOT = Path("/data/xinyua11/ft_arms")
 
+# hdf5 to source robomimic env_args (env_name/type/env_kwargs: robot, controller,
+# camera rig) from -- same PandaOmron + HYBRID_MOBILE_BASE recipe used to generate
+# the pool itself. Loaded via robomimic_dataset_utils.get_env_metadata_from_dataset,
+# same pattern as policy_analysis/check_train_eval_disjoint.py. No cameras/rendering
+# needed for state capture, so only env_kwargs (not the recorded camera sizes) matter.
+ENV_ARGS_HDF5 = REPO / "mimicgen_src/PickPlaceCounterToSink_pi0_src.hdf5"
+
 OPENPI = Path("/data/xinyua11/openpi")
 PRETRAIN_CKPT = Path("/data/xinyua11/checkpoints/pi0/pi0_robocasa_pretrain_human300/"
                      "multitask_learning/75000/params")
