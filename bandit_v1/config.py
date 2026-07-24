@@ -84,6 +84,7 @@ E_DIR = STATES_DIR / "E"
 DIAG_DIR = STATES_DIR / "diag"
 DIAG_CHECK_DIR = STATES_DIR / "diag_check"  # scratch out_dir for diagnosis.py's --out_check dry-run
 DIAG_TERCILE_MAP_JSON = LEDGER_DIR / "diag_tercile_map.json"  # frozen category->tercile map (task 6)
+MAP_MODELS_JOBLIB = LEDGER_DIR / "map_models.joblib"  # fitted p_hat_0 + p_stage (task 8, map_fit.py)
 
 SEED_PI0 = 1000
 def pull_seed(j: int) -> int: return 1000 + j       # round j >= 1
