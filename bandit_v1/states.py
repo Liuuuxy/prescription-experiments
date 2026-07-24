@@ -61,6 +61,36 @@ def make_env(seed=None):
         reward_shaping=False, seed=seed)
 
 
+ROLLOUT_CAMERAS = ("robot0_agentview_left", "robot0_agentview_right", "robot0_eye_in_hand")
+ROLLOUT_CAMERA_SIZE = 256  # matches robocasa.wrappers.gym_wrapper.PandaOmronKeyConverter.get_camera_config
+
+
+def make_env_for_rollout(seed=None):
+    """Second env constructor (bandit_v1 Task 4), used only by rollout.py's
+    policy-serving loop. make_env() passes camera_names=[] because fingerprint /
+    start_features never touch pixels (pure overhead there); a policy rollout needs
+    the pi0 websocket server's 3 cameras instead -- robot0_agentview_left/right +
+    robot0_eye_in_hand at 256x256, the exact rig
+    robocasa.wrappers.gym_wrapper.PandaOmronKeyConverter.get_camera_config uses for
+    the gym env pi0 is normally served from (analyze_pi0_weakregions.py's path).
+
+    Still built on the robomimic `create_env_for_data_processing` path (not
+    gym.make), NOT the gym wrapper, so restore()'s reset_to()-based saved-state
+    restoration and the env.env / get_ep_meta() / obj_body_id access states.py and
+    rollout.py rely on keep working unchanged; only the returned obs dict gains
+    image keys plus the raw robosuite-style low-dim keys (robot0_eef_pos,
+    robot0_gripper_qpos, robot0_base_to_eef_pos, ...) that rollout.py maps into the
+    pi0 server's expected observation/state contract (the gym wrapper's obs uses
+    differently-named "video.*"/"state.*" keys for the same underlying
+    quantities -- see rollout.py's module docstring)."""
+    env_meta = DatasetUtils.get_env_metadata_from_dataset(
+        dataset_path=str(config.ENV_ARGS_HDF5))
+    return EnvUtils.create_env_for_data_processing(
+        env_meta=env_meta, camera_names=list(ROLLOUT_CAMERAS),
+        camera_height=ROLLOUT_CAMERA_SIZE, camera_width=ROLLOUT_CAMERA_SIZE,
+        reward_shaping=False, seed=seed)
+
+
 def close_env(env):
     """EnvRobocasa (the robomimic wrapper) has no .close(); the underlying
     robosuite env does."""
