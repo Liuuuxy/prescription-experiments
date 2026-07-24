@@ -87,15 +87,57 @@ from . import config
 def decide(pulls_df: pd.DataFrame, sigma_e: float,
            delta: float = config.DELTA_CONF,
            t_max: int = config.T_MAX_PULLS) -> dict:
+    """Decide which arms survive the current round under max-LCB elimination.
+
+    Args:
+        pulls_df: DataFrame with columns (pull_id, arm, round_j, delta, status).
+        sigma_e: Noise floor for confidence interval widths.
+        delta: Confidence level (default 0.1 -> z~1.645); 1-delta/2 quantile.
+        t_max: Maximum pull budget for non-null arms (done when reached).
+
+    Returns:
+        dict with keys:
+            survivors: list of arm names still being pulled this round.
+            eliminated: dict {arm: round_j} of newly eliminated arms at their
+                last round (frozen across repeated calls; unchanged if arm
+                already eliminated).
+            next_round: int for next pull, or None if done.
+            done: True iff survivors==1, max_lcb decisively separates leader,
+                or budget exhausted.
+            ranking: list of (arm, mean, lcb, ucb, n) for all arms ever seen,
+                sorted by mean descending.
+            tied_with_leader: subset of survivors (excl. leader) within sigma_e
+                of leader's mean; used for exploit-phase proportional split.
+            no_data: list of arm names present in pulls_df but with no ok rows
+                (sorted); signals race runner to re-pull when data arrives.
+
+    Elimination rule: A non-leader cohort arm (last ok at max round) is cut
+    iff its ucb < max_lcb (the max lcb across all cohort arms, possibly from
+    a different arm). The leader (max mean in cohort) is exempt, never inferred
+    from arithmetic. Ties are preserved (tied_with_leader for exploit phase).
+    """
     ok = pulls_df[(pulls_df["status"] == "ok") & (pulls_df["arm"] != "null")]
 
     if ok.empty:
+        # All arms with ok rows are "null"; include those nulls in no_data.
+        all_non_null = pulls_df[pulls_df["arm"] != "null"]
+        no_data = sorted(all_non_null["arm"].unique().tolist()) if not all_non_null.empty else []
         return {"survivors": [], "eliminated": {}, "next_round": 1,
-                "done": False, "ranking": [], "tied_with_leader": []}
+                "done": False, "ranking": [], "tied_with_leader": [], "no_data": no_data}
 
     total_ok_pulls = len(ok)
     max_round = int(ok["round_j"].max())
     z = float(norm.ppf(1 - delta / 2))
+
+    # Detect NaN deltas in ok rows and raise an error; these silently shrink
+    # n (via pandas' skipna=True default on mean/std) and understate CI width.
+    nan_deltas = ok[ok["delta"].isna()]
+    if not nan_deltas.empty:
+        offending_ids = sorted(nan_deltas["pull_id"].tolist())
+        raise ValueError(
+            f"NaN delta found in ok rows: pull_ids={offending_ids}. "
+            "Check data integrity before proceeding."
+        )
 
     stats = {}
     last_round = {}
@@ -109,6 +151,11 @@ def decide(pulls_df: pd.DataFrame, sigma_e: float,
         half_w = z * sigma_hat / np.sqrt(n)
         stats[arm] = {"mean": mean, "lcb": mean - half_w, "ucb": mean + half_w, "n": n}
         last_round[arm] = int(g["round_j"].max())
+
+    # Detect arms with no ok rows (all their rows have status != "ok").
+    # These must be reported so the race runner knows to re-pull when data arrives.
+    all_non_null = pulls_df[pulls_df["arm"] != "null"]["arm"].unique()
+    no_data = sorted([a for a in all_non_null if a not in stats])
 
     # Cohort = arms still actually being pulled (last row at the overall max
     # round). Arms whose last row is earlier were already cut by a prior
@@ -135,6 +182,10 @@ def decide(pulls_df: pd.DataFrame, sigma_e: float,
     ]
 
     rival_ucbs = [stats[a]["ucb"] for a in survivors if a != leader]
+    # Leader-separation done: max_lcb > all rivals' ucbs. This is provably
+    # subsumed by the single-survivor condition under max-LCB thresholding
+    # (any rival still surviving has ucb >= max_lcb; if max_lcb > all rivals'
+    # ucbs, no rivals survive), but retained here for spec fidelity.
     decisive = not rival_ucbs or max_lcb > max(rival_ucbs)
 
     done = len(survivors) == 1 or decisive or total_ok_pulls >= t_max
@@ -153,4 +204,5 @@ def decide(pulls_df: pd.DataFrame, sigma_e: float,
         "done": done,
         "ranking": ranking,
         "tied_with_leader": tied_with_leader,
+        "no_data": no_data,
     }

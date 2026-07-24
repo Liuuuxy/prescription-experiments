@@ -157,3 +157,69 @@ def test_non_ok_status_rows_are_ignored():
     assert d_noisy["eliminated"] == d_clean["eliminated"]
     assert d_noisy["done"] == d_clean["done"]
     assert d_noisy["next_round"] == d_clean["next_round"]
+
+
+# --- NaN delta in ok rows must raise ValueError listing offending pull_ids. ---
+
+def test_nan_delta_in_ok_row_raises_valueerror_with_pull_ids():
+    rows = [("A", 1, 0.30), ("A", 2, np.nan), ("B", 1, 0.05)]
+    df = _pulls(rows)
+
+    with pytest.raises(ValueError) as exc_info:
+        scheduler.decide(df, sigma_e=0.01, delta=0.1, t_max=16)
+
+    error_msg = str(exc_info.value)
+    assert "NaN delta" in error_msg
+    assert "pull_id" in error_msg or "pull_ids" in error_msg
+    # pull_id 1 is the NaN row in the _pulls output
+    assert "1" in error_msg
+
+
+# --- Arms with all non-ok rows must appear in no_data and nowhere else. -----
+
+def test_all_failed_arm_appears_in_no_data():
+    rows = [
+        ("A", 1, 0.30), ("A", 2, 0.31),  # A has ok rows
+        ("B", 1, 0.05, "failed"), ("B", 2, 0.06, "failed"),  # B all failed
+        ("C", 1, 0.08, "smoke"),  # C all smoke
+    ]
+    df = _pulls(rows)
+
+    d = scheduler.decide(df, sigma_e=0.01, delta=0.1, t_max=16)
+
+    # B and C should appear in no_data (sorted)
+    assert d["no_data"] == ["B", "C"]
+    # They must NOT appear in survivors, eliminated, or ranking
+    assert "B" not in d["survivors"]
+    assert "C" not in d["survivors"]
+    assert "B" not in d["eliminated"]
+    assert "C" not in d["eliminated"]
+    assert {r[0] for r in d["ranking"]} == {"A"}
+    # A should be the lone survivor
+    assert d["survivors"] == ["A"]
+    assert d["done"] is True  # single survivor -> done
+
+
+# --- no_data must be present even when all arms have ok rows. ---------------
+
+def test_no_data_is_empty_when_all_arms_have_ok_rows():
+    rows = [("A", 1, 0.30), ("B", 1, 0.05)]
+    df = _pulls(rows)
+
+    d = scheduler.decide(df, sigma_e=0.01, delta=0.1, t_max=16)
+
+    assert d["no_data"] == []
+    assert "no_data" in d  # key must be present
+
+
+# --- no_data reported for ok.empty case (all arms null or missing ok). ------
+
+def test_no_data_reported_when_no_ok_rows():
+    rows = [("A", 1, 0.30, "failed"), ("B", 1, 0.05, "smoke")]
+    df = _pulls(rows)
+
+    d = scheduler.decide(df, sigma_e=0.01, delta=0.1, t_max=16)
+
+    assert d["no_data"] == ["A", "B"]
+    assert d["survivors"] == []
+    assert d["ranking"] == []
