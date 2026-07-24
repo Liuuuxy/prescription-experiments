@@ -14,7 +14,13 @@ def test_pool_table_complete_and_d0_flagged():
 
 def test_row_level_fidelity():
     """Spot-check the table against fx_pool.json's raw rows at i=0, 1824, 9884,
-    and lock down the canonical int side encoding decided in task 2."""
+    and lock down the canonical int side encoding decided in task 2.
+
+    expected_category is recomputed via config.CATEGORY_ALIASES.get(raw, raw)
+    directly (task 3 fix), NOT via pool.py's own categories.canonical_category
+    call, so this test stays independent of pool.py's implementation and would
+    still catch a regression if pool.py's canonicalization call were dropped or
+    swapped for a different alias table."""
     fx = json.load(open(config.FX_POOL_JSON))
     fields = fx["fields"]
     cats = fx["cats"]
@@ -26,7 +32,8 @@ def test_row_level_fidelity():
 
     for i in (0, 1824, 9884):
         src = rows[i]
-        expected_category = cats[int(src[idx["cat"]])]["name"]
+        raw_category = cats[int(src[idx["cat"]])]["name"]
+        expected_category = config.CATEGORY_ALIASES.get(raw_category, raw_category)
         expected_side = int(src[idx["side"]])
         table_row = by_episode.loc[i]
         assert table_row["category"] == expected_category

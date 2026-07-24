@@ -1,4 +1,5 @@
 """Frozen constants for bandit v1. Design: weakregion/BANDIT_V1_DESIGN.md. Never edit mid-run."""
+import types
 from pathlib import Path
 
 REPO = Path("/data/xinyua11/robocasa")
@@ -17,6 +18,47 @@ FT_ARMS_ROOT = Path("/data/xinyua11/ft_arms")
 # same pattern as policy_analysis/check_train_eval_disjoint.py. No cameras/rendering
 # needed for state capture, so only env_kwargs (not the recorded camera sizes) matter.
 ENV_ARGS_HDF5 = REPO / "mimicgen_src/PickPlaceCounterToSink_pi0_src.hdf5"
+
+# CATEGORY_ALIASES -- task-3 fix for the cross-process determinism gate's one
+# recurring failure mode (see .superpowers/sdd/task-3-report.md's root-cause
+# diagnosis). robocasa's object registry (OBJ_CATEGORIES, built by
+# robocasa/models/objects/kitchen_object_utils.py from kitchen_objects.py) registers
+# some mjcf instances under TWO overlapping category names. Forward sampling
+# (sample_kitchen_object_helper, groups=<category name>) can label such an
+# instance with either name; env.reset_to()'s reverse mjcf_path->category lookup
+# (same function, groups=<xml path>, a first-match loop over
+# `for cand_cat in OBJ_CATEGORIES: for reg in obj_registries: ...`) always resolves
+# it to whichever of the two names comes first in OBJ_CATEGORIES's dict insertion
+# order, regardless of which name the instance was originally forward-sampled
+# under. CATEGORY_ALIASES maps every such alias name to that reverse-lookup winner
+# (the canonical name), so `category` compares/joins consistently no matter which
+# code path (forward sample at capture vs. reverse lookup at restore) produced it.
+# Per the owner decision: the mjcf instance path is the identity ground truth;
+# category is canonicalized to match it everywhere in bandit_v1.
+#
+# Generated 2026-07-23 by a one-off script that imported
+# robocasa.models.objects.kitchen_object_utils.OBJ_CATEGORIES (robocasa_pkg at
+# /data/xinyua11/robocasa_pkg) and replicated sample_kitchen_object_helper's
+# reverse-lookup traversal with obj_registries=("objaverse", "lightwheel") --
+# environments/kitchen/kitchen.py's own obj_registries default, i.e. the registry
+# set bandit_v1's env actually uses -- to find, for every mjcf_path, every
+# category name whose registry (in either "objaverse" or "lightwheel") contains
+# it, in the exact traversal order the reverse lookup uses; the first name found
+# for a path is that path's canonical label.
+#
+# Registry counts at generation time: 198 total categories, 1,516 distinct
+# mjcf_paths, 17 (1.1%) dual-registered under exactly one of 2 overlapping
+# category pairs -- and, checked exhaustively, each alias category's mjcf_path set
+# is a FULL SUBSET of its canonical counterpart's (no per-instance exceptions, so
+# the alias is safe to apply at the category-name level, not just per-instance):
+#   - jug_wide_opening (5 paths, OBJ_CATEGORIES index 44) subset of
+#     jug (9 paths, index 43) -> jug is earlier -> canonical = "jug".
+#   - saucepan_with_lid (12 paths, index 186) subset of
+#     saucepan (15 paths, index 185) -> saucepan is earlier -> canonical = "saucepan".
+CATEGORY_ALIASES = types.MappingProxyType({
+    "jug_wide_opening": "jug",
+    "saucepan_with_lid": "saucepan",
+})
 
 OPENPI = Path("/data/xinyua11/openpi")
 PRETRAIN_CKPT = Path("/data/xinyua11/checkpoints/pi0/pi0_robocasa_pretrain_human300/"

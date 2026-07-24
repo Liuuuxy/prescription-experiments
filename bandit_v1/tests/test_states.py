@@ -84,3 +84,38 @@ def test_start_features_unknown_category_has_none_hw(tmp_path):
                             cat="not_a_real_category")
     feats = states.start_features(tmp_path)
     assert feats["h"] is None and feats["w"] is None
+
+
+def test_fingerprint_diff_alias_category_same_instance_compares_equal():
+    """Task 3 fix: forward-sampled 'jug_wide_opening' (capture) vs. reverse-lookup
+    'jug' (restore) for the SAME mjcf instance is not a real mismatch -- the mjcf
+    path is the identity ground truth, category is just an alias of it here (see
+    config.CATEGORY_ALIASES)."""
+    captured = {
+        "category": "jug_wide_opening",
+        "instance": "/data/xinyua11/robocasa_pkg/robocasa/models/assets/objects/objaverse/jug/jug_4/model.xml",
+        "layout_id": 11, "style_id": 8,
+        "obj_xyz": [0.4843, -1.1632, 0.9958], "base_xy": [0.7681, -1.8298],
+    }
+    restored = dict(captured, category="jug")
+    assert states.fingerprint_diff(captured, restored) == []
+
+
+def test_fingerprint_diff_different_instance_compares_unequal_regardless_of_category():
+    """A genuinely different physical instance must still register as a mismatch
+    even if both sides happen to canonicalize to the same category label --
+    canonicalization must not mask a real identity difference."""
+    captured = {
+        "category": "jug_wide_opening",
+        "instance": "/data/xinyua11/robocasa_pkg/robocasa/models/assets/objects/objaverse/jug/jug_4/model.xml",
+        "layout_id": 11, "style_id": 8,
+        "obj_xyz": [0.4843, -1.1632, 0.9958], "base_xy": [0.7681, -1.8298],
+    }
+    restored = dict(
+        captured,
+        category="jug",  # same canonical category as captured's alias
+        instance="/data/xinyua11/robocasa_pkg/robocasa/models/assets/objects/objaverse/jug/jug_1/model.xml",
+    )
+    diff = states.fingerprint_diff(captured, restored)
+    assert "instance" in diff
+    assert "category" not in diff

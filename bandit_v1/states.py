@@ -22,6 +22,14 @@ Layout of a start directory (out_dir passed to capture_start):
 TARGET is always "obj": bandit_v1's single task (PickPlaceCounterToSink) names its
 one manipulated object "obj" in every ep_meta / obj_body_id (see
 check_train_eval_disjoint.py, analyze_pi0_weakregions.py).
+
+Category aliasing (task 3 fix, see .superpowers/sdd/task-3-report.md): 17/1516
+robocasa mjcf instances are registered under two overlapping category names, so
+capture's forward-sampled `category` can disagree with reset_to's reverse-lookup
+`category` for the SAME instance. `instance` (the mjcf path) is the identity
+ground truth; `category` is canonicalized via categories.canonical_category
+everywhere it is compared or emitted (fingerprint_diff, start_features) so this
+no longer registers as a mismatch.
 """
 import json
 from pathlib import Path
@@ -31,7 +39,7 @@ import numpy as np
 import robocasa.utils.robomimic.robomimic_dataset_utils as DatasetUtils
 import robocasa.utils.robomimic.robomimic_env_utils as EnvUtils
 
-from . import config
+from . import categories, config
 
 TARGET = "obj"
 
@@ -92,10 +100,28 @@ def fingerprint(env):
 
 def fingerprint_diff(a, b):
     """List of keys where fingerprints `a` and `b` disagree (empty == exact match).
-    Pure dict comparison -- used by validate_reset.py's cross-process gate to
-    report exactly which fields mismatched, not just pass/fail."""
+    Used by validate_reset.py's cross-process gate to report exactly which fields
+    mismatched, not just pass/fail.
+
+    `instance` (the mjcf path) is the primary identity signal and is always
+    compared verbatim. `category` is compared after canonicalizing both sides via
+    categories.canonical_category: forward sampling (capture_start's env.reset())
+    and env.reset_to()'s reverse mjcf_path->category lookup (restore) can
+    legitimately disagree on the category LABEL for the ~1% of instances
+    registered under two overlapping category names (config.CATEGORY_ALIASES) --
+    the mjcf path is the ground-truth identity, not either code path's raw label,
+    so an alias-only disagreement here is not a real mismatch. Every other key
+    (layout_id, style_id, obj_xyz, base_xy, ...) compares as-is, unchanged."""
     keys = sorted(set(a) | set(b))
-    return [k for k in keys if a.get(k) != b.get(k)]
+    diffs = []
+    for k in keys:
+        va, vb = a.get(k), b.get(k)
+        if k == "category":
+            va = categories.canonical_category(va)
+            vb = categories.canonical_category(vb)
+        if va != vb:
+            diffs.append(k)
+    return diffs
 
 
 def capture_start(seed, out_dir):
@@ -160,15 +186,20 @@ def _side(x_rel, y_rel):
 def start_features(start_dir):
     """(category, h, w, x_rel, y_rel, side, yaw, layout_id, style_id) for a
     captured start, parsed from ep_meta.json + fingerprint.json (no live env
-    needed). h/w come from the category table (see _category_hw); x_rel/y_rel are
-    obj_xyz - base_xy (matching check_train_eval_disjoint.py's descriptor); side is
-    the dominant-axis rule; yaw is the robot base spawn yaw (init_robot_base_ori[2]),
+    needed). `category` is canonicalized via categories.canonical_category before
+    being returned or used for the h/w join (task 3 fix: fingerprint.json's raw
+    category can be either alias name for the 17 dual-registered instances, see
+    config.CATEGORY_ALIASES; canonicalizing here keeps this in sync with pool.py's
+    pool-table category column, which is canonicalized the same way). h/w come
+    from the category table (see _category_hw); x_rel/y_rel are obj_xyz - base_xy
+    (matching check_train_eval_disjoint.py's descriptor); side is the
+    dominant-axis rule; yaw is the robot base spawn yaw (init_robot_base_ori[2]),
     the one per-episode orientation ep_meta actually carries."""
     start_dir = Path(start_dir)
     ep_meta = json.loads((start_dir / "ep_meta.json").read_text())
     fp = json.loads((start_dir / "fingerprint.json").read_text())
 
-    category = fp.get("category", "unknown")
+    category = categories.canonical_category(fp.get("category", "unknown"))
     h, w = _category_hw(category)
 
     obj_xyz = fp["obj_xyz"]
