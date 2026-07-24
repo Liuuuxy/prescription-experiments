@@ -37,6 +37,12 @@ POLL_SECS=120          # precondition-wait poll interval (brief's Step 1)
 PORT_WAIT_TRIES=90     # 90 x 5s = 7.5 min max wait for the server socket to accept
 PORT_WAIT_SLEEP=5
 
+SERVE_MAX_ATTEMPTS=6      # max real serve attempts before giving up (Task 7 hardening)
+SERVE_RETRY_SLEEP=300     # seconds between serve attempts
+GPU0_MIN_FREE_MB=20000    # required free MiB on GPU0 before each serve attempt
+GPU_WAIT_POLL_SECS=60     # how often to re-check GPU0 free mem while waiting (does not burn an attempt)
+GPU_WAIT_MAX_SECS=14400   # cap total pre-serve GPU-memory waiting at 4h, then exit 2 loudly
+
 ORCH_LOG=/data/xinyua11/tmp/bandit_diag_orch.log
 SERVE_LOG=/data/xinyua11/tmp/bandit_diag_serve.log
 ROLLOUT_LOG=/data/xinyua11/tmp/bandit_diag_rollouts.log
@@ -67,42 +73,86 @@ done
 log ">>> both preconditions satisfied -- proceeding to serve pi_0"
 
 # --- Step 2: serve pi_0, claim GPU0 promptly (it may be grabbed by others) --
-cd "$OPENPI_DIR"
-log ">>> serving pi0_ppc2sink_pi0base from $CKPT_DIR on :$PORT (gpu0)"
-CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_MEM_FRACTION=0.25 MUJOCO_GL=egl \
-  TMPDIR=/data/xinyua11/tmp HF_HOME=/data/xinyua11/.cache/huggingface \
-  "$OPENPI_PY" scripts/serve_policy.py --port "$PORT" policy:checkpoint \
-  --policy.config pi0_ppc2sink_pi0base --policy.dir "$CKPT_DIR" \
-  > "$SERVE_LOG" 2>&1 &
-SV=$!
-log ">>> server pid=$SV, waiting for it to accept connections on :$PORT"
+# Hardening (Task 7 postmortem): GPU0 can be grabbed by another user's job
+# between training finishing and this step claiming it. Retry the whole
+# serve+port-wait attempt up to SERVE_MAX_ATTEMPTS times, SERVE_RETRY_SLEEP
+# apart, gated on GPU0 having >=GPU0_MIN_FREE_MB free before each attempt
+# (mirrors launch_pi0.sh's free_mb() parsing). Waiting for memory does not
+# burn an attempt, but total memory-wait time is capped at GPU_WAIT_MAX_SECS.
+cd "$OPENPI_DIR" || { log "FATAL cd $OPENPI_DIR"; exit 4; }
 
-up=no
-for i in $(seq 1 "$PORT_WAIT_TRIES"); do
-  if "$ROBOCASA_PY" -c "
+served=no
+gpu_wait_elapsed=0
+attempt=1
+while [ "$attempt" -le "$SERVE_MAX_ATTEMPTS" ]; do
+  # gate on GPU0 memory before burning a serve attempt
+  while :; do
+    f=$(free_mb 0)
+    if [ "${f:-0}" -ge "$GPU0_MIN_FREE_MB" ]; then
+      break
+    fi
+    log "gpu0 free=${f:-0}MiB < ${GPU0_MIN_FREE_MB}MiB needed -- waiting before serve attempt ${attempt}/${SERVE_MAX_ATTEMPTS} (mem-wait elapsed ${gpu_wait_elapsed}s / cap ${GPU_WAIT_MAX_SECS}s)"
+    if [ "$gpu_wait_elapsed" -ge "$GPU_WAIT_MAX_SECS" ]; then
+      log "!!! GPU0 memory wait exceeded cap of ${GPU_WAIT_MAX_SECS}s -- aborting"
+      exit 2
+    fi
+    sleep "$GPU_WAIT_POLL_SECS"
+    gpu_wait_elapsed=$((gpu_wait_elapsed + GPU_WAIT_POLL_SECS))
+  done
+
+  log ">>> serve attempt ${attempt}/${SERVE_MAX_ATTEMPTS}: serving pi0_ppc2sink_pi0base from $CKPT_DIR on :$PORT (gpu0 free=${f}MiB)"
+  CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_MEM_FRACTION=0.25 MUJOCO_GL=egl \
+    TMPDIR=/data/xinyua11/tmp HF_HOME=/data/xinyua11/.cache/huggingface \
+    "$OPENPI_PY" scripts/serve_policy.py --port "$PORT" policy:checkpoint \
+    --policy.config pi0_ppc2sink_pi0base --policy.dir "$CKPT_DIR" \
+    > "$SERVE_LOG" 2>&1 &
+  SV=$!
+  log ">>> server pid=$SV, waiting for it to accept connections on :$PORT"
+
+  up=no
+  for i in $(seq 1 "$PORT_WAIT_TRIES"); do
+    if "$ROBOCASA_PY" -c "
 import socket
 s = socket.socket(); s.settimeout(1)
 s.connect(('127.0.0.1', $PORT)); s.close()
 " 2>/dev/null; then
-    up=yes
-    log ">>> server up after ${i}x${PORT_WAIT_SLEEP}s"
+      up=yes
+      log ">>> server up after ${i}x${PORT_WAIT_SLEEP}s"
+      break
+    fi
+    if ! kill -0 "$SV" 2>/dev/null; then
+      log "!!! SERVER DIED while waiting for port (attempt ${attempt}/${SERVE_MAX_ATTEMPTS}) -- tail of $SERVE_LOG:"
+      tail -30 "$SERVE_LOG" >> "$ORCH_LOG"
+      break
+    fi
+    sleep "$PORT_WAIT_SLEEP"
+  done
+
+  if [ "$up" = yes ]; then
+    served=yes
     break
   fi
-  if ! kill -0 "$SV" 2>/dev/null; then
-    log "!!! SERVER DIED while waiting for port -- tail of $SERVE_LOG:"
+
+  if kill -0 "$SV" 2>/dev/null; then
+    log "!!! server never accepted connections after $((PORT_WAIT_TRIES * PORT_WAIT_SLEEP))s (attempt ${attempt}/${SERVE_MAX_ATTEMPTS}) -- tail of $SERVE_LOG:"
     tail -30 "$SERVE_LOG" >> "$ORCH_LOG"
-    exit 2
   fi
-  sleep "$PORT_WAIT_SLEEP"
-done
-if [ "$up" != yes ]; then
-  log "!!! server never accepted connections after $((PORT_WAIT_TRIES * PORT_WAIT_SLEEP))s -- aborting"
   kill "$SV" 2>/dev/null; sleep 2; kill -9 "$SV" 2>/dev/null || true
-  exit 3
+
+  attempt=$((attempt + 1))
+  if [ "$attempt" -le "$SERVE_MAX_ATTEMPTS" ]; then
+    log "!!! serve attempt failed -- retrying in ${SERVE_RETRY_SLEEP}s (next attempt ${attempt}/${SERVE_MAX_ATTEMPTS})"
+    sleep "$SERVE_RETRY_SLEEP"
+  fi
+done
+
+if [ "$served" != yes ]; then
+  log "!!! all ${SERVE_MAX_ATTEMPTS} serve attempts failed -- aborting"
+  exit 2
 fi
 
 # --- Step 3: chunked, resumable rollouts (300 starts x M_DIAG=8 repeats) ----
-cd "$REPO"
+cd "$REPO" || { log "FATAL cd $REPO"; exit 4; }
 log ">>> starting rollouts: bandit_v1.run_diagnosis --host 127.0.0.1 --port $PORT"
 log ">>> rollout progress -> $ROLLOUT_LOG"
 MUJOCO_GL=egl PYOPENGL_PLATFORM=egl "$ROBOCASA_PY" -u -m bandit_v1.run_diagnosis \

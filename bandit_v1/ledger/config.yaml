@@ -83,3 +83,12 @@ cli_flags_confirmed:
   num_train_steps: "--num-train-steps INT"
   exp_name: "--exp-name STR"
   overwrite: "--overwrite / --no-overwrite"
+
+diag_orchestrator_pid: 370496
+  # old value: 2772837 (killed 2026-07-24 for the serve-retry + cd-guard hardening
+  # edit to bandit_v1/run_diagnosis.sh -- was still in the Step 1 wait loop at kill
+  # time, no serving/rollouts had started; verified via ps + orch log before kill).
+  # Relaunched identically (same nohup command, same stdout redirect path
+  # /data/xinyua11/tmp/bandit_diag_orch_stdout.log) after the edit; new PID
+  # confirmed alive with PPid 1 and a fresh wait-loop poll in
+  # /data/xinyua11/tmp/bandit_diag_orch.log.
