@@ -12,6 +12,17 @@ FX_POOL_JSON = REPO / "weakregion/factor_analysis/fx_pool.json"
 D0_DATASET = Path("/data/xinyua11/ft_arms/ppc2sink_base_only")
 FT_ARMS_ROOT = Path("/data/xinyua11/ft_arms")
 
+# Prior per-category difficulty source for bandit_v1/diagnosis.py's tercile map
+# (task 6). fx_episodes.json's top-level "cats" list ([{"name","sr","n","h","w"}])
+# carries a per-category prior success rate ("sr") -- same shape as fx_pool.json's
+# "cats" list that states.py's _category_hw already trusts for h/w, so diagnosis.py
+# trusts "sr" the same way (no recomputation from fx_episodes.json's own "rows",
+# which are a different, feature-joined episode slice -- see task-6-report.md for
+# why the two don't match row-for-row). POOLED_EPISODES_CSV is the documented
+# fallback if fx_episodes.json is ever absent/lacks "sr".
+FX_EPISODES_JSON = REPO / "weakregion/factor_analysis/fx_episodes.json"
+POOLED_EPISODES_CSV = REPO / "weakregion/factor_analysis/pooled_episodes.csv"
+
 # hdf5 to source robomimic env_args (env_name/type/env_kwargs: robot, controller,
 # camera rig) from -- same PandaOmron + HYBRID_MOBILE_BASE recipe used to generate
 # the pool itself. Loaded via robomimic_dataset_utils.get_env_metadata_from_dataset,
@@ -71,6 +82,8 @@ LEDGER_DIR = BANDIT_DIR / "ledger"
 STATES_DIR = BANDIT_DIR / "states"          # saved-state starts: states/<set>/<start_id>/
 E_DIR = STATES_DIR / "E"
 DIAG_DIR = STATES_DIR / "diag"
+DIAG_CHECK_DIR = STATES_DIR / "diag_check"  # scratch out_dir for diagnosis.py's --out_check dry-run
+DIAG_TERCILE_MAP_JSON = LEDGER_DIR / "diag_tercile_map.json"  # frozen category->tercile map (task 6)
 
 SEED_PI0 = 1000
 def pull_seed(j: int) -> int: return 1000 + j       # round j >= 1

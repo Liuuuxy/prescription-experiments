@@ -36,3 +36,11 @@ xgradtest/
 
 # bandit_v1 ledger: regenerable snapshot/event parquets (hashes.json IS committed)
 bandit_v1/ledger/*.parquet
+
+# bandit_v1 saved-state captures (state.npz/model.xml/ep_meta.json/fingerprint.json
+# per start dir): deterministically regenerable from a fixed seed via
+# states.capture_start, and large (~636KB/start, mostly model.xml -- 300 diagnosis
+# starts ~= 190MB). The frozen tercile map (bandit_v1/ledger/diag_tercile_map.json,
+# NOT under ledger/*.parquet above) and diagnosis.py's code are what's committed;
+# the captured states themselves are not.
+bandit_v1/states/
