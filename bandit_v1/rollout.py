@@ -169,12 +169,23 @@ def _rollout_one(env, client, start_dir, horizon):
     )
 
 
-def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=None, pull_id=None):
+def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=None,
+        pull_id=None, skip_pairs=None):
     """Roll the policy served at (policy_host, policy_port) out on every start in
     `start_dirs`, `repeats` times each. Appends every episode to ledger table
     "episodes" as it completes (crash-safe -- mirrors the rest of bandit_v1's
     per-item ledger writes, e.g. validate_reset.py's per-start gate) and returns
-    the same rows as a list of dicts."""
+    the same rows as a list of dicts.
+
+    `skip_pairs` (optional, default None -- identical behavior to before this
+    parameter existed): a container supporting `in` of (start_id, repeat_idx)
+    tuples (start_id == Path(start_dir).name, matching the ledger's own
+    start_id column) to skip entirely -- no `_rollout_one` call, no row built,
+    no ledger append. This is bandit_v1's resume mechanism (run_diagnosis.py):
+    the caller queries the ledger for already-completed (start_id, repeat_idx)
+    pairs before each chunk and passes them here so a rerun after a crash
+    never redoes a completed episode, at per-episode (not just per-chunk)
+    granularity."""
     horizon = int(get_task_horizon(config.TASK))
     client = _wcp.WebsocketClientPolicy(policy_host, policy_port)
     env = states.make_env_for_rollout()
@@ -186,6 +197,8 @@ def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=Non
             start_id = start_dir.name
             feats = states.start_features(start_dir)
             for repeat_idx in range(repeats):
+                if skip_pairs is not None and (start_id, repeat_idx) in skip_pairs:
+                    continue
                 t0 = time.time()
                 result = _rollout_one(env, client, start_dir, horizon)
                 wall_time_s = round(time.time() - t0, 3)
