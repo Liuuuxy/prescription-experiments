@@ -136,3 +136,115 @@ def test_build_tercile_map_pot_is_absent_saucepan_alias_is_merged():
     assert "pot" not in tmap
     assert "saucepan_with_lid" not in tmap
     assert "saucepan" in tmap
+
+
+# --- nearest_undersubscribed overflow cell selection logic -------------------
+
+def test_nearest_undersubscribed_same_tercile_undersubscribed_cell_returned():
+    """Given a full target cell and one undersubscribed cell in the same tercile,
+    it returns that undersubscribed cell."""
+    cell = (1, 1, 1)  # target cell (tercile 1, middle of h and x bins)
+    counts = {
+        (1, 1, 1): 12,  # full
+        (1, 0, 0): 5,   # undersubscribed, same tercile
+        (0, 1, 1): 12,  # full, different tercile
+    }
+    target = 12
+    all_cells = [(0, 0, 0), (0, 1, 1), (1, 0, 0), (1, 1, 1), (2, 1, 1)]
+
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    assert result == (1, 0, 0)
+
+
+def test_nearest_undersubscribed_tercile_distance_dominates_bin_distance():
+    """Tercile distance dominates: an undersubscribed cell in the same tercile
+    is preferred over a closer-by-bins cell in a different tercile."""
+    cell = (1, 1, 1)  # target cell in tercile 1
+    counts = {
+        (1, 1, 1): 12,    # full
+        (1, 0, 0): 8,     # undersubscribed, same tercile, far by bins
+        (2, 1, 2): 6,     # undersubscribed, different tercile, close by bins
+    }
+    target = 12
+    all_cells = [(0, 0, 0), (1, 0, 0), (1, 1, 1), (2, 1, 2)]
+
+    # (1, 0, 0): tercile distance = 0, bin distance = |0-1| + |0-1| = 2
+    # (2, 1, 2): tercile distance = 1, bin distance = |1-1| + |2-1| = 1
+    # tercile distance comes first in the ranking, so (1, 0, 0) wins
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    assert result == (1, 0, 0)
+
+
+def test_nearest_undersubscribed_deterministic_tiebreak_by_cell_tuple():
+    """Deterministic tiebreak between two equally-distant undersubscribed cells:
+    the cell with smaller (tercile, hbin, xbin) tuple wins."""
+    cell = (1, 1, 1)  # target cell
+    counts = {
+        (1, 1, 1): 12,    # full
+        (1, 0, 0): 5,     # undersubscribed, same tercile distance, bin distance = 2
+        (1, 2, 2): 7,     # undersubscribed, same tercile distance, bin distance = 2
+    }
+    target = 12
+    all_cells = [(1, 0, 0), (1, 1, 1), (1, 2, 2)]
+
+    # Both (1, 0, 0) and (1, 2, 2) have:
+    # - tercile distance = 0
+    # - bin distance = |0-1| + |0-1| = 2 and |2-1| + |2-1| = 2
+    # The tiebreaker is the cell tuple itself: (1, 0, 0) < (1, 2, 2)
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    assert result == (1, 0, 0)
+
+
+def test_nearest_undersubscribed_returns_none_when_all_cells_full():
+    """Returns None when all cells are at or above the target."""
+    cell = (1, 1, 1)
+    counts = {
+        (0, 0, 0): 12,
+        (1, 0, 0): 12,
+        (1, 1, 1): 12,
+        (2, 2, 2): 15,  # over target
+    }
+    target = 12
+    all_cells = [(0, 0, 0), (1, 0, 0), (1, 1, 1), (2, 2, 2)]
+
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    assert result is None
+
+
+def test_nearest_undersubscribed_complex_ranking():
+    """Test a more complex scenario with mixed tercile and bin distances."""
+    cell = (1, 1, 1)  # target cell
+    counts = {
+        (1, 1, 1): 12,    # full, target
+        (0, 1, 1): 5,     # tercile distance = 1, bin distance = 0
+        (2, 1, 1): 6,     # tercile distance = 1, bin distance = 0
+        (1, 0, 0): 7,     # tercile distance = 0, bin distance = 2
+        (1, 1, 0): 8,     # tercile distance = 0, bin distance = 1
+    }
+    target = 12
+    all_cells = [(0, 1, 1), (1, 0, 0), (1, 1, 0), (1, 1, 1), (2, 1, 1)]
+
+    # (0, 1, 1): tercile=1, bin=0
+    # (2, 1, 1): tercile=1, bin=0
+    # (1, 0, 0): tercile=0, bin=2
+    # (1, 1, 0): tercile=0, bin=1
+    # Rankings: (1, 1, 0) wins with tercile=0, bin=1
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    assert result == (1, 1, 0)
+
+
+def test_nearest_undersubscribed_all_cells_missing_from_counts_defaults_to_zero():
+    """When a cell is not in counts dict, its count defaults to 0 (undersubscribed)."""
+    cell = (1, 1, 1)
+    counts = {}  # all cells have implicit count 0
+    target = 12
+    all_cells = [(0, 0, 0), (1, 1, 1), (2, 2, 2)]
+
+    # (1, 1, 1) is implicit 0, which is < 12 (undersubscribed)
+    result = diagnosis._nearest_undersubscribed(cell, counts, target, all_cells)
+    # With all undersubscribed, ranking by distance and tiebreak:
+    # (1, 1, 1): tercile=0, bin=0, cell=(1,1,1)
+    # (0, 0, 0): tercile=1, bin=2, cell=(0,0,0)
+    # (2, 2, 2): tercile=1, bin=2, cell=(2,2,2)
+    # (1, 1, 1) is the winner as it's closest
+    assert result == (1, 1, 1)
