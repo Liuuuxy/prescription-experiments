@@ -1,0 +1,85 @@
+# bandit_v1 Task 5: pi_0 (D0-only, full recipe, seed 1000) run record.
+# Recipe constants mirror bandit_v1/config.py; identical to pi0_ppc2sink_core except
+# name + data_dirs (see openpi TrainConfig pi0_ppc2sink_pi0base, commit 6e21f87).
+# Written once at launch time; do not edit mid-run (see bandit_v1/config.py docstring).
+
+recipe:
+  task: PickPlaceCounterToSink
+  model:
+    max_token_len: 96
+    paligemma_variant: gemma_2b_lora
+    action_expert_variant: gemma_300m_lora
+  weight_loader_ckpt: /data/xinyua11/checkpoints/pi0/pi0_robocasa_pretrain_human300/multitask_learning/75000/params
+  freeze_filter: "Pi0Config(paligemma_variant=gemma_2b_lora, action_expert_variant=gemma_300m_lora).get_freeze_filter()"
+  ema_decay: null
+  num_train_steps: 20000
+  save_interval: 5000
+  keep_period: 5000
+  batch_size: 32
+  num_workers: 4
+  final_ckpt_step: 19999   # matches bandit_v1/config.py FINAL_CKPT_STEP; confirmed against
+                           # existing pi0_ppc2sink_core/core_v1/ checkpoint dir listing
+                           # (5000/10000/15000/19999) -- no fix needed, already correct.
+
+run:
+  openpi_config_name: pi0_ppc2sink_pi0base
+  exp_name: pi0_v1
+  seed: 1000
+  data_dirs:
+    path: /data/xinyua11/ft_arms/ppc2sink_base_only
+    horizon: 600
+    filter_key: null
+    task: PickPlaceCounterToSink
+    split: pretrain
+    source: mimicgen
+  # D0-only warmup: this is the "base" arm every bandit round's slot_a/slot_b configs
+  # (pi0_ppc2sink_bandit_a, pi0_ppc2sink_bandit_b) diverge from, per bandit_v1's design.
+  checkpoint_path_final: /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1/19999
+  checkpoint_path_root: /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1
+
+launch:
+  launcher_script: /data/xinyua11/robocasa/bandit_v1/launch_pi0.sh
+  launch_cmd: "nohup bash /data/xinyua11/robocasa/bandit_v1/launch_pi0.sh > /data/xinyua11/tmp/ft_pi0base.log 2>&1 &"
+  launch_timestamp: "2026-07-23T17:46:20-07:00"
+  launcher_pid: 2338049
+  gpu_wait_policy: "poll nvidia-smi every 300s across GPU0/GPU1; launch on whichever first has >=70000 MiB free"
+  orchestrator_log: /data/xinyua11/tmp/launch_pi0.log
+  training_log: /data/xinyua11/tmp/ft_pi0base.log
+  state_at_write_time: "polling -- gpu0 free=23835MB, gpu1 free=18345MB, both below 70000MB threshold (shared H100s held by other users' jobs)"
+
+smoke_test:
+  config: pi0_ppc2sink_pi0base
+  exp_name: smoke
+  seed: 1000
+  num_train_steps: 60
+  gpu: 0
+  env_overrides: "CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_PREALLOCATE=false"
+  outcome: "OOM at first train step (step 0/60): model load + init succeeded, then
+    RESOURCE_EXHAUSTED trying to allocate 11440647568 bytes (~10.65GiB) on GPU0
+    (~23.8GB free at the time). Acceptable per task-5 adjustment #1 -- config
+    verified correct by construction (literal clone of pi0_ppc2sink_core, only
+    name/data_dirs changed) and by tyro registering it as a valid subcommand with
+    working --seed/--num-train-steps/--exp-name/--overwrite flags."
+  log_path: /data/xinyua11/tmp/smoke_pi0base.log
+  smoke_checkpoint_cleanup: "deleted /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/smoke/ after the run"
+
+openpi_repo:
+  commit: 6e21f87
+  commit_message: "bandit v1: pi0base + two bandit slot TrainConfigs (clones of core, data_dirs only)"
+  configs_added:
+    - pi0_ppc2sink_pi0base   # data_dirs -> /data/xinyua11/ft_arms/ppc2sink_base_only
+    - pi0_ppc2sink_bandit_a  # data_dirs -> /data/xinyua11/ft_arms/ppc2sink_bandit_slot_a (symlink, created at pull time)
+    - pi0_ppc2sink_bandit_b  # data_dirs -> /data/xinyua11/ft_arms/ppc2sink_bandit_slot_b (symlink, created at pull time)
+  note: >
+    Pre-existing uncommitted changes in the openpi working tree (pi0_ppc2sink_rc/rc2/
+    saturate/failretr/whiten TrainConfigs, and a groot_utils/groot_openpi_dataset.py
+    norm-stats fallback fix) predate this task, are unrelated to bandit_v1, and were
+    deliberately left untouched/uncommitted -- only the 3 new configs above were staged
+    (via an isolated git-apply --cached hunk) and committed.
+
+cli_flags_confirmed:
+  # from: conda run -n openpi python scripts/train.py pi0_ppc2sink_pi0base --help
+  seed: "--seed INT"
+  num_train_steps: "--num-train-steps INT"
+  exp_name: "--exp-name STR"
+  overwrite: "--overwrite / --no-overwrite"
