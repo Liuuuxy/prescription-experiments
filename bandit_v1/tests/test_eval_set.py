@@ -287,6 +287,31 @@ def test_eval_checkpoint_default_repeats_is_config_eval_repeats():
     assert calls["reps"] == config.EVAL_REPEATS
 
 
+def test_eval_checkpoint_default_repeats_reads_config_at_call_time_not_import_time(monkeypatch):
+    """`repeats` must resolve config.EVAL_REPEATS inside the function body at
+    CALL time, not bind it as a signature default at IMPORT time -- a
+    signature default of `config.EVAL_REPEATS` would freeze whatever value
+    was live when eval_set.py was first imported, silently ignoring any
+    later monkeypatch. Patch config.EVAL_REPEATS to an off-default value
+    well after import and confirm an omitted-`repeats` call picks it up."""
+    manifest = _make_manifest(n_per_stratum=2)
+    monkeypatch.setattr(config, "EVAL_REPEATS", 7)
+    calls = {}
+
+    def fake_run(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                 skip_pairs=None):
+        calls["reps"] = reps
+        rows = []
+        for sd in start_dirs:
+            for r in range(reps):
+                rows.append({"start_id": Path(sd).name, "repeat_idx": r, "success": True})
+        return rows
+
+    eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                              manifest=manifest, run_fn=fake_run)
+    assert calls["reps"] == 7
+
+
 def test_eval_checkpoint_missing_start_in_a_repeat_raises_loudly():
     manifest = _make_manifest(n_per_stratum=2)
     # drop the row for ordinal=3 (a "mid" start) at repeat_idx=1
@@ -312,6 +337,26 @@ def test_eval_checkpoint_duplicate_row_in_a_repeat_raises_loudly():
         return rows
 
     with pytest.raises(ValueError, match="duplicate"):
+        eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                  repeats=2, manifest=manifest, run_fn=fake_run)
+
+
+def test_eval_checkpoint_manifest_missing_a_whole_stratum_raises_loudly():
+    """A manifest with only 2 of the 3 STRATA (e.g. a hand-built/corrupted
+    manifest missing "easy" entirely) must raise -- not silently mean() an
+    empty slice into NaN for the missing stratum."""
+    manifest = _make_manifest(n_per_stratum=2)
+    manifest = manifest[manifest["stratum"] != "easy"].reset_index(drop=True)
+
+    def fake_run(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                 skip_pairs=None):
+        rows = []
+        for sd in start_dirs:
+            for r in range(reps):
+                rows.append({"start_id": Path(sd).name, "repeat_idx": r, "success": True})
+        return rows
+
+    with pytest.raises(ValueError, match="easy"):
         eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
                                   repeats=2, manifest=manifest, run_fn=fake_run)
 

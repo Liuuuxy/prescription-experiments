@@ -282,7 +282,7 @@ def load_manifest(path=None) -> pd.DataFrame:
 # 2. Baseline-eval aggregation
 # =============================================================================
 
-def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=config.EVAL_REPEATS, *,
+def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
                      host="127.0.0.1", manifest=None, manifest_path=None,
                      run_fn=None, log=print) -> dict:
     """Evaluate the checkpoint served at (host, policy_port) on the frozen
@@ -334,7 +334,8 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=config.EVAL_RE
     Raises ValueError (loud, never a silently-averaged partial slice or a
     silent NaN) if any manifest start_id is missing from -- or any row is
     duplicated within, or any extra start_id appears in -- a given repeat's
-    rollout.run rows. See `_aggregate_eval_rows`.
+    rollout.run rows; also if `manifest` itself has zero starts for one or
+    more of STRATA (an entirely-missing stratum). See `_aggregate_eval_rows`.
     """
     repeats = config.EVAL_REPEATS if repeats is None else repeats
     if manifest is None:
@@ -359,7 +360,13 @@ def _aggregate_eval_rows(result_rows, manifest: pd.DataFrame, repeats: int) -> d
     naming exactly which repeat and which start_ids are missing/duplicated/
     unexpected, rather than silently averaging over however many rows
     actually showed up (a partial-data average or an empty-slice NaN would
-    both hide a real rollout/serving failure instead of surfacing it)."""
+    both hide a real rollout/serving failure instead of surfacing it).
+
+    Also requires every member of STRATA to have >= 1 start in `manifest`
+    itself (checked before any per-stratum reduction) -- an entirely-missing
+    stratum would otherwise mean() an empty slice into a silent NaN rather
+    than surfacing the malformed manifest; raises ValueError naming exactly
+    which stratum/strata are missing."""
     df = pd.DataFrame(result_rows)
     if len(df) == 0:
         raise ValueError(
@@ -371,6 +378,14 @@ def _aggregate_eval_rows(result_rows, manifest: pd.DataFrame, repeats: int) -> d
 
     start_to_stratum = dict(zip(manifest["start_id"], manifest["stratum"]))
     expected_starts = set(manifest["start_id"])
+
+    manifest_strata = set(manifest["stratum"].unique())
+    missing_strata = [s for s in STRATA if s not in manifest_strata]
+    if missing_strata:
+        raise ValueError(
+            f"eval_checkpoint: manifest has zero starts for stratum/strata "
+            f"{missing_strata} (STRATA={STRATA}) -- cannot compute a per-stratum "
+            f"mean for an entirely-missing stratum")
 
     per_repeat_means = []
     per_stratum_per_repeat = {s: [] for s in STRATA}
