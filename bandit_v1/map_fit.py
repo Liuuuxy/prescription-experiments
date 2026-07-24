@@ -84,11 +84,18 @@ from sklearn.model_selection import GroupKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from . import categories, config
+from . import categories, config, ledger
 
 # --- canonical constants ----------------------------------------------------
 
 CAT_TE_K = 8  # shrinkage constant k in (k*global + n*rate)/(k+n), per the brief
+
+# bandit_v1 Task 9's "investigate-before-proceeding" gate (task-8-brief.md Step
+# 3's own sanity note: "If AUC < 0.55 investigate before proceeding (wrong
+# join, leaked constants)"). run_baseline.sh's map-fit step refuses to build E
+# / run the baseline eval at all if the REAL diag-batch fit doesn't clear this
+# -- see `_main` below and run_baseline.sh.
+AUC_GATE_MIN = 0.55
 
 # 5-stage failure signature, in rollout.py's `_failure_stage` return order.
 # `predict_stage` always returns columns in exactly this order, zero-filling
@@ -416,3 +423,70 @@ def validation_report(models: MapModels, df: pd.DataFrame, n_splits: int = DEFAU
         "stage_log_loss": stage_ll,
         "global_mean": models.metadata.get("global_mean"),
     }
+
+
+# --- CLI: fit on the real diag ledger slice (bandit_v1 Task 9's baseline ----
+# orchestrator invokes this; see run_baseline.sh) -----------------------------
+
+def _main():
+    import argparse
+    import json
+    import sys
+
+    # Line-buffer stdout regardless of invocation (nohup'd to a file etc.) --
+    # same fix as diagnosis.py/run_diagnosis.py's _main.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except AttributeError:
+        pass
+
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--phase", default="diag",
+                     help="ledger episodes.parquet phase to fit on (default: diag, "
+                          "the 2,400-row diagnosis batch)")
+    ap.add_argument("--out", default=None,
+                     help="joblib save path (default: config.MAP_MODELS_JOBLIB)")
+    ap.add_argument("--report_out", default=None,
+                     help="validation report json path (default: "
+                          "config.LEDGER_DIR/map_validation_report.json)")
+    args = ap.parse_args()
+
+    df = ledger.read("episodes")
+    df = df[df["phase"] == args.phase].reset_index(drop=True)
+    print(f"map_fit: fitting on {len(df)} phase={args.phase!r} rows "
+          f"({df['start_id'].nunique() if len(df) else 0} distinct start_ids)")
+    if len(df) == 0:
+        print(f"!!! map_fit: zero rows with phase={args.phase!r} in ledger episodes.parquet "
+              f"-- nothing to fit. Refusing to proceed.")
+        sys.exit(1)
+
+    models = fit(df)
+    report = validation_report(models, df)
+    print("VALIDATION_REPORT", json.dumps(report, indent=2))
+
+    report_path = (Path(args.report_out) if args.report_out is not None
+                   else config.LEDGER_DIR / "map_validation_report.json")
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2, sort_keys=True))
+    print(f"map_fit: wrote validation report to {report_path}")
+
+    # Investigate-before-proceeding gate (task-8-brief.md Step 3 / this
+    # module's AUC_GATE_MIN docstring note). `not (auc >= AUC_GATE_MIN)` is
+    # deliberately used instead of `auc < AUC_GATE_MIN` so a NaN AUC (e.g. a
+    # degenerate all-success/all-fail diag slice with zero label variance --
+    # see validation_report's `pd.unique(y).size >= 2` guard) ALSO fails the
+    # gate loudly, rather than silently comparing False against a NaN.
+    if not (report["auc"] >= AUC_GATE_MIN):
+        print(f"!!! GATE FAILED: held-out AUC {report['auc']} < {AUC_GATE_MIN} -- "
+              f"investigate before proceeding (wrong join? leaked constants? see "
+              f"task-8-brief.md Step 3). Refusing to save a model to "
+              f"{args.out or config.MAP_MODELS_JOBLIB} -- run_baseline.sh must NOT "
+              f"build E or run the baseline eval against this fit.")
+        sys.exit(1)
+
+    path = save(models, path=args.out)
+    print(f"map_fit: gate passed (AUC={report['auc']:.4f} >= {AUC_GATE_MIN}) -- saved {path}")
+
+
+if __name__ == "__main__":
+    _main()
