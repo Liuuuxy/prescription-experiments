@@ -234,3 +234,208 @@ def test_predict_features_commensurable_across_pool_and_eval_row_shapes():
 
     assert models.predict_p(pool_row)[0] == models.predict_p(eval_row)[0]
     assert np.array_equal(models.predict_stage(pool_row), models.predict_stage(eval_row))
+
+
+# =============================================================================
+# continuation-ratio ("sequential") family + A/B (owner decision: MOTIVATION
+# in the task-8b brief -- the 5 STAGES are a reach -> grasp -> transport ->
+# place progression the two disconnected two_model fits ignore)
+# =============================================================================
+
+def _sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def _make_gate_process_synthetic_df(n_conditions=400, repeats=4, seed=21):
+    """Synthetic diag-ledger-shaped rows generated from a KNOWN, EXPLICIT
+    gate process (not a single P(success) rule, unlike
+    `_make_synthetic_diag_df` above):
+      q_reach(x_rel)  = sigmoid(20 * x_rel)                       -- steep step in x_rel
+      q_grasp(h)      = sigmoid(3.0 - 1500*(h - 0.185)**2)        -- narrow inverted-U in h
+      q_transport     = 0.85 (constant)
+      q_place         = 0.80 (constant)
+    Each repeat draws reach -> grasp -> transport -> place Bernoullis in
+    order, stopping at the first failure (exactly how a real rollout's
+    failure_stage is assigned) -- so success requires an AND of two
+    near-step conditions in two DIFFERENT features (x_rel high enough AND h
+    inside a narrow window). A single logistic p_success fit (two_model,
+    with only additive x_rel/h/h_sq terms and no x_rel*h cross term) can
+    only represent a parabola-shaped decision region in (x_rel, h) space, not
+    this rectangle-shaped AND region, while the sequential family's two
+    independent gates (each a plain function of its own single feature)
+    reproduce it exactly by construction -- verified below to give the
+    sequential family a real, seed-robust held-out AUC edge (checked
+    against >=10 other seeds during development, see task-8b report)."""
+    rng = np.random.default_rng(seed)
+    cats = ["jar", "jug", "apple", "plate", "saucepan"]
+    rows = []
+    for i in range(n_conditions):
+        h = float(rng.uniform(0.02, 0.35))
+        w = float(rng.uniform(0.02, 0.20))
+        x_rel = float(rng.uniform(-0.8, 0.8))
+        y_rel = float(rng.uniform(-0.8, 0.8))
+        side = 1 if (x_rel if abs(x_rel) >= abs(y_rel) else y_rel) >= 0 else -1
+        cat = cats[i % len(cats)]
+        q_reach = _sigmoid(20.0 * x_rel)
+        q_grasp = _sigmoid(3.0 - 1500.0 * (h - 0.185) ** 2)
+        for r in range(repeats):
+            if rng.random() >= q_reach:
+                stage = "never_reached"
+            elif rng.random() >= q_grasp:
+                stage = "reached_no_grasp"
+            elif rng.random() >= 0.85:
+                stage = "fail_grasped_no_transport"
+            elif rng.random() >= 0.80:
+                stage = "fail_reached_sink_no_place"
+            else:
+                stage = "success"
+            rows.append(dict(
+                start_id=f"start_{i:05d}", repeat_idx=r, success=(stage == "success"),
+                failure_stage=stage, category=cat, h=h, w=w,
+                x_rel=x_rel, y_rel=y_rel, side=side,
+            ))
+    return pd.DataFrame(rows)
+
+
+def test_sequential_model_recovers_known_gate_structure_and_beats_two_model():
+    df = _make_gate_process_synthetic_df(n_conditions=400, repeats=4, seed=21)
+
+    report_two = map_fit.validation_report(map_fit.fit(df, family="two_model"), df, n_splits=5)
+    report_seq = map_fit.validation_report(map_fit.fit(df, family="sequential"), df, n_splits=5)
+
+    assert report_seq["auc"] > report_two["auc"], (
+        f"sequential held-out composed AUC {report_seq['auc']} did not beat two_model's "
+        f"{report_two['auc']} on data generated from a known reach(x_rel)/grasp(h) gate process"
+    )
+
+    models_seq = map_fit.fit(df, family="sequential")
+    feat_idx = {c: i for i, c in enumerate(map_fit.FEATURE_COLUMNS)}
+    reach_coef = models_seq.sequential.gates["reach"].pipeline.named_steps["clf"].coef_[0]
+    grasp_coef = models_seq.sequential.gates["grasp"].pipeline.named_steps["clf"].coef_[0]
+
+    reach_x_rel_weight = abs(reach_coef[feat_idx["x_rel"]])
+    reach_h_weight = abs(reach_coef[feat_idx["h"]]) + abs(reach_coef[feat_idx["h_sq"]])
+    grasp_h_weight = abs(grasp_coef[feat_idx["h"]]) + abs(grasp_coef[feat_idx["h_sq"]])
+    grasp_x_rel_weight = abs(grasp_coef[feat_idx["x_rel"]])
+
+    assert reach_x_rel_weight > reach_h_weight, (
+        f"reach gate should respond mainly to x_rel (its true driver): "
+        f"|coef_x_rel|={reach_x_rel_weight} <= |coef_h|+|coef_h_sq|={reach_h_weight}"
+    )
+    assert grasp_h_weight > grasp_x_rel_weight, (
+        f"grasp gate should respond mainly to h (its true, inverted-U driver): "
+        f"|coef_h|+|coef_h_sq|={grasp_h_weight} <= |coef_x_rel|={grasp_x_rel_weight}"
+    )
+
+
+def test_sequential_predict_stage_sums_to_one_and_matches_predict_p_exactly():
+    df = _make_gate_process_synthetic_df(n_conditions=150, repeats=3, seed=5)
+    models = map_fit.fit(df, family="sequential")
+    sample = df.sample(30, random_state=0)
+
+    stage_proba = models.predict_stage(sample)
+    p = models.predict_p(sample)
+
+    assert stage_proba.shape == (30, len(map_fit.STAGES))
+    assert np.all(stage_proba >= 0)
+    assert np.allclose(stage_proba.sum(axis=1), 1.0)
+
+    success_idx = map_fit.STAGES.index("success")
+    assert np.array_equal(p, stage_proba[:, success_idx]), (
+        "p_success must equal predict_stage's success column EXACTLY (both are the "
+        "same q1*q2*q3*q4 product) for the sequential family"
+    )
+
+
+def test_sequential_save_load_roundtrip_preserves_family_and_predictions(tmp_path):
+    df = _make_gate_process_synthetic_df(n_conditions=100, repeats=3, seed=6)
+    models = map_fit.fit(df, family="sequential")
+    path = tmp_path / "map_models_sequential.joblib"
+
+    returned_path = map_fit.save(models, path)
+    assert returned_path == path
+    assert path.exists()
+
+    loaded = map_fit.load(path)
+    probe = df.iloc[:10]
+
+    assert loaded.family == "sequential"
+    assert np.array_equal(models.predict_p(probe), loaded.predict_p(probe))
+    assert np.array_equal(models.predict_stage(probe), loaded.predict_stage(probe))
+    gp_models = models.predict_gate_probs(probe)
+    gp_loaded = loaded.predict_gate_probs(probe)
+    for name in map_fit.GATE_NAMES:
+        assert np.array_equal(gp_models[name], gp_loaded[name])
+    assert loaded.cat_encoding == models.cat_encoding
+    assert loaded.metadata == models.metadata
+
+
+def test_sequential_handles_empty_gate_population_without_crashing():
+    """No row in this df ever grasps anything (stage is always
+    "never_reached" or "reached_no_grasp") -- gate 3 (transport) and gate 4
+    (place)'s training populations are literally EMPTY, the degenerate case
+    _make_estimator's DummyClassifier fallback alone can't cover (it still
+    needs >=1 training row). Must fit/predict/validate without crashing."""
+    rng = np.random.default_rng(11)
+    rows = []
+    for i in range(60):
+        x_rel = float(rng.uniform(-0.5, 0.5))
+        reached = rng.random() < 0.6
+        stage = "reached_no_grasp" if reached else "never_reached"
+        rows.append(dict(
+            start_id=f"s{i:03d}", repeat_idx=0, success=False, failure_stage=stage,
+            category="jar", h=0.15, w=0.1, x_rel=x_rel, y_rel=0.0, side=1,
+        ))
+    df = pd.DataFrame(rows)
+
+    models = map_fit.fit(df, family="sequential")  # must not raise
+
+    assert models.sequential.gates["transport"].n_train == 0
+    assert models.sequential.gates["place"].n_train == 0
+    assert models.sequential.gates["transport"].pipeline is None
+    assert models.sequential.gates["place"].pipeline is None
+
+    p = models.predict_p(df)
+    assert np.all(np.isfinite(p))
+    assert np.all((p >= 0) & (p <= 1))
+    assert np.all(p < 0.05)  # nobody ever grasped -> composed P(success) ~ 0 everywhere
+
+    stage = models.predict_stage(df)
+    assert np.all(np.isfinite(stage))
+    assert np.allclose(stage.sum(axis=1), 1.0)
+
+    report = map_fit.validation_report(models, df, n_splits=3)
+    assert not np.isnan(report["gate_auc"]["reach"])
+    assert np.isnan(report["gate_auc"]["grasp"])       # grasp label is single-class (always False)
+    assert np.isnan(report["gate_auc"]["transport"])   # population empty
+    assert np.isnan(report["gate_auc"]["place"])       # population empty
+
+
+def test_compare_families_returns_both_reports_and_a_deterministic_winner():
+    df = _make_gate_process_synthetic_df(n_conditions=200, repeats=3, seed=42)
+
+    result_1 = map_fit.compare_families(df)
+    result_2 = map_fit.compare_families(df)
+
+    assert set(result_1.keys()) == {"two_model", "sequential", "winner"}
+    assert result_1["winner"] in ("two_model", "sequential")
+    # data was generated from a genuine gate process -- the structurally
+    # correct family should win the held-out log-loss comparison.
+    assert result_1["winner"] == "sequential"
+
+    assert result_1["winner"] == result_2["winner"]
+    for family in ("two_model", "sequential"):
+        assert result_1[family]["log_loss"] == pytest.approx(result_2[family]["log_loss"])
+        assert result_1[family]["auc"] == pytest.approx(result_2[family]["auc"])
+        assert result_1[family]["stage_log_loss"] == pytest.approx(result_2[family]["stage_log_loss"])
+
+
+# --- two_model family unaffected by the new default `family` kwarg ----------
+
+def test_fit_default_family_is_two_model_and_has_no_sequential_populated():
+    df = _make_synthetic_diag_df(n_conditions=80, repeats=3, seed=13)
+    models = map_fit.fit(df)
+    assert models.family == "two_model"
+    assert models.sequential is None
+    assert models.p_success is not None
+    assert models.p_stage is not None
