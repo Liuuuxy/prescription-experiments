@@ -175,6 +175,44 @@ def test_nan_delta_in_ok_row_raises_valueerror_with_pull_ids():
     assert "1" in error_msg
 
 
+# --- "eval_failed" rows must be ignored exactly like "failed" (bandit_v1 --
+#     pull.py's new eval-except ledger row, race-runner review Lead Finding:
+#     scheduler.decide's status == "ok" filter already excludes any non-"ok"
+#     status, so this is a targeted regression test for that specific new
+#     status value rather than a behavior change to this module). -----------
+
+def test_eval_failed_status_rows_are_ignored_like_failed():
+    rows = [("A", 1, 0.30), ("A", 2, 0.31), ("B", 1, 0.05), ("B", 2, 0.06)]
+    d_clean = scheduler.decide(_pulls(rows), sigma_e=0.01, delta=0.1, t_max=16)
+
+    # Extreme-valued eval_failed rows that would flip the leader and blow
+    # the budget if they were ever counted -- same shape as the existing
+    # "smoke"/"failed" regression test above, for the "eval_failed" status.
+    noisy_rows = list(rows) + [("A", 1, -100.0, "eval_failed"), ("B", 1, 100.0, "eval_failed")] * 10
+    d_noisy = scheduler.decide(_pulls(noisy_rows), sigma_e=0.01, delta=0.1, t_max=16)
+
+    assert d_noisy["ranking"] == d_clean["ranking"]
+    assert d_noisy["survivors"] == d_clean["survivors"]
+    assert d_noisy["eliminated"] == d_clean["eliminated"]
+    assert d_noisy["done"] == d_clean["done"]
+    assert d_noisy["next_round"] == d_clean["next_round"]
+
+
+def test_arm_with_only_eval_failed_rows_appears_in_no_data():
+    rows = [
+        ("A", 1, 0.30), ("A", 2, 0.31),                              # A has ok rows
+        ("B", 1, 0.05, "eval_failed"), ("B", 2, 0.06, "eval_failed"),  # B: eval always failed
+    ]
+    d = scheduler.decide(_pulls(rows), sigma_e=0.01, delta=0.1, t_max=16)
+
+    assert d["no_data"] == ["B"]
+    assert "B" not in d["survivors"]
+    assert "B" not in d["eliminated"]
+    assert {r[0] for r in d["ranking"]} == {"A"}
+    assert d["survivors"] == ["A"]
+    assert d["done"] is True
+
+
 # --- Arms with all non-ok rows must appear in no_data and nowhere else. -----
 
 def test_all_failed_arm_appears_in_no_data():

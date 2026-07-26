@@ -438,6 +438,86 @@ def test_run_race_phase_t_cap_stops_with_multiple_survivors():
     assert len(fl.calls) == 4  # exactly t_max ok pulls, no more
 
 
+def test_run_batch_two_wide_should_stop_fn_checked_before_each_pull():
+    """The literal acceptance test named in the fix brief: cap reached after
+    the 2nd of 4 planned pulls -> exactly 0 further run_one calls (not just
+    "eventually stops", but stops with zero extra dispatches)."""
+    calls = []
+    count = {"n": 0}
+
+    def run_one(spec):
+        calls.append(spec["slot"])
+        count["n"] += 1
+        return spec["slot"]
+
+    out = rr.run_batch_two_wide(
+        [{"slot": "a"}, {"slot": "b"}, {"slot": "c"}, {"slot": "d"}],
+        run_one, claimable_fn=lambda: False, log=_quiet_log,
+        should_stop_fn=lambda: count["n"] >= 2)
+
+    assert calls == ["a", "b"]   # c, d never started
+    assert out == ["a", "b"]
+
+
+def test_run_batch_two_wide_should_stop_fn_none_never_stops_batch():
+    # default behavior (should_stop_fn=None) is unchanged: no early exit.
+    calls = []
+    rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}, {"slot": "c"}],
+                           lambda spec: calls.append(spec["slot"]),
+                           claimable_fn=lambda: False, log=_quiet_log)
+    assert calls == ["a", "b", "c"]
+
+
+def test_run_race_phase_t_cap_checked_mid_round_stops_with_zero_further_calls():
+    """run_race_phase-level version of the same acceptance test: t_max=2,
+    4 arms planned this round -- after the 2nd ok pull the cap is hit, so
+    the 3rd and 4th planned pulls must NEVER be attempted."""
+    fl = FakeLedger(delta_fn=lambda arm, j: 0.1)
+    decision = rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
+                                  all_arms=["A", "B", "C", "D"], claimable_fn=lambda: False,
+                                  t_max=2, log=_quiet_log)
+    assert fl.calls == [("A", rr.RACE_FIRST_ROUND), ("B", rr.RACE_FIRST_ROUND)]
+    assert decision["done"] is True
+
+
+def test_run_race_phase_t_cap_stops_mid_round_after_elimination_shrinks_roster():
+    """Race-runner review Finding 2's exact overshoot scenario: 15 ok pulls
+    already banked (1 below t_max=16) with a live 3-arm roster. Before this
+    fix, the whole round (3 more pulls) always ran to completion regardless
+    of budget, landing at 18 (2 over budget, since the cap was only
+    re-checked BETWEEN whole rounds). Now the round stops the instant the
+    16th ok pull lands -- exactly 1 of that round's 3 planned pulls runs."""
+    preseed_rows = []
+    for k in range(5):   # rounds RACE_FIRST_ROUND..+4, 3 tied arms each = 15 ok pulls
+        j = rr.RACE_FIRST_ROUND + k
+        preseed_rows += [(arm, j, 0.10) for arm in ("A", "B", "C")]
+    fl = FakeLedger(preseed=_pulls(preseed_rows).to_dict("records"), delta_fn=lambda arm, j: 0.10)
+
+    # sigma_e=1.0 (deliberately huge): all 3 arms are tied at mean 0.10, so
+    # nothing is ever eliminated -- the race can ONLY end via t_max here,
+    # isolating the T-cap behavior from elimination logic.
+    decision = rr.run_race_phase(sigma_e=1.0, read_pulls_fn=fl.read, run_one=fl.run_one,
+                                  all_arms=["A", "B", "C"], claimable_fn=lambda: False,
+                                  t_max=16, log=_quiet_log)
+
+    assert len(fl.calls) == 1   # NOT the full 3-arm round -- stops right at t_max
+    assert decision["done"] is True
+
+
+def test_run_race_phase_resumes_eval_failed_row_by_repulling_that_arm():
+    """An eval_failed row (pull.py's new eval-except ledger row) must be
+    treated exactly like a missing/failed pull for resume purposes -- the
+    arm gets re-pulled this round; an arm that's genuinely `ok` is not."""
+    preseed = _pulls([("A", rr.RACE_FIRST_ROUND, None, "eval_failed"),
+                       ("B", rr.RACE_FIRST_ROUND, 0.10)])
+    fl = FakeLedger(preseed=preseed.to_dict("records"), delta_fn=lambda arm, j: 0.10)
+    rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
+                       all_arms=["A", "B"], claimable_fn=lambda: False,
+                       t_max=3, log=_quiet_log)
+    assert ("A", rr.RACE_FIRST_ROUND) in fl.calls
+    assert ("B", rr.RACE_FIRST_ROUND) not in fl.calls
+
+
 def test_run_race_phase_resumes_mid_round_never_re_pulls_already_ok_arms():
     preseed = _pulls([("A", rr.RACE_FIRST_ROUND, 0.10), ("B", rr.RACE_FIRST_ROUND, 0.10)])
     fl = FakeLedger(preseed=preseed.to_dict("records"),

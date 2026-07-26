@@ -111,3 +111,11 @@ arms_freeze:
     tall_vessel_grasp_fail: 2201
   map_hash: cee3f2fa71d76e09433ab5c43ea11bbac1d7b123430e273c4459131b9da7e431
   written_at: '2026-07-26T18:32:37.627067+00:00'
+
+# bandit_v1 E-build + baseline orchestrator (adapted run_baseline.sh: frozen-map
+# skip verified against arms_freeze.map_hash above, MUJOCO_GL=osmesa for all env
+# steps, --workers 4 baseline eval) -- launched detached (nohup, reparented to
+# PPID 1), same "record the launcher PID" convention as diag_orchestrator_pid
+# above. Logs: /data/xinyua11/tmp/bandit_baseline.log (nohup stdout/stderr),
+# /data/xinyua11/tmp/bandit_baseline_orch.log (the script's own structured log).
+baseline_chain_pid: 4077116

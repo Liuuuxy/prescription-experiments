@@ -647,6 +647,196 @@ def test_run_pull_training_exhausted_row_records_training_artifacts_json(isolate
     assert artifacts["recipe_seed"] == config.pull_seed(5)
 
 
+# --- (j) resume-safety: training fast path + eval_failed row (race-runner --
+#     review Lead Finding, .superpowers/sdd/task-racerunner-report.md) ------
+
+def _write_complete_checkpoint(ckpt_dir):
+    """Mirrors a REAL completed openpi checkpoint's on-disk shape (verified
+    against .../pi0_ppc2sink_pi0base/pi0_v1/19999): a top-level
+    `_CHECKPOINT_METADATA` file (orbax's per-step commit marker) plus a
+    non-empty `params/` subdirectory."""
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    (ckpt_dir / pull.CKPT_METADATA_FILE).write_text("{}")
+    (ckpt_dir / "params").mkdir(exist_ok=True)
+    (ckpt_dir / "params" / "manifest.ocdbt").write_text("x")
+
+
+def test_checkpoint_looks_complete_false_when_dir_missing(isolated):
+    assert pull.checkpoint_looks_complete(config.OPENPI / "checkpoints" / "cfg" / "exp" / "19999") is False
+
+
+def test_checkpoint_looks_complete_false_when_metadata_file_missing(isolated):
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "hard_j2")
+    ckpt_dir.mkdir(parents=True)
+    (ckpt_dir / "params").mkdir()
+    (ckpt_dir / "params" / "x").write_text("x")
+    assert pull.checkpoint_looks_complete(ckpt_dir) is False  # no _CHECKPOINT_METADATA
+
+
+def test_checkpoint_looks_complete_false_when_params_dir_empty(isolated):
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "hard_j2")
+    ckpt_dir.mkdir(parents=True)
+    (ckpt_dir / pull.CKPT_METADATA_FILE).write_text("{}")
+    (ckpt_dir / "params").mkdir()
+    assert pull.checkpoint_looks_complete(ckpt_dir) is False  # params/ present but empty
+
+
+def test_checkpoint_looks_complete_true_for_real_completed_shape(isolated):
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "hard_j2")
+    _write_complete_checkpoint(ckpt_dir)
+    assert pull.checkpoint_looks_complete(ckpt_dir) is True
+
+
+def test_run_pull_skips_training_when_final_checkpoint_already_complete(isolated):
+    """The resume-safety fast path: if a PRIOR invocation already produced a
+    complete checkpoint (e.g. an eval-stage exception left no ok row, but
+    training itself succeeded), a fresh run_pull call must NOT relaunch
+    `scripts/train.py --overwrite` -- that would rmtree the very checkpoint
+    it's about to serve. popen_fn raises if a train.py launch is ever
+    attempted, so this test fails loudly if the fast path regresses."""
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "null_j2")
+    _write_complete_checkpoint(ckpt_dir)
+
+    def popen_fn(cmd, **kwargs):
+        if "scripts/train.py" in cmd:
+            raise AssertionError("training must not be launched -- checkpoint already complete")
+        return FakeProc(always=None)  # serve_policy.py
+
+    eval_calls = []
+    row = pull.run_pull(
+        "null", 2, "a", B=0, pool_df=make_pool_df([]),
+        eval_fn=lambda *a, **kw: _eval_fn_ok(*a, calls=eval_calls, **kw),
+        gpu=0, dataset_runner=fake_dataset_runner,
+        popen_fn=popen_fn, connect_fn=lambda host, port: True,
+        sleep_fn=lambda secs: None,
+    )
+
+    assert row["status"] == "ok"
+    assert row["n_train_attempts"] == 0
+    assert row["checkpoint_id"] == str(ckpt_dir)
+    assert "fast path" in row["note"]
+    assert len(eval_calls) == 1
+
+    ledger_rows = ledger.read("pulls")
+    assert len(ledger_rows) == 1
+    assert ledger_rows.iloc[0]["status"] == "ok"
+
+
+def test_run_pull_eval_fn_exception_writes_eval_failed_row_and_reraises(isolated):
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "null_j3")
+
+    def fake_sleep(secs):
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    def exploding_eval_fn(port, policy_id, arm, pull_id):
+        raise RuntimeError("worker timed out after 10800s")
+
+    with pytest.raises(RuntimeError, match="worker timed out"):
+        pull.run_pull(
+            "null", 3, "a", B=0, pool_df=make_pool_df([]),
+            eval_fn=exploding_eval_fn, gpu=0,
+            dataset_runner=fake_dataset_runner, popen_fn=make_fake_popen(None),
+            connect_fn=lambda host, port: True, sleep_fn=fake_sleep,
+        )
+
+    ledger_rows = ledger.read("pulls")
+    assert len(ledger_rows) == 1
+    row = ledger_rows.iloc[0]
+    assert row["status"] == "eval_failed"
+    assert row["checkpoint_id"] == str(ckpt_dir)
+    assert list(row["demo_ids"]) == []
+    assert "worker timed out after 10800s" in row["note"]
+    assert row["n_train_attempts"] == 1
+    artifacts = json.loads(row["training_artifacts_json"])
+    assert artifacts["ckpt_root"] == str(pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "null_j3"))
+
+
+def test_run_pull_eval_failed_note_is_truncated_for_a_long_error():
+    long_msg = "x" * (pull.EVAL_ERROR_NOTE_MAX_LEN * 2)
+    note = pull._truncate_error(RuntimeError(long_msg))
+    assert len(note) < len(long_msg)
+    assert note.startswith("eval_failed: RuntimeError:")
+    assert "truncated" in note
+
+
+def test_run_pull_missing_eval_fn_also_writes_eval_failed_row(isolated):
+    """`eval_fn is None` raises NotImplementedError from inside the same
+    eval-step try/except -- it must get the same ledger-row treatment as
+    any other eval-stage exception, not be a second silent gap."""
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "null_j4")
+
+    def fake_sleep(secs):
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    with pytest.raises(NotImplementedError, match="Task 9"):
+        pull.run_pull(
+            "null", 4, "a", B=0, pool_df=make_pool_df([]),
+            gpu=0, dataset_runner=fake_dataset_runner, popen_fn=make_fake_popen(None),
+            connect_fn=lambda host, port: True, sleep_fn=fake_sleep,
+        )
+
+    ledger_rows = ledger.read("pulls")
+    assert len(ledger_rows) == 1
+    assert ledger_rows.iloc[0]["status"] == "eval_failed"
+    assert "Task 9" in ledger_rows.iloc[0]["note"]
+
+
+def test_run_pull_resume_after_eval_failed_reruns_only_eval_not_training(isolated):
+    """The end-to-end resume-safety invariant the race-runner review asked
+    for: an (arm, round) whose most recent invocation left an eval_failed
+    row (training succeeded, eval blew up) must, on the NEXT run_pull call
+    for that same (arm, round, slot), re-run ONLY the eval -- never
+    relaunch training against the already-complete checkpoint."""
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "null_j5")
+
+    def fake_sleep(secs):
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+    train_popen_calls = []
+
+    def popen_fn(cmd, **kwargs):
+        if "scripts/train.py" in cmd:
+            train_popen_calls.append(cmd)
+        return FakeProc(always=None)
+
+    # --- invocation 1: training succeeds, eval blows up ---------------------
+    with pytest.raises(RuntimeError, match="eval boom"):
+        pull.run_pull(
+            "null", 5, "a", B=0, pool_df=make_pool_df([]),
+            eval_fn=lambda *a, **kw: (_ for _ in ()).throw(RuntimeError("eval boom")),
+            gpu=0, dataset_runner=fake_dataset_runner, popen_fn=popen_fn,
+            connect_fn=lambda host, port: True, sleep_fn=fake_sleep,
+        )
+    assert len(train_popen_calls) == 1
+
+    ledger_rows = ledger.read("pulls")
+    assert len(ledger_rows) == 1
+    assert ledger_rows.iloc[0]["status"] == "eval_failed"
+
+    # The training that ran for real above only left a bare directory (this
+    # test's fake_sleep just mkdir's it, like every other test in this
+    # file) -- overwrite it with the shape a REAL completed checkpoint has,
+    # exactly as if the real orbax save had actually finished.
+    _write_complete_checkpoint(ckpt_dir)
+
+    # --- invocation 2 (resume): same (arm, j, slot), eval now succeeds -------
+    eval_calls = []
+    row2 = pull.run_pull(
+        "null", 5, "a", B=0, pool_df=make_pool_df([]),
+        eval_fn=lambda *a, **kw: _eval_fn_ok(*a, calls=eval_calls, **kw),
+        gpu=0, dataset_runner=fake_dataset_runner, popen_fn=popen_fn,
+        connect_fn=lambda host, port: True, sleep_fn=fake_sleep,
+    )
+
+    assert row2["status"] == "ok"
+    assert len(train_popen_calls) == 1   # NOT relaunched on resume
+    assert len(eval_calls) == 1
+
+    ledger_rows = ledger.read("pulls")
+    assert len(ledger_rows) == 2
+    assert list(ledger_rows["status"]) == ["eval_failed", "ok"]
+
+
 def test_append_gradient_analysis_note_writes_block_and_guards_double_append(tmp_path):
     cfg = tmp_path / "config.yaml"
     cfg.write_text("existing: true\n")

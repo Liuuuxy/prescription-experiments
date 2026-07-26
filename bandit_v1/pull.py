@@ -12,9 +12,19 @@ of arm `arm` at round `j` on training slot `slot`:
      (via policy_analysis/build_lerobot_subset.py) and point
      `FT_ARMS_ROOT/ppc2sink_bandit_slot_<slot>` at it (`ln -sfn` semantics).
   3. train the slot's openpi TrainConfig (`pi0_ppc2sink_bandit_a`/`_b`,
-     Task 5) at seed `config.pull_seed(j)`, retrying once on failure.
+     Task 5) at seed `config.pull_seed(j)`, retrying once on failure -- UNLESS
+     the final checkpoint already exists and looks complete (see
+     `checkpoint_looks_complete`), in which case training is skipped
+     entirely (resume-safety fast path: prevents a resumed invocation from
+     relaunching `--overwrite` training and deleting an already-complete
+     checkpoint -- see section 4c below).
   4. serve the resulting checkpoint on the slot's port and call the
-     caller-supplied `eval_fn`.
+     caller-supplied `eval_fn`; ANY exception from this step (including
+     `eval_fn` itself, or `eval_fn is None`) writes a `status="eval_failed"`
+     ledger row (checkpoint_id, demo_ids, training_artifacts, a truncated
+     error string) before re-raising -- so a resumed run_race.py can tell
+     "never attempted" apart from "trained fine, eval blew up" and (via step
+     3's fast path) re-runs ONLY the eval, not the training.
   5. compute delta vs an (optional, caller-supplied) baseline and append the
      full row to `ledger/pulls.parquet`.
 
@@ -322,7 +332,12 @@ def ckpt_final_dir(config_name: str, exp_name: str, num_train_steps=None) -> Pat
 # partial checkpoint dir for the SAME exp_name on a retry -- see train_cmd's
 # docstring -- it does not prune earlier save_interval steps within one
 # successful run); this section only ADDS a row-level record of where
-# everything already on disk actually lives.
+# everything already on disk actually lives. This invariant used to have a
+# real gap across SEPARATE run_pull invocations of the same pull_id (an
+# eval-stage exception left no ledger row, so a resumed run would relaunch
+# `--overwrite` training against an already-complete checkpoint and delete
+# it) -- closed by the `checkpoint_looks_complete` pre-training fast path
+# (section 4c below) plus the eval-except ledger row (step 4 in `run_pull`).
 
 WANDB_BASE_DIR = Path("/data/xinyua11/wandb")   # matches _train_env's WANDB_DIR
 
@@ -433,6 +448,47 @@ def append_gradient_analysis_note_to_config_yaml(path=None, log=lambda *a: None)
         f.write(dumped)
     log(f"appended gradient_analysis note to {path}")
     return path
+
+
+# --- 4c. resume-safety: is a checkpoint already complete? -------------------
+# (race-runner review Lead Finding, .superpowers/sdd/task-racerunner-report.md)
+# An eval-stage exception on a PRIOR invocation of this exact pull_id (any
+# exception from eval_fn -- e.g. parallel_eval's worker-timeout RuntimeError)
+# can leave a fully-trained checkpoint on disk with NO ledger row at all (see
+# the eval-except block in step 4 below, which now writes one, but pulls
+# made before that fix -- or any other as-yet-undiscovered eval-stage
+# exception path -- could still land here). Without this guard, a resumed
+# run_race.py sees "no ok/eval_failed row yet for this (arm, round)" and
+# calls run_pull again, which would reach step 3 and unconditionally launch
+# `scripts/train.py ... --overwrite`. Verified directly against openpi's real
+# `initialize_checkpoint_dir` (src/openpi/training/checkpoints.py:26-29):
+# `overwrite=True` + an EXISTING checkpoint_dir -> `checkpoint_dir.rmtree()`
+# -- unconditionally destroying the very checkpoint we're trying to resume
+# onto, wasting a full training run (hours of GPU time).
+CKPT_METADATA_FILE = "_CHECKPOINT_METADATA"   # orbax's own per-step commit marker
+
+
+def checkpoint_looks_complete(ckpt_dir) -> bool:
+    """Best-effort, stat-only (no GPU, no subprocess) check that `ckpt_dir`
+    (a specific step's checkpoint dir, e.g. `ckpt_final_dir(...)`) holds a
+    genuinely FINISHED openpi checkpoint, not a partial leftover from a
+    crashed prior training attempt. Verified against a real completed
+    checkpoint already on disk (.../pi0_ppc2sink_pi0base/pi0_v1/19999):
+    every finished step dir has a top-level `_CHECKPOINT_METADATA` file
+    (orbax's own per-step commit marker, absent on an interrupted/mid-write
+    save) AND a non-empty `params/` subdirectory (the actual inference-
+    usable weights `serve_policy.py` restores from -- `train_state/` alone,
+    without `params/`, is not enough to serve).
+
+    Used as `run_pull`'s pre-training resume-safety fast path -- see this
+    section's module-level comment for why this check must run BEFORE any
+    `--overwrite` training launch.
+    """
+    ckpt_dir = Path(ckpt_dir)
+    if not (ckpt_dir / CKPT_METADATA_FILE).is_file():
+        return False
+    params_dir = ckpt_dir / "params"
+    return params_dir.is_dir() and any(params_dir.iterdir())
 
 
 # --- 5. GPU selection (mirrors launch_pi0.sh's wait-for-GPU loop) ----------
@@ -640,6 +696,40 @@ def _failed_row(resolved: dict, seed: int, started_at: str, attempt: int, note=N
     return row
 
 
+EVAL_ERROR_NOTE_MAX_LEN = 2000   # truncation cap for the eval_failed row's `note`
+
+
+def _truncate_error(exc: BaseException, max_len: int = EVAL_ERROR_NOTE_MAX_LEN) -> str:
+    """`"eval_failed: <ExceptionType>: <message>"`, truncated to `max_len`
+    chars -- a policy-server-hang or a deeply-nested worker traceback string
+    can be arbitrarily long, and the ledger row's `note` field is meant to be
+    a short, greppable audit trail (the FULL traceback still lives in the
+    real exception this is raised alongside of -- this module never
+    swallows the exception, only records a bounded summary of it)."""
+    text = f"eval_failed: {type(exc).__name__}: {exc}"
+    if len(text) > max_len:
+        text = text[:max_len] + f"...[truncated, {len(text)} chars total]"
+    return text
+
+
+def _eval_failed_row(resolved: dict, seed: int, started_at: str, attempts: int,
+                      ckpt_dir, exc: BaseException, training_artifacts: dict = None) -> dict:
+    """The ledger row written when `eval_fn` (or the eval step generally)
+    raises -- closes the race-runner review's Lead Finding: previously this
+    exact failure mode propagated with NO ledger row at all, so a resumed
+    run_race.py could not distinguish "never attempted" from "trained fine,
+    eval blew up" and would relaunch `--overwrite` training against the
+    already-complete checkpoint (see `checkpoint_looks_complete`'s docstring).
+    `status="eval_failed"` (not "failed") so this is queryable as its own
+    category; `scheduler.decide`'s `status == "ok"` filter already treats
+    any non-"ok" status -- including this one -- as a non-counting row, same
+    as "failed"/"smoke" (see test_scheduler.py's dedicated coverage)."""
+    row = _base_row(resolved, seed, started_at, training_artifacts=training_artifacts)
+    row.update(status="eval_failed", n_train_attempts=attempts, note=_truncate_error(exc),
+               checkpoint_id=str(ckpt_dir), finished_at=datetime.now(timezone.utc).isoformat())
+    return row
+
+
 def _append_pull_row(row: dict) -> None:
     ledger.append_rows(PULLS_TABLE, [row])
 
@@ -730,32 +820,49 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
     if dry_run:
         return resolved
 
-    # --- step 3: train, retrying once on failure ------------------------------
+    # --- step 3: train, retrying once on failure (unless already complete) ---
+    # Resume-safety fast path (see section 4c / module docstring): a cheap,
+    # stat-only check BEFORE any GPU wait or training launch. If the final
+    # checkpoint is already there and looks genuinely finished, training is
+    # skipped entirely -- this is what stops a resumed invocation (e.g.
+    # after a PRIOR eval-stage exception left no ok/eval_failed row) from
+    # relaunching `--overwrite` training and deleting the checkpoint it's
+    # trying to resume onto.
     ok = False
     attempts = 0
     last_train_log = None
-    for attempt in range(1, max_train_attempts + 1):
-        attempts = attempt
+    train_gpu = None
+    training_skipped = checkpoint_looks_complete(ckpt_dir)
+    if training_skipped:
+        log(f"run_pull: {pull_id} RESUME-SAFETY FAST PATH -- final checkpoint "
+            f"{ckpt_dir} already exists and looks complete ({CKPT_METADATA_FILE} "
+            f"+ non-empty params/) -- SKIPPING TRAINING (would otherwise "
+            f"--overwrite-delete it) and proceeding straight to serve+eval")
+        ok = True
         train_gpu = gpu if gpu is not None else wait_for_free_gpu(gpus=gpus, sleep_fn=sleep_fn, log=log)
-        train_log = config.LEDGER_DIR / LOGS_SUBDIR / f"{pull_id}_train_attempt{attempt}.log"
-        last_train_log = train_log
-        proc = launch_training(tcmd, train_gpu, train_log, popen_fn=popen_fn)
-        ok = wait_for_checkpoint(proc, ckpt_dir, sleep_fn=sleep_fn, log=log)
-        if ok:
-            break
-        if attempt < max_train_attempts:
-            # An attempt that WILL be retried gets its own ledger row here
-            # (audit trail of the failed attempt); the row for the FINAL
-            # attempt -- whether this loop naturally exhausts on failure, or
-            # succeeds -- is appended exactly once, after the loop, by the
-            # code below. Appending here unconditionally on every failure
-            # (including the last) would double-log the last attempt: once
-            # here, once in the post-loop "if not ok" block.
-            attempt_artifacts = collect_training_artifacts(config_name, exp_name, train_log, seed)
-            _append_pull_row(_failed_row(resolved, seed, started_at, attempt,
-                                          note="training process exited without producing a checkpoint -- retrying",
-                                          training_artifacts=attempt_artifacts))
-            log(f"run_pull: {pull_id} training attempt {attempt} failed -- retrying once")
+    else:
+        for attempt in range(1, max_train_attempts + 1):
+            attempts = attempt
+            train_gpu = gpu if gpu is not None else wait_for_free_gpu(gpus=gpus, sleep_fn=sleep_fn, log=log)
+            train_log = config.LEDGER_DIR / LOGS_SUBDIR / f"{pull_id}_train_attempt{attempt}.log"
+            last_train_log = train_log
+            proc = launch_training(tcmd, train_gpu, train_log, popen_fn=popen_fn)
+            ok = wait_for_checkpoint(proc, ckpt_dir, sleep_fn=sleep_fn, log=log)
+            if ok:
+                break
+            if attempt < max_train_attempts:
+                # An attempt that WILL be retried gets its own ledger row here
+                # (audit trail of the failed attempt); the row for the FINAL
+                # attempt -- whether this loop naturally exhausts on failure, or
+                # succeeds -- is appended exactly once, after the loop, by the
+                # code below. Appending here unconditionally on every failure
+                # (including the last) would double-log the last attempt: once
+                # here, once in the post-loop "if not ok" block.
+                attempt_artifacts = collect_training_artifacts(config_name, exp_name, train_log, seed)
+                _append_pull_row(_failed_row(resolved, seed, started_at, attempt,
+                                              note="training process exited without producing a checkpoint -- retrying",
+                                              training_artifacts=attempt_artifacts))
+                log(f"run_pull: {pull_id} training attempt {attempt} failed -- retrying once")
 
     if not ok:
         artifacts = collect_training_artifacts(config_name, exp_name, last_train_log, seed)
@@ -780,9 +887,28 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
             _append_pull_row(row)
             return row
 
-        if eval_fn is None:
-            raise NotImplementedError("Task 9 eval_set not built yet")
-        eval_result = eval_fn(port, pull_id, arm, pull_id)
+        try:
+            if eval_fn is None:
+                raise NotImplementedError("Task 9 eval_set not built yet")
+            eval_result = eval_fn(port, pull_id, arm, pull_id)
+        except Exception as e:
+            # Resume-safety (race-runner review Lead Finding): ANY eval-stage
+            # exception (a hung parallel_eval worker's timeout RuntimeError,
+            # eval_fn not being wired up yet, or any other eval-side error)
+            # now writes a real ledger row before propagating -- previously
+            # this path left NO row at all, so a resumed run_race.py could
+            # not tell "never attempted" apart from "trained fine, eval blew
+            # up", and would relaunch --overwrite training against the
+            # (already complete) checkpoint. `checkpoint_looks_complete`'s
+            # pre-training fast path (step 3 above) is the other half of
+            # this fix: together they make "re-run ONLY the eval" the
+            # natural resume behavior once this row exists.
+            eval_artifacts = collect_training_artifacts(config_name, exp_name, last_train_log, seed)
+            _append_pull_row(_eval_failed_row(resolved, seed, started_at, attempts, ckpt_dir, e,
+                                               training_artifacts=eval_artifacts))
+            log(f"run_pull: {pull_id} eval step raised -- wrote eval_failed ledger row, "
+                f"re-raising: {type(e).__name__}: {e}")
+            raise
     finally:
         stop_process(server_proc)
 
@@ -802,7 +928,8 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
         delta_per_stratum_json=(json.dumps(delta_info["delta_per_stratum"])
                                  if delta_info["delta_per_stratum"] is not None else None),
         status="smoke" if smoke else "ok",
-        note=None,
+        note=("training skipped: final checkpoint already complete (resume-safety fast path)"
+              if training_skipped else None),
         finished_at=datetime.now(timezone.utc).isoformat(),
     )
     _append_pull_row(row)

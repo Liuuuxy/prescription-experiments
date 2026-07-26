@@ -229,7 +229,8 @@ def _run_one_capturing(run_one, spec, errors, results):
         errors.append(e)
 
 
-def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=print) -> list:
+def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=print,
+                        should_stop_fn=None) -> list:
     """Run `specs` (each a dict, at minimum carrying "slot") via
     `run_one(spec)`: one at a time, UNLESS `claimable_fn()` says both GPU
     slots are currently claimable, in which case each adjacent PAIR of specs
@@ -238,6 +239,19 @@ def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=pr
     separate training/eval jobs on 2 separate GPUs). A trailing odd spec (or
     every spec, when `claimable_fn()` is False) runs sequentially in the
     caller's own thread.
+
+    `should_stop_fn` (optional, defaults to never-stop): re-checked
+    immediately before EVERY spec is about to be dispatched -- once before
+    each pair (a concurrent pair is one dispatch decision: either both
+    members start together or neither does) and, in the sequential branch,
+    additionally before each individual spec within that pair. If it
+    returns True, this batch stops immediately: nothing further is started,
+    and whatever's already been collected (results/errors) is returned/
+    raised as usual. This is the seam `run_race.run_race_phase` uses to
+    enforce the T-cap (`t_max`) budget mid-round, not just between whole
+    rounds (race-runner review Finding 2) -- `should_stop_fn` re-reads the
+    ledger fresh on every call so the check reflects pulls THIS batch has
+    already completed, not a stale count taken before the batch started.
 
     Every spec in `specs` is attempted regardless of an earlier one's
     failure (one arm's pull failing should never prevent an already-decided
@@ -253,7 +267,13 @@ def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=pr
     """
     errors, results = [], []
     i = 0
-    while i < len(specs):
+    stopped = False
+    while i < len(specs) and not stopped:
+        if should_stop_fn is not None and should_stop_fn():
+            log(f"run_batch_two_wide: should_stop_fn() signalled stop -- not starting "
+                f"the remaining {len(specs) - i} spec(s) in this batch "
+                f"({[s.get('arm', s.get('slot')) for s in specs[i:]]})")
+            break
         pair = specs[i:i + 2]
         if len(pair) == 2 and claimable_fn():
             log(f"run_batch_two_wide: both GPU slots claimable -- running "
@@ -266,6 +286,11 @@ def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=pr
                 t.join()
         else:
             for spec in pair:
+                if should_stop_fn is not None and should_stop_fn():
+                    log(f"run_batch_two_wide: should_stop_fn() signalled stop mid-pair -- "
+                        f"not starting {spec.get('arm', spec.get('slot'))}")
+                    stopped = True
+                    break
                 _run_one_capturing(run_one, spec, errors, results)
         i += 2
     if errors:
@@ -415,6 +440,16 @@ def _current_round_and_roster(pulls_df, all_arms, sigma_e, delta, t_max, log=pri
     return m, roster_m
 
 
+def _ok_non_null_pull_count(pulls_df) -> int:
+    """Count of `status == "ok"` non-null rows -- exactly the quantity
+    `t_max` budgets (scheduler.decide's own "total_ok_pulls" -- see that
+    module's docstring on why null pulls are excluded from T)."""
+    if pulls_df is None or pulls_df.empty:
+        return 0
+    ok = pulls_df[(pulls_df["status"] == "ok") & (pulls_df["arm"] != "null")]
+    return len(ok)
+
+
 def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_slots_claimable,
                     t_max=config.T_MAX_PULLS, delta=config.DELTA_CONF, log=print) -> dict:
     """Successive-elimination race over `all_arms`, starting at
@@ -427,7 +462,26 @@ def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_
     scheduler.decide() on an incomplete round (see _roster_before_round's
     docstring for why that would risk a wrong elimination). Returns the
     final `scheduler.decide()` dict once done.
+
+    T-cap (`t_max`) enforcement (race-runner review Finding 2): the ok-pull
+    count is checked BEFORE every individual pull is dispatched within a
+    round, not merely between whole rounds -- `_ok_non_null_pull_count` is
+    re-read fresh from the ledger and passed as `run_batch_two_wide`'s
+    `should_stop_fn`. Previously the cap was only re-checked via
+    `scheduler.decide` once an entire round's pulls had already all run, so
+    an elimination that shrank the live roster to an "unlucky" size could
+    overshoot `t_max` by up to `roster_size - 1` pulls; now the round stops
+    cleanly as soon as the cap is hit, however many of that round's planned
+    pulls have actually started. Hitting the cap mid-round is NOT treated
+    as a failure: whichever arms in `to_pull` never got dispatched are
+    simply not attempted (no "HUMAN INTERVENTION REQUIRED" raise -- that
+    path is reserved for an arm that WAS attempted and still didn't produce
+    an ok row) -- the current ranking is logged and the (now budget-decided)
+    `scheduler.decide()` verdict is returned directly.
     """
+    def _t_cap_reached() -> bool:
+        return _ok_non_null_pull_count(read_pulls_fn()) >= t_max
+
     while True:
         pulls_df = read_pulls_fn()
         j, alive = _current_round_and_roster(pulls_df, all_arms, sigma_e, delta, t_max, log=log)
@@ -444,9 +498,18 @@ def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_
             log(f"Round {j}: to_pull={to_pull} (already ok this round: "
                 f"{sorted(set(alive) - set(to_pull))})")
             specs = [{"arm": a, "j": j, "slot": pull.SLOTS[i % 2]} for i, a in enumerate(to_pull)]
-            run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log)
+            run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log,
+                                should_stop_fn=_t_cap_reached)
 
             pulls_df = read_pulls_fn()
+            if _t_cap_reached():
+                decision = scheduler.decide(pulls_df, sigma_e, delta=delta, t_max=t_max)
+                log_ranking(decision, log=log)
+                log(f"=== DONE: race complete (T-cap t_max={t_max} reached mid-round "
+                    f"{j}) -- survivors={decision['survivors']} "
+                    f"eliminated={decision['eliminated']} ===")
+                return decision
+
             still_missing = [a for a in to_pull if a not in _ok_arms_at_round(pulls_df, j)]
             if still_missing:
                 msg = (
