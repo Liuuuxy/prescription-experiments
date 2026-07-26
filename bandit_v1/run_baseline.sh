@@ -94,7 +94,27 @@ BUILDE_LOG=/data/xinyua11/tmp/bandit_baseline_build_e.log
 EVAL_LOG=/data/xinyua11/tmp/bandit_baseline_eval.log
 
 log(){ echo "[$(date '+%m-%d %H:%M:%S')] $*" >> "$ORCH_LOG"; }
-free_mb(){ nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits -i "$1" | tr -d ' '; }
+free_mb(){
+  # Prints GPU $1's free memory in MiB per nvidia-smi, or the literal string
+  # "unavailable" if nvidia-smi itself is broken (nonzero exit -- e.g. an
+  # NVML/driver mismatch -- or output that doesn't parse as an integer).
+  # NVML being unavailable says nothing about whether CUDA itself works (JAX
+  # sees both GPUs fine and XLA_PYTHON_CLIENT_MEM_FRACTION=0.25 serving works
+  # even when nvidia-smi is broken box-wide) -- the guard's caller below
+  # treats "unavailable" as sufficient memory rather than misreading it as 0
+  # MiB free and waiting out the full GPU_WAIT_MAX_SECS cap before aborting.
+  # The serve-retry loop (SERVE_MAX_ATTEMPTS attempts, each checked via an
+  # actual socket connect once the server process is launched) is the real
+  # safety net for a genuinely failed server start -- this guard is only a
+  # best-effort head start and is safe to skip.
+  local out
+  out=$(nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits -i "$1" 2>/dev/null | tr -d ' ')
+  if [ $? -ne 0 ] || ! [[ "$out" =~ ^[0-9]+$ ]]; then
+    echo unavailable
+    return
+  fi
+  echo "$out"
+}
 
 log "=== baseline orchestrator START (pid $$) -- waiting mode ==="
 
@@ -214,6 +234,10 @@ attempt=1
 while [ "$attempt" -le "$SERVE_MAX_ATTEMPTS" ]; do
   while :; do
     f=$(free_mb 0)
+    if [ "$f" = unavailable ]; then
+      log "NVML unavailable -- skipping memory guard, proceeding to serve attempt"
+      break
+    fi
     if [ "${f:-0}" -ge "$GPU0_MIN_FREE_MB" ]; then
       break
     fi
