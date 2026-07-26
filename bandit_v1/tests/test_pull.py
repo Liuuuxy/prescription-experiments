@@ -14,6 +14,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
 from bandit_v1 import config, draw, ledger, pool, pull
 
@@ -520,3 +521,150 @@ def test_run_pull_first_attempt_fails_second_succeeds_then_completes_eval(isolat
     assert len(ledger_rows) == 2  # 1 failed-attempt row + 1 final ok row
     assert list(ledger_rows["status"]) == ["failed", "ok"]
     assert len(train_popen_calls) == 2  # exactly one train.py launch per attempt
+
+
+# --- (i) gradient-analysis training_artifacts (owner request) -----------------
+
+def test_ckpt_steps_present_empty_when_dir_missing(isolated):
+    assert pull.ckpt_steps_present(config.OPENPI / "checkpoints" / "cfg" / "exp") == []
+
+
+def test_ckpt_steps_present_lists_numeric_subdirs_sorted(isolated):
+    root = pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "hard_j3")
+    for step in (19999, 5000, 10000, 15000):
+        (root / str(step)).mkdir(parents=True)
+    (root / "not_a_step").mkdir()  # must never be mistaken for a checkpoint step
+    assert pull.ckpt_steps_present(root) == [5000, 10000, 15000, 19999]
+
+
+def test_wandb_run_id_none_when_file_missing(isolated):
+    root = pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "hard_j3")
+    root.mkdir(parents=True)
+    assert pull.wandb_run_id(root) is None
+
+
+def test_wandb_run_id_reads_file_stripped(isolated):
+    root = pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "hard_j3")
+    root.mkdir(parents=True)
+    (root / "wandb_id.txt").write_text("abc123\n")
+    assert pull.wandb_run_id(root) == "abc123"
+
+
+def test_find_wandb_dir_none_when_run_id_none(tmp_path):
+    assert pull.find_wandb_dir(None, wandb_base=tmp_path) is None
+
+
+def test_find_wandb_dir_none_when_no_match(tmp_path):
+    (tmp_path / "wandb").mkdir()
+    assert pull.find_wandb_dir("zzz", wandb_base=tmp_path) is None
+
+
+def test_find_wandb_dir_matches_offline_run_glob_by_id_suffix(tmp_path):
+    wandb_dir = tmp_path / "wandb"
+    wandb_dir.mkdir()
+    (wandb_dir / "offline-run-20260701_095541-rw79hr65").mkdir()
+    (wandb_dir / "offline-run-20260702_100000-other123").mkdir()
+    found = pull.find_wandb_dir("rw79hr65", wandb_base=tmp_path)
+    assert found == str(wandb_dir / "offline-run-20260701_095541-rw79hr65")
+
+
+def test_collect_training_artifacts_full_shape(isolated, tmp_path):
+    root = pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "hard_j3")
+    root.mkdir(parents=True)
+    (root / "5000").mkdir()
+    (root / "19999").mkdir()
+    (root / "wandb_id.txt").write_text("myrunid")
+    wandb_base = tmp_path / "wandbroot"
+    (wandb_base / "wandb").mkdir(parents=True)
+    (wandb_base / "wandb" / "offline-run-x-myrunid").mkdir()
+
+    artifacts = pull.collect_training_artifacts(
+        "pi0_ppc2sink_bandit_a", "hard_j3", tmp_path / "train.log", seed=1003,
+        wandb_base=wandb_base)
+
+    assert artifacts == {
+        "ckpt_root": str(root),
+        "ckpt_steps_present": [5000, 19999],
+        "train_log_path": str(tmp_path / "train.log"),
+        "wandb_dir": str(wandb_base / "wandb" / "offline-run-x-myrunid"),
+        "recipe_seed": 1003,
+    }
+
+
+def test_collect_training_artifacts_train_log_path_none_when_never_attempted(isolated):
+    artifacts = pull.collect_training_artifacts("pi0_ppc2sink_bandit_a", "never_j1", None, seed=5)
+    assert artifacts["train_log_path"] is None
+    assert artifacts["ckpt_steps_present"] == []
+
+
+def test_run_pull_success_row_records_training_artifacts_json(isolated):
+    rows = [{"episode_index": i, "category": "jar", "x_rel": float(i), "y_rel": 0.0} for i in range(20)]
+    pool_df = make_pool_df(rows)
+    regions = pd.Series({i: "hard" for i in range(20)})
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "hard_j2")
+
+    def fake_sleep(secs):
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        (ckpt_dir.parent / "wandb_id.txt").write_text("wid123")
+
+    row = pull.run_pull(
+        "hard", 2, "a", B=4,
+        pool_df=pool_df, regions=regions, e_features=EMPTY_E,
+        eval_fn=_eval_fn_ok, baseline=0.5, baseline_per_stratum={"easy": 0.7, "hard": 0.2},
+        gpu=0, dataset_runner=fake_dataset_runner,
+        popen_fn=make_fake_popen(None), connect_fn=lambda host, port: True,
+        sleep_fn=fake_sleep,
+    )
+
+    assert row["status"] == "ok"
+    artifacts = json.loads(row["training_artifacts_json"])
+    assert artifacts["ckpt_root"] == str(pull.ckpt_root_dir("pi0_ppc2sink_bandit_a", "hard_j2"))
+    assert artifacts["ckpt_steps_present"] == [int(ckpt_dir.name)]
+    assert artifacts["train_log_path"] == str(
+        config.LEDGER_DIR / pull.LOGS_SUBDIR / "hard_j2_train_attempt1.log")
+    assert artifacts["recipe_seed"] == config.pull_seed(2)
+    # "wid123" is not a real wandb run -- no offline-run dir should match under
+    # the real WANDB_BASE_DIR, so this must resolve to None, not raise.
+    assert artifacts["wandb_dir"] is None
+
+
+def test_run_pull_training_exhausted_row_records_training_artifacts_json(isolated):
+    def failing_popen(cmd, **kwargs):
+        return FakeProc(always=1)
+
+    row = pull.run_pull(
+        "null", 5, "a", B=0, pool_df=make_pool_df([]),
+        eval_fn=_eval_fn_ok, gpu=0,
+        dataset_runner=fake_dataset_runner, popen_fn=failing_popen,
+        sleep_fn=lambda secs: None,
+    )
+
+    assert row["status"] == "failed"
+    artifacts = json.loads(row["training_artifacts_json"])
+    assert artifacts["ckpt_steps_present"] == []  # training never produced a checkpoint
+    assert artifacts["train_log_path"] == str(
+        config.LEDGER_DIR / pull.LOGS_SUBDIR / "null_j5_train_attempt2.log")
+    assert artifacts["recipe_seed"] == config.pull_seed(5)
+
+
+def test_append_gradient_analysis_note_writes_block_and_guards_double_append(tmp_path):
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text("existing: true\n")
+
+    pull.append_gradient_analysis_note_to_config_yaml(path=cfg, log=lambda *a: None)
+    doc = yaml.safe_load(cfg.read_text())
+    assert doc["existing"] is True
+    assert doc["gradient_analysis"]["rationale"] == "future per-demo gradient/influence analysis"
+    assert list(doc["gradient_analysis"]["retained"]) == list(pull.GRADIENT_ANALYSIS_RETAINED)
+
+    before = cfg.read_text()
+    pull.append_gradient_analysis_note_to_config_yaml(path=cfg, log=lambda *a: None)
+    assert cfg.read_text() == before  # guard fired -- second call is a pure no-op
+
+
+def test_append_gradient_analysis_note_creates_file_if_absent(tmp_path):
+    cfg = tmp_path / "config.yaml"
+    path = pull.append_gradient_analysis_note_to_config_yaml(path=cfg, log=lambda *a: None)
+    assert path == cfg
+    doc = yaml.safe_load(cfg.read_text())
+    assert "gradient_analysis" in doc

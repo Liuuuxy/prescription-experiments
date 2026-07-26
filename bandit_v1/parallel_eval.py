@@ -75,6 +75,10 @@ from . import config, ledger, rollout
 WORKER_TMP_DIR = Path("/data/xinyua11/tmp")   # per-worker spec + log files
 SHARDS_SUBDIR = "shards"                      # bandit_v1/ledger/shards/<run-tag>_<worker>.parquet
 LOG_TAIL_LINES = 40
+DEFAULT_WORKER_TIMEOUT_S = 10800              # 3h -- a genuinely hung worker (stuck rollout,
+                                               # dead policy connection that never errors) must
+                                               # not block run_parallel forever; see run_parallel's
+                                               # `timeout` kwarg docstring.
 
 
 # =============================================================================
@@ -219,7 +223,8 @@ def merge_shards(shard_paths, table="episodes") -> list:
 
 def run_parallel(policy_host, policy_port, start_dirs, repeats, phase, policy_id,
                   workers=4, arm=None, pull_id=None, skip_pairs=None,
-                  spawn_fn=None, log_dir=None, spec_dir=None) -> list:
+                  spawn_fn=None, log_dir=None, spec_dir=None,
+                  timeout=DEFAULT_WORKER_TIMEOUT_S) -> list:
     """Parallel counterpart to bandit_v1.rollout.run: same return contract (a
     list of the completed-episode row dicts, already durably merged into
     ledger table "episodes"), but shards `start_dirs` round-robin across
@@ -255,6 +260,22 @@ def run_parallel(policy_host, policy_port, start_dirs, repeats, phase, policy_id
     WORKER_TMP_DIR, i.e. /data/xinyua11/tmp) are injection seams for tests --
     no real subprocess, GPU, env, or policy server is needed to exercise the
     sharding/merge/crash-handling logic this function owns.
+
+    `timeout` (default DEFAULT_WORKER_TIMEOUT_S, 3h): per-worker wall-clock
+    cap on `proc.wait()`. A worker that exits normally (0 or nonzero) is
+    handled exactly as before, regardless of how long it took; `timeout`
+    only bounds a worker that never exits at all (a genuinely hung rollout --
+    e.g. a policy connection that blocks forever instead of erroring, which
+    a plain unbounded `.wait()` would never surface). On breach, that
+    worker's process is killed (`proc.kill()`, then reaped with a short
+    follow-up wait so it never becomes a zombie) -- its shard file, if any
+    rows were written before it hung, is left exactly where it is (workers
+    write per-episode via `ledger.append_rows_to_path`, so whatever
+    completed before the hang is already durable) and IS still merged, same
+    as any other worker's partial/crashed shard. The timeout is surfaced in
+    the raised error exactly like a nonzero-exit failure (log tail included,
+    `failures` entry present), just labeled as a timeout rather than an exit
+    code.
     """
     if workers is None or workers <= 1:
         return rollout.run(policy_host, policy_port, start_dirs, repeats, phase=phase,
@@ -293,16 +314,28 @@ def run_parallel(policy_host, policy_port, start_dirs, repeats, phase, policy_id
 
     failures = []
     for p in procs:
-        rc = p["proc"].wait()
+        try:
+            rc = p["proc"].wait(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            p["proc"].kill()
+            try:
+                p["proc"].wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                pass  # best-effort reap; a kill -9 that still won't die is not this function's problem
+            failures.append({"worker": p["worker"], "returncode": None, "timed_out": True,
+                              "log_tail": _log_tail(p["log_path"])})
+            continue
         if rc != 0:
-            failures.append({"worker": p["worker"], "returncode": rc,
+            failures.append({"worker": p["worker"], "returncode": rc, "timed_out": False,
                               "log_tail": _log_tail(p["log_path"])})
 
     combined_rows = merge_shards([p["shard_path"] for p in procs])
 
     if failures:
         detail = "\n".join(
-            f"--- worker {f['worker']} exited {f['returncode']} ---\n{f['log_tail']}"
+            (f"--- worker {f['worker']} TIMED OUT after {timeout}s (killed) ---\n{f['log_tail']}"
+             if f["timed_out"] else
+             f"--- worker {f['worker']} exited {f['returncode']} ---\n{f['log_tail']}")
             for f in failures)
         raise RuntimeError(
             f"run_parallel: {len(failures)}/{len(procs)} worker(s) failed "

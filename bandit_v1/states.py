@@ -236,6 +236,12 @@ def _restore_warm(env, states_arr, ep_meta_json):
       2. Runs ONE soft (non-recompiling) reset by forcing
          `env.env.deterministic_reset = True` around a normal
          `env.reset(unset_ep_meta=False)` call, then setting it back to False
+         in a `finally` (review fix: if `env.reset()` itself raises -- a bad
+         ep_meta, a controller error, anything -- the flag must not leak
+         `True` forever; a stuck `deterministic_reset=True` would silently
+         force EVERY subsequent reset() on this same env, warm or cold, real
+         pull or eval, onto the soft/no-recompile branch, corrupting every
+         restore after the exception until the process is restarted)
          (exactly mirroring reset_from_xml_string's own use of this flag, see
          robosuite/environments/base.py). With `deterministic_reset=True` and
          `sim` already built, robosuite's own reset() takes its "soft" branch
@@ -277,8 +283,10 @@ def _restore_warm(env, states_arr, ep_meta_json):
         raw.set_ep_meta(ep_meta)
 
     raw.deterministic_reset = True
-    env.reset(unset_ep_meta=False)
-    raw.deterministic_reset = False
+    try:
+        env.reset(unset_ep_meta=False)
+    finally:
+        raw.deterministic_reset = False
 
     raw.sim.set_state_from_flattened(states_arr)
     raw.sim.forward()

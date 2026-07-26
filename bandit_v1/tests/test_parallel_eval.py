@@ -11,6 +11,7 @@ crashed worker by writing a partial shard file and returning a nonzero
 "process".
 """
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -22,11 +23,12 @@ from bandit_v1 import config, ledger, parallel_eval
 
 class _FakeProc:
     """Stand-in for subprocess.Popen: only `.wait()` is ever used by
-    run_parallel."""
+    run_parallel (accepts and ignores `timeout=`, matching the real
+    Popen.wait signature run_parallel now always calls with)."""
     def __init__(self, returncode=0):
         self.returncode = returncode
 
-    def wait(self):
+    def wait(self, timeout=None):
         return self.returncode
 
 
@@ -291,6 +293,75 @@ def test_run_parallel_worker_crash_keeps_partial_shard_and_raises_with_log_tail(
     d = ledger.read("episodes")
     assert len(d) == 5
     assert list((tmp_path / "ledger" / "shards").glob("*.parquet")) == []  # both read shards cleaned up
+
+
+class _HangingProc:
+    """Stand-in for a worker subprocess that never exits on its own: the
+    FIRST `.wait(timeout=...)` call always raises TimeoutExpired (simulating
+    a genuinely hung rollout); `.kill()` flips a flag so the SECOND wait
+    (run_parallel's post-kill reap) succeeds, mirroring how a real killed
+    process eventually becomes waitable."""
+    def __init__(self):
+        self.killed = False
+        self.kill_called = False
+        self.wait_calls = 0
+
+    def wait(self, timeout=None):
+        self.wait_calls += 1
+        if not self.killed:
+            raise subprocess.TimeoutExpired(cmd="worker", timeout=timeout)
+        return -9
+
+    def kill(self):
+        self.kill_called = True
+        self.killed = True
+
+
+def test_run_parallel_hung_worker_times_out_is_killed_and_surfaces_in_error(
+        tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path / "ledger")
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path / "ledger")
+    monkeypatch.setattr(parallel_eval.rollout, "run", _fake_rollout_run)
+
+    start_dirs = [tmp_path / f"start_{i:03d}" for i in range(4)]  # workers=2 -> shard0=[0,2], shard1=[1,3]
+    hung = _HangingProc()
+
+    def fake_spawn(spec_path, log_path):
+        spec = json.loads(Path(spec_path).read_text())
+        if spec["start_dirs"] == [str(Path(sd)) for sd in start_dirs[0::2]]:
+            # this is worker 0 (the one we hang) -- it DID write one episode
+            # to its shard before hanging, matching a real worker's
+            # per-episode durability (see the crash test above).
+            partial_sid = Path(spec["start_dirs"][0]).name
+            ledger.append_rows_to_path(
+                Path(spec["shard_path"]),
+                [{"start_id": partial_sid, "repeat_idx": 0, "success": True}])
+            Path(log_path).write_text("stuck waiting on policy server...\n")
+            return hung
+        parallel_eval.run_worker_inline(spec)
+        return _FakeProc(0)
+
+    with pytest.raises(RuntimeError, match=r"1/2 worker\(s\) failed") as excinfo:
+        parallel_eval.run_parallel(
+            "host", 1, start_dirs, repeats=2, phase="eval", policy_id="pi0",
+            workers=2, spawn_fn=fake_spawn, log_dir=tmp_path / "logs", spec_dir=tmp_path / "specs",
+            timeout=0.01)
+
+    assert "TIMED OUT" in str(excinfo.value)
+    assert "stuck waiting on policy server" in str(excinfo.value)
+    assert hung.kill_called is True         # breached worker was killed
+    assert hung.wait_calls == 2             # one timed-out wait, one post-kill reap
+
+    # the hung worker's partial shard + the surviving worker's full shard
+    # were both still merged (a timeout never silently discards completed
+    # episodes, same guarantee as a nonzero-exit crash).
+    d = ledger.read("episodes")
+    assert len(d) == 5
+    assert list((tmp_path / "ledger" / "shards").glob("*.parquet")) == []
+
+
+def test_run_parallel_default_timeout_is_10800s():
+    assert parallel_eval.DEFAULT_WORKER_TIMEOUT_S == 10800
 
 
 def test_run_parallel_workers_none_or_one_falls_back_to_plain_rollout_run(monkeypatch):

@@ -779,6 +779,23 @@ def load_arms_yaml(path=None) -> dict:
     return yaml.safe_load(path.read_text())
 
 
+def _config_yaml_has_key(path, key: str) -> bool:
+    """True iff `path` exists and, parsed whole as YAML, has `key` as a
+    top-level mapping key. config.yaml's note blocks (this one, `baseline:`,
+    `noise_floor:`, ...) are each independent plain-text appends of their own
+    top-level mapping (never a round-trip rewrite -- see this function's
+    callers' own docstrings), so re-parsing the WHOLE file with
+    `yaml.safe_load` still yields one merged dict with every block's key
+    present -- this is the guard that stops a re-run of a `--names` finalize
+    (or any other append-once caller) from silently duplicating a block it
+    already wrote."""
+    path = Path(path)
+    if not path.exists():
+        return False
+    doc = yaml.safe_load(path.read_text())
+    return isinstance(doc, dict) and key in doc
+
+
 def append_arms_freeze_to_config_yaml(final_arms_yaml: dict, well_table_df: pd.DataFrame,
                                        B: int, path=None) -> Path:
     """Append an `arms_freeze:` block (arms_frozen_at, descriptor, k, names,
@@ -873,6 +890,9 @@ def _main():
                      help="override config.ARMS_YAML, the finalize output (testability)")
     ap.add_argument("--hashes-path", default=None,
                      help="override <out-path's dir>/hashes.json (testability)")
+    ap.add_argument("--config-yaml-path", default=None,
+                     help="override config.LEDGER_DIR/'config.yaml' for the arms_freeze "
+                          "note append on a --names finalize run (testability)")
     ap.add_argument("--frozen-at", default=None,
                      help="ISO date to freeze into arms.yaml. Default: at "
                           "finalize, the draft file's own frozen_at (never a "
@@ -896,6 +916,34 @@ def _main():
             print(f"!!! clustering finalize FAILED: {e}")
             sys.exit(1)
         print(f"clustering: wrote FINAL {out_path}")
+
+        # Wire the arms_freeze config.yaml note into this same run (review
+        # fix): previously this block was only ever appended by a separate,
+        # manual invocation (see task-armsfreeze-report.md's "Real freeze
+        # run" section) -- well_table/B are cheap, deterministic re-
+        # evaluations of the now-FROZEN centroids against the pool (never a
+        # re-clustering), so there is no reason finalize's own CLI run
+        # shouldn't just do this itself. Guarded (`_config_yaml_has_key`)
+        # against a double append -- the real ledger/config.yaml already has
+        # this block from that manual run, so a real re-run of this CLI
+        # would be a no-op here, not a duplicate.
+        cfg_path = (Path(config.LEDGER_DIR) / "config.yaml" if args.config_yaml_path is None
+                    else Path(args.config_yaml_path))
+        if _config_yaml_has_key(cfg_path, "arms_freeze"):
+            print(f"clustering: {cfg_path} already has an arms_freeze block -- not re-appending")
+        else:
+            final_arms_yaml = load_arms_yaml(out_path)
+            pool_df = (pd.read_parquet(args.pool_parquet) if args.pool_parquet is not None
+                       else pool.build_pool_table(write=False))
+            models = map_fit.load(args.map_models_path)
+            from . import wells as _wells  # deferred: see compute_draft's own identical import
+            arms_spec_for_wells = {"arms": final_arms_yaml["arms"], "z_spec": final_arms_yaml["z_spec"]}
+            regions = _wells.assign_regions(pool_df, models, arms_spec_for_wells)
+            well_tbl = _wells.well_table(regions)
+            B, limiting_arm = _wells.choose_B(well_tbl)
+            append_arms_freeze_to_config_yaml(final_arms_yaml, well_tbl, B, path=cfg_path)
+            print(f"clustering: appended arms_freeze block to {cfg_path} "
+                  f"(B={B}, limiting_arm={limiting_arm!r})")
         sys.exit(0)
 
     result = compute_draft(ledger_dir=args.ledger_dir, pool_parquet=args.pool_parquet,

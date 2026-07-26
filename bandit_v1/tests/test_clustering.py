@@ -599,6 +599,92 @@ def test_cli_valid_names_finalizes_and_hashes(tmp_path):
     assert hashes["arms.yaml"] == ledger.file_hash(out_path)
 
 
+# --- review fix: --names finalize wires append_arms_freeze_to_config_yaml ----
+
+def test_cli_names_finalize_wires_arms_freeze_into_config_yaml(tmp_path):
+    """A `--names` finalize run must now ALSO append the `arms_freeze:` note
+    to config.yaml itself (previously this only ever happened via a separate,
+    manual invocation -- see task-armsfreeze-report.md's "Real freeze run"
+    section). well_table/B are re-evaluated against the newly-FROZEN
+    centroids + the synthetic pool fixture (never a re-clustering)."""
+    _, draft_path, base = _produce_draft(tmp_path, name="wire1")
+    draft = yaml.safe_load(draft_path.read_text())
+    n = len(draft["arms"])
+    names = [f"wireslug{i}" for i in range(n)]
+
+    pool_path = base / "pool_demos.parquet"
+    map_path = base / "ledger" / "map_models.joblib"
+    out_path = base / "arms.yaml"
+    hashes_path = base / "hashes.json"
+    cfg_path = base / "config.yaml"
+    cfg_path.write_text("# pre-existing comment\nsomething_else: 1\n")
+
+    result = _run_cli([
+        "--draft-path", str(draft_path), "--out-path", str(out_path),
+        "--hashes-path", str(hashes_path), "--config-yaml-path", str(cfg_path),
+        "--pool-parquet", str(pool_path), "--map-models-path", str(map_path),
+        "--names", ",".join(names),
+    ])
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "appended arms_freeze block" in result.stdout
+
+    doc = yaml.safe_load(cfg_path.read_text())
+    assert doc["something_else"] == 1  # pre-existing content preserved verbatim
+
+    final = yaml.safe_load(out_path.read_text())
+    freeze = doc["arms_freeze"]
+    expected_names = [a["name"] for a in sorted(final["arms"], key=lambda a: a["index"])]
+    assert freeze["names"] == expected_names
+    assert freeze["descriptor"] == final["z_spec"]["descriptor"]
+    assert freeze["k"] == len(final["arms"])
+    assert freeze["map_hash"] == final["map_hash"]
+    assert freeze["arms_frozen_at"] == final["frozen_at"]
+    assert "random" in freeze["well_counts"]
+    assert freeze["B"] > 0
+
+
+def test_cli_names_finalize_does_not_double_append_arms_freeze_when_already_present(tmp_path):
+    """Guard: a config.yaml that ALREADY has an arms_freeze block (the real
+    ledger/config.yaml's normal state after the one real freeze -- see
+    task-armsfreeze-report.md) must be left byte-for-byte untouched by a
+    later --names finalize run, not grown a duplicate block."""
+    _, draft_path, base = _produce_draft(tmp_path, name="wire2")
+    draft = yaml.safe_load(draft_path.read_text())
+    n = len(draft["arms"])
+    names = [f"guardslug{i}" for i in range(n)]
+
+    pool_path = base / "pool_demos.parquet"
+    map_path = base / "ledger" / "map_models.joblib"
+    out_path = base / "arms.yaml"
+    cfg_path = base / "config.yaml"
+    cfg_path.write_text(yaml.safe_dump({"arms_freeze": {"B": 999, "names": ["preexisting"]}},
+                                       sort_keys=False))
+    before = cfg_path.read_text()
+
+    result = _run_cli([
+        "--draft-path", str(draft_path), "--out-path", str(out_path),
+        "--config-yaml-path", str(cfg_path),
+        "--pool-parquet", str(pool_path), "--map-models-path", str(map_path),
+        "--names", ",".join(names),
+    ])
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "already has an arms_freeze block" in result.stdout
+    assert cfg_path.read_text() == before  # untouched -- guard fired, no re-append
+    assert out_path.exists()  # finalize itself still ran normally
+
+
+def test_config_yaml_has_key_helper(tmp_path):
+    missing = tmp_path / "no_such.yaml"
+    assert clustering._config_yaml_has_key(missing, "arms_freeze") is False
+
+    present = tmp_path / "present.yaml"
+    present.write_text(yaml.safe_dump({"arms_freeze": {}, "other": 1}))
+    assert clustering._config_yaml_has_key(present, "arms_freeze") is True
+    assert clustering._config_yaml_has_key(present, "baseline") is False
+
+
 def test_cli_names_duplicate_or_bad_slug_format_rejected(tmp_path):
     _, draft_path, base = _produce_draft(tmp_path)
     draft = yaml.safe_load(draft_path.read_text())

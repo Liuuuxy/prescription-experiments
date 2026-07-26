@@ -13,6 +13,9 @@ unit-tested here too, against a bare `types.SimpleNamespace`.
 import json
 import types
 
+import numpy as np
+import pytest
+
 from bandit_v1 import states
 
 
@@ -170,3 +173,84 @@ def test_restore_plan_initialized_but_no_cached_hash_takes_full_path_without_pre
     getattr(..., None) must not accidentally equal a real hash string."""
     env = types.SimpleNamespace(_bandit_initialized=True)
     assert states._restore_plan(env, model_hash="abc123", warm=True) == "full_no_prereset"
+
+
+# --- _restore_warm's deterministic_reset flag must never leak (review fix) ---
+
+class _FakeRawEnv:
+    """Minimal stand-in for the underlying robosuite env `_restore_warm`
+    touches: only `deterministic_reset` (the flag under test) and
+    `set_attrs_from_ep_meta` are needed before `env.reset()` is called."""
+    def __init__(self):
+        self.deterministic_reset = False
+        self.ep_meta_applied = None
+
+    def set_attrs_from_ep_meta(self, ep_meta):
+        self.ep_meta_applied = ep_meta
+
+
+class _FakeEnvResetRaises:
+    def __init__(self, raw):
+        self.env = raw
+
+    def reset(self, unset_ep_meta=False):
+        raise RuntimeError("boom -- controller error mid-reset")
+
+
+class _FakeEnvResetOk:
+    def __init__(self, raw):
+        self.env = raw
+        self.reset_called_with = None
+
+    def reset(self, unset_ep_meta=False):
+        self.reset_called_with = unset_ep_meta
+
+    def get_observation(self):
+        return {"ok": True}
+
+
+def test_restore_warm_resets_deterministic_reset_flag_even_when_env_reset_raises():
+    """If `env.reset()` itself raises (bad ep_meta, a controller error,
+    anything), `deterministic_reset` must still end up False -- a stuck
+    `True` would silently force EVERY later reset() on this same env (warm
+    or cold) onto the soft/no-recompile branch, corrupting every restore
+    after the exception until the process restarts. This is the exact bug a
+    bare (no try/finally) flag flip has."""
+    raw = _FakeRawEnv()
+    env = _FakeEnvResetRaises(raw)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        states._restore_warm(env, states_arr=None, ep_meta_json="{}")
+
+    assert raw.deterministic_reset is False
+
+
+def test_restore_warm_sets_flag_true_during_reset_then_false_after_success():
+    """Happy path: the flag is True for the duration of `env.reset()` (so
+    robosuite's soft-reset branch actually fires) and False again once
+    `_restore_warm` returns -- the try/finally must not change this normal
+    case's outcome at all."""
+    raw = _FakeRawEnv()
+    seen_during_reset = {}
+
+    class _FakeEnvCapturing(_FakeEnvResetOk):
+        def reset(self, unset_ep_meta=False):
+            seen_during_reset["flag"] = raw.deterministic_reset
+            super().reset(unset_ep_meta=unset_ep_meta)
+
+    env = _FakeEnvCapturing(raw)
+
+    class _FakeSim:
+        def set_state_from_flattened(self, arr):
+            pass
+
+        def forward(self):
+            pass
+
+    raw.sim = _FakeSim()
+
+    obs = states._restore_warm(env, states_arr=np.zeros(3), ep_meta_json="{}")
+
+    assert seen_during_reset["flag"] is True
+    assert raw.deterministic_reset is False
+    assert obs == {"ok": True}

@@ -87,6 +87,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+import yaml
 
 from . import config, draw, ledger, pool
 
@@ -313,6 +314,127 @@ def ckpt_final_dir(config_name: str, exp_name: str, num_train_steps=None) -> Pat
     return ckpt_root_dir(config_name, exp_name) / str(final_step)
 
 
+# --- 4b. gradient-analysis metadata (owner request): record, never delete ---
+# every pull's checkpoint/log/wandb provenance, so a future per-demo
+# gradient/influence pass over bandit_v1's pulls has something to point at.
+# `run_pull` never deletes an intermediate checkpoint at any save interval
+# (scripts/train.py's own `--overwrite` only replaces a PRIOR attempt's
+# partial checkpoint dir for the SAME exp_name on a retry -- see train_cmd's
+# docstring -- it does not prune earlier save_interval steps within one
+# successful run); this section only ADDS a row-level record of where
+# everything already on disk actually lives.
+
+WANDB_BASE_DIR = Path("/data/xinyua11/wandb")   # matches _train_env's WANDB_DIR
+
+
+def ckpt_steps_present(ckpt_root) -> list:
+    """Sorted list of int step-dir names actually present under `ckpt_root`
+    (a post-training directory LISTING, not a guess from config -- e.g.
+    [5000, 10000, 15000, 19999] for the full 20k-step recipe, or a shorter
+    prefix if training was overridden/interrupted). Empty list if
+    `ckpt_root` doesn't exist yet (e.g. a pull whose training never got far
+    enough to write even the first checkpoint)."""
+    ckpt_root = Path(ckpt_root)
+    if not ckpt_root.is_dir():
+        return []
+    return sorted(int(p.name) for p in ckpt_root.iterdir() if p.is_dir() and p.name.isdigit())
+
+
+def wandb_run_id(ckpt_root) -> str:
+    """openpi's scripts/train.py (`init_wandb`) writes the fresh run's wandb
+    id to `<ckpt_root>/wandb_id.txt` right after `wandb.init()` -- reading it
+    back is the one reliable way to find which of WANDB_BASE_DIR's many
+    `offline-run-<timestamp>-<id>` directories belongs to THIS pull (there is
+    no other correlation key available after the fact: exp_name/config_name
+    are not embedded in the wandb run directory name at all). None if the
+    file doesn't exist (training never reached `init_wandb`, or wandb itself
+    failed to initialize)."""
+    p = Path(ckpt_root) / "wandb_id.txt"
+    return p.read_text().strip() if p.exists() else None
+
+
+def find_wandb_dir(run_id, wandb_base=None) -> str:
+    """`<wandb_base>/wandb/offline-run-*-<run_id>` (WANDB_MODE=offline's
+    naming convention, verified against real runs already on disk under
+    /data/xinyua11/wandb/wandb/) -- None if `run_id` is None or no matching
+    directory exists yet. `wandb_base` is injectable purely for tests (real
+    default: WANDB_BASE_DIR)."""
+    if run_id is None:
+        return None
+    wandb_base = Path(WANDB_BASE_DIR if wandb_base is None else wandb_base)
+    matches = sorted((wandb_base / "wandb").glob(f"*-{run_id}"))
+    return str(matches[-1]) if matches else None
+
+
+def collect_training_artifacts(config_name: str, exp_name: str, train_log_path, seed: int,
+                                wandb_base=None) -> dict:
+    """The `training_artifacts` dict every pulls.parquet row now carries
+    (owner request): `ckpt_root` (the directory holding every save-interval
+    checkpoint for this pull, never pruned), `ckpt_steps_present` (a real
+    post-training listing, not a guess), `train_log_path` (whichever
+    training-attempt log actually produced -- or last attempted to produce
+    -- this row), `wandb_dir` (resolved via `wandb_id.txt` -> the matching
+    offline-run directory, or None if not found), `recipe_seed` (== the
+    row's own `seed`, repeated here so a gradient-analysis pass over just
+    this one dict has everything it needs without re-joining the row)."""
+    ckpt_root = ckpt_root_dir(config_name, exp_name)
+    run_id = wandb_run_id(ckpt_root)
+    return {
+        "ckpt_root": str(ckpt_root),
+        "ckpt_steps_present": ckpt_steps_present(ckpt_root),
+        "train_log_path": str(train_log_path) if train_log_path is not None else None,
+        "wandb_dir": find_wandb_dir(run_id, wandb_base=wandb_base),
+        "recipe_seed": int(seed),
+    }
+
+
+GRADIENT_ANALYSIS_RETAINED = (
+    "lora adapter ckpts at all save intervals",
+    "demo_ids per pull",
+    "paired seeds",
+)
+
+
+def append_gradient_analysis_note_to_config_yaml(path=None, log=lambda *a: None) -> Path:
+    """Append a one-time `gradient_analysis:` note block to config.yaml
+    (owner request): documents that nothing a pull writes is ever deleted,
+    for a future per-demo gradient/influence analysis pass over bandit_v1's
+    pulls. Plain-text APPEND only (never a yaml.safe_load-then-dump round-
+    trip of the whole file), same convention as eval_set.
+    append_baseline_to_config_yaml / clustering.append_arms_freeze_to_config_yaml
+    -- and, like both of those, this note is static (not tied to any one
+    experiment's outcome), so it is additionally guarded against a DOUBLE
+    append: a resumed run_race.py process calls this on every restart, and
+    must not grow config.yaml a fresh copy of the same note every time."""
+    path = Path(config.LEDGER_DIR) / "config.yaml" if path is None else Path(path)
+    if path.exists():
+        doc = yaml.safe_load(path.read_text()) or {}
+        if isinstance(doc, dict) and "gradient_analysis" in doc:
+            log(f"gradient_analysis note already present in {path} -- not re-appending")
+            return path
+
+    block = {
+        "gradient_analysis": {
+            "retained": list(GRADIENT_ANALYSIS_RETAINED),
+            "rationale": "future per-demo gradient/influence analysis",
+        }
+    }
+    header = (
+        "\n# bandit_v1 run_race: gradient-analysis retention note (owner request) --\n"
+        "# nothing pull.py writes (checkpoints at every save interval, per-pull\n"
+        "# demo_ids, paired training seeds) is ever deleted; every pull row also\n"
+        "# carries a training_artifacts_json field recording exactly where each\n"
+        "# of these landed on disk, for a future per-demo gradient/influence pass.\n"
+    )
+    dumped = yaml.safe_dump(block, sort_keys=False, default_flow_style=False)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a") as f:
+        f.write(header)
+        f.write(dumped)
+    log(f"appended gradient_analysis note to {path}")
+    return path
+
+
 # --- 5. GPU selection (mirrors launch_pi0.sh's wait-for-GPU loop) ----------
 
 def free_mib(gpu: int, query=None) -> int:
@@ -481,11 +603,12 @@ _ROW_KEYS = (
     "per_repeat_means", "per_repeat_vectors_ref", "overall_mean", "delta",
     "per_stratum_means_json", "delta_per_stratum_json",
     "selector_n_demos", "selector_mean_pairwise_dist", "selector_mean_dist_to_nearest_d0",
+    "training_artifacts_json",
     "status", "note", "started_at", "finished_at",
 )
 
 
-def _base_row(resolved: dict, seed: int, started_at: str) -> dict:
+def _base_row(resolved: dict, seed: int, started_at: str, training_artifacts: dict = None) -> dict:
     """Every field every pulls.parquet row shares, defaulted to None; both
     the failure path and the success path fill in on top of this so every
     row -- failed, smoke, or ok -- has the identical key set (append-only
@@ -504,12 +627,14 @@ def _base_row(resolved: dict, seed: int, started_at: str) -> dict:
         "selector_mean_pairwise_dist": resolved["selector_scores"]["mean_pairwise_dist"],
         "selector_mean_dist_to_nearest_d0": resolved["selector_scores"]["mean_dist_to_nearest_d0"],
         "started_at": started_at,
+        "training_artifacts_json": json.dumps(training_artifacts) if training_artifacts is not None else None,
     })
     return row
 
 
-def _failed_row(resolved: dict, seed: int, started_at: str, attempt: int, note=None) -> dict:
-    row = _base_row(resolved, seed, started_at)
+def _failed_row(resolved: dict, seed: int, started_at: str, attempt: int, note=None,
+                 training_artifacts: dict = None) -> dict:
+    row = _base_row(resolved, seed, started_at, training_artifacts=training_artifacts)
     row.update(status="failed", n_train_attempts=attempt, note=note,
                finished_at=datetime.now(timezone.utc).isoformat())
     return row
@@ -608,10 +733,12 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
     # --- step 3: train, retrying once on failure ------------------------------
     ok = False
     attempts = 0
+    last_train_log = None
     for attempt in range(1, max_train_attempts + 1):
         attempts = attempt
         train_gpu = gpu if gpu is not None else wait_for_free_gpu(gpus=gpus, sleep_fn=sleep_fn, log=log)
         train_log = config.LEDGER_DIR / LOGS_SUBDIR / f"{pull_id}_train_attempt{attempt}.log"
+        last_train_log = train_log
         proc = launch_training(tcmd, train_gpu, train_log, popen_fn=popen_fn)
         ok = wait_for_checkpoint(proc, ckpt_dir, sleep_fn=sleep_fn, log=log)
         if ok:
@@ -624,14 +751,18 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
             # code below. Appending here unconditionally on every failure
             # (including the last) would double-log the last attempt: once
             # here, once in the post-loop "if not ok" block.
+            attempt_artifacts = collect_training_artifacts(config_name, exp_name, train_log, seed)
             _append_pull_row(_failed_row(resolved, seed, started_at, attempt,
-                                          note="training process exited without producing a checkpoint -- retrying"))
+                                          note="training process exited without producing a checkpoint -- retrying",
+                                          training_artifacts=attempt_artifacts))
             log(f"run_pull: {pull_id} training attempt {attempt} failed -- retrying once")
 
     if not ok:
+        artifacts = collect_training_artifacts(config_name, exp_name, last_train_log, seed)
         row = _failed_row(resolved, seed, started_at, attempts,
                            note="training process exited without producing a checkpoint "
-                                "(all attempts exhausted)")
+                                "(all attempts exhausted)",
+                           training_artifacts=artifacts)
         _append_pull_row(row)
         return row
 
@@ -642,7 +773,9 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
         up = wait_for_port("127.0.0.1", port, proc=server_proc, sleep_fn=sleep_fn,
                             connect_fn=connect_fn, log=log)
         if not up:
-            row = _failed_row(resolved, seed, started_at, attempts, note="policy server never came up")
+            artifacts = collect_training_artifacts(config_name, exp_name, last_train_log, seed)
+            row = _failed_row(resolved, seed, started_at, attempts, note="policy server never came up",
+                               training_artifacts=artifacts)
             row["checkpoint_id"] = str(ckpt_dir)
             _append_pull_row(row)
             return row
@@ -656,7 +789,8 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
     # --- step 5: deltas + final ledger row -------------------------------------
     delta_info = compute_delta(eval_result, baseline=baseline, baseline_per_stratum=baseline_per_stratum)
 
-    row = _base_row(resolved, seed, started_at)
+    training_artifacts = collect_training_artifacts(config_name, exp_name, last_train_log, seed)
+    row = _base_row(resolved, seed, started_at, training_artifacts=training_artifacts)
     row.update(
         checkpoint_id=str(ckpt_dir),
         n_train_attempts=attempts,
