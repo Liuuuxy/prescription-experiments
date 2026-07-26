@@ -92,3 +92,22 @@ diag_orchestrator_pid: 370496
   # /data/xinyua11/tmp/bandit_diag_orch_stdout.log) after the edit; new PID
   # confirmed alive with PPid 1 and a fresh wait-loop poll in
   # /data/xinyua11/tmp/bandit_diag_orch.log.
+
+# bandit_v1 Task 10: FROZEN arms (clustering.py finalize + wells.py well table/B rule), written once at freeze time -- never
+# edited mid-run, same frozen-constant convention as the rest of this file (bandit_v1/config.py's docstring).
+arms_freeze:
+  arms_frozen_at: '2026-07-26'
+  descriptor: behavior
+  k: 3
+  names:
+  - tall_vessel_grasp_fail
+  - easy_band
+  - mid_band
+  B: 200
+  well_counts:
+    easy_band: 2972
+    mid_band: 4312
+    random: 9485
+    tall_vessel_grasp_fail: 2201
+  map_hash: cee3f2fa71d76e09433ab5c43ea11bbac1d7b123430e273c4459131b9da7e431
+  written_at: '2026-07-26T18:32:37.627067+00:00'

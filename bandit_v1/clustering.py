@@ -48,6 +48,58 @@ A zero-variance column/block (e.g. a synthetic single-category test diag set
 with constant height) is left un-scaled (divided by 1) rather than producing
 NaN/inf, same zero-variance-safety convention as draw.py's `_standardize`.
 
+--- descriptor modes ("hybrid" vs "behavior") ---
+
+`fit_z_spec`/`build_z` take a `descriptor` argument selecting which blocks the
+frozen z-space is built from:
+  - "hybrid" (default, backward-compatible): all 3 blocks above -- knob(5) +
+    p_hat(1) + p_stage(5), 11-dim total, EXACTLY the pre-existing (pre-
+    descriptor-modes) behavior. Every pre-existing caller/test that never
+    passes `descriptor` gets this, byte-identical to before this mode existed.
+  - "behavior": p_hat(1) + p_stage(5), 6-dim total, NO knob block at all --
+    z = [p_hat, p_stage(5)], each of these 6 columns standardized PER-COLUMN
+    (ordinary mean-0/std-1, same zero-variance guard as the knob block --
+    `_safe_scale`), i.e. a plain 6-column StandardScaler, NOT the p_stage
+    block's "shared_total" scheme item 3 above uses for "hybrid".
+
+    This differs from `cluster_study.py`'s `Z3_behavior` descriptor, which
+    scales the SAME two feature blocks (p_hat + p_stage) via "shared_total"
+    for p_stage (see that module's docstring item 2) -- an apparent
+    contradiction with this task's own brief ("match cluster_study Z3
+    exactly"). It was resolved empirically, not by assumption: on the real
+    300-condition diag batch + the real frozen `map_models.joblib`, "behavior"
+    descriptor + KMeans(k=3, n_init=50, rs=0) gives ARI **0.844** against the
+    owner-approved cross-check fixture (an independently computed behavior-
+    only k=3 labeling) under the shared_total scheme, but ARI **1.0** (exact
+    agreement, sizes 130/102/68 matching the approved candidate stats to the
+    row) under genuine per-column standardization of all 6 dims. Per-column is
+    therefore what the owner's approved arms (tall_vessel_grasp_fail/mid_band/
+    easy_band) actually were computed under -- this module matches THAT
+    (verified, ARI=1.0), not `cluster_study.py`'s Z3_behavior construction
+    (unverified against this same fixture, and empirically the wrong one).
+    `cluster_study.py` itself is untouched by this finding (out of this
+    task's scope) -- it remains a separate audit tool with its own
+    Z1_hybrid-vs-`build_z` equivalence assertion, unaffected either way since
+    that assertion only concerns the "hybrid" descriptor.
+
+The chosen descriptor is recorded on `ZSpec.descriptor` and round-trips
+through `to_dict`/`from_dict` (arms.yaml's `z_spec.descriptor` field) --
+`wells.assign_regions` reads it back off the frozen yaml and `transform_z`
+branches on it, so a pool row is ALWAYS embedded through the same blocks (and
+the same per-column-vs-shared-total scaling) the arms' centroids themselves
+were computed from, whichever descriptor a given freeze used. (`ZSpec.
+p_stage_scale` is consequently either a scalar-like value, shared across all
+5 p_stage columns ("hybrid"), or a genuine 5-vector of independent per-column
+scales ("behavior") -- `transform_z`'s elementwise division broadcasts either
+shape correctly without needing to branch on it explicitly; only
+`fit_z_spec`'s construction of the value differs by descriptor.)
+`build_arms_entries`'s `centroid.raw`/`cov_diag` (the RAW KNOB_COLS values
+used for cluster naming + the per-arm sampler's dormant truncated-Gaussian
+backup channel) are UNAFFECTED by descriptor choice -- those always come
+straight from `features_df`, never from the standardized Z, so a
+"behavior"-frozen arm still gets human-readable raw knob stats even though
+knobs never entered its clustering z-space.
+
 --- Naming hard stop (design item 4's "naming test") ---
 
 `summarize`/`build_arms_entries` produce per-cluster cards and a MECHANICAL
@@ -125,42 +177,71 @@ _KNOB_DIRECTION_WORDS = {
 # z-spec + build_z
 # =============================================================================
 
+# Valid `descriptor` values for fit_z_spec/build_z (see module docstring's
+# "descriptor modes" section). "hybrid" is the original/default mode; kept
+# first in this tuple for readability, not significance.
+DESCRIPTORS = ("hybrid", "behavior")
+
+
 @dataclass
 class ZSpec:
-    """Frozen standardization parameters for the 3-block descriptor (see
-    module docstring). `to_dict`/`from_dict` are the arms.yaml round-trip
-    (plain JSON/YAML-safe types only)."""
+    """Frozen standardization parameters for the descriptor (see module
+    docstring's "descriptor modes" section). `to_dict`/`from_dict` are the
+    arms.yaml round-trip (plain JSON/YAML-safe types only).
+
+    `descriptor` defaults to "hybrid" so every pre-existing direct
+    construction (tests that build a `ZSpec` by hand without naming this
+    field) keeps behaving exactly as before this mode was added. For
+    `descriptor="behavior"`, `knob_cols`/`knob_mean`/`knob_scale` are simply
+    empty (no knob block exists in that z-space) -- `transform_z` never reads
+    them in that case, but they are kept as real (empty) arrays rather than
+    None so `to_dict`/`from_dict` stay uniform across both modes.
+
+    `p_stage_scale` may be EITHER a scalar (Python float, "hybrid": one
+    shared divisor for all 5 p_stage columns) OR a length-5 array
+    ("behavior": independent per-column divisors) -- `transform_z`'s
+    elementwise `(p_stage - p_stage_mean) / p_stage_scale` broadcasts either
+    shape correctly, so no branching on this field's shape is ever needed
+    outside `fit_z_spec`/`to_dict`/`from_dict` themselves. `to_dict` always
+    serializes it as a list (broadcasting a shared scalar out to length 5) so
+    arms.yaml's `z_spec.p_stage_scale` has one uniform (list) shape
+    regardless of descriptor; `from_dict` always restores it as an ndarray."""
     knob_cols: tuple
     knob_mean: np.ndarray
     knob_scale: np.ndarray
     p_hat_mean: float
     p_hat_scale: float
     p_stage_mean: np.ndarray
-    p_stage_scale: float
+    p_stage_scale: object  # float ("hybrid") or (5,) ndarray ("behavior")
     stages: tuple
+    descriptor: str = "hybrid"
 
     def to_dict(self) -> dict:
+        p_stage_scale_arr = np.broadcast_to(
+            np.asarray(self.p_stage_scale, dtype=float), self.p_stage_mean.shape)
         return {
+            "descriptor": self.descriptor,
             "knob_cols": list(self.knob_cols),
             "knob_mean": [float(x) for x in self.knob_mean],
             "knob_scale": [float(x) for x in self.knob_scale],
             "p_hat_mean": float(self.p_hat_mean),
             "p_hat_scale": float(self.p_hat_scale),
             "p_stage_mean": [float(x) for x in self.p_stage_mean],
-            "p_stage_scale": float(self.p_stage_scale),
+            "p_stage_scale": [float(x) for x in p_stage_scale_arr],
             "stages": list(self.stages),
         }
 
     @classmethod
     def from_dict(cls, d: dict) -> "ZSpec":
         return cls(
-            knob_cols=tuple(d["knob_cols"]),
-            knob_mean=np.asarray(d["knob_mean"], dtype=float),
-            knob_scale=np.asarray(d["knob_scale"], dtype=float),
+            descriptor=str(d.get("descriptor", "hybrid")),
+            knob_cols=tuple(d.get("knob_cols", ())),
+            knob_mean=np.asarray(d.get("knob_mean", []), dtype=float),
+            knob_scale=np.asarray(d.get("knob_scale", []), dtype=float),
             p_hat_mean=float(d["p_hat_mean"]),
             p_hat_scale=float(d["p_hat_scale"]),
             p_stage_mean=np.asarray(d["p_stage_mean"], dtype=float),
-            p_stage_scale=float(d["p_stage_scale"]),
+            p_stage_scale=np.asarray(d["p_stage_scale"], dtype=float),
             stages=tuple(d["stages"]),
         )
 
@@ -171,12 +252,22 @@ def _safe_scale(x: np.ndarray) -> np.ndarray:
     return np.where(x == 0, 1.0, x)
 
 
-def fit_z_spec(features_df: pd.DataFrame, models: map_fit.MapModels) -> ZSpec:
+def fit_z_spec(features_df: pd.DataFrame, models: map_fit.MapModels,
+               descriptor: str = "hybrid") -> ZSpec:
     """Fit a fresh `ZSpec` on `features_df` (the diag conditions) -- see
-    module docstring for the exact per-block scheme."""
-    knob = features_df[list(KNOB_COLS)].to_numpy(dtype=float)
-    knob_mean = knob.mean(axis=0)
-    knob_scale = _safe_scale(knob.std(axis=0))
+    module docstring for the exact per-block scheme + descriptor modes.
+    `descriptor="hybrid"` (default): knob+p_hat+p_stage, 11-dim, byte-
+    identical to this function's original (pre-descriptor-modes) behavior --
+    the p_stage block uses the "shared_total" scaling (module docstring item
+    3). `descriptor="behavior"`: p_hat+p_stage only, 6-dim, no knob block at
+    all, and the p_stage block is standardized PER-COLUMN instead (module
+    docstring's "descriptor modes" section explains why this deliberately
+    differs from `cluster_study.py`'s `Z3_behavior`, which uses shared_total
+    for p_stage regardless of descriptor -- verified empirically against the
+    owner-approved cross-check fixture, not assumed)."""
+    if descriptor not in DESCRIPTORS:
+        raise ValueError(f"fit_z_spec: unknown descriptor {descriptor!r}, "
+                          f"expected one of {DESCRIPTORS}")
 
     p_hat = models.predict_p(features_df).astype(float)
     p_hat_mean = float(p_hat.mean())
@@ -185,14 +276,28 @@ def fit_z_spec(features_df: pd.DataFrame, models: map_fit.MapModels) -> ZSpec:
 
     p_stage = models.predict_stage(features_df).astype(float)
     p_stage_mean = p_stage.mean(axis=0)
-    p_stage_total_var = float(np.mean((p_stage - p_stage_mean) ** 2, axis=0).sum())
-    p_stage_scale = float(np.sqrt(p_stage_total_var)) if p_stage_total_var > 0 else 1.0
+    if descriptor == "hybrid":
+        p_stage_total_var = float(np.mean((p_stage - p_stage_mean) ** 2, axis=0).sum())
+        p_stage_scale = float(np.sqrt(p_stage_total_var)) if p_stage_total_var > 0 else 1.0
+    else:  # "behavior": genuine per-column scaling, NOT shared_total
+        p_stage_scale = _safe_scale(p_stage.std(axis=0))
+
+    if descriptor == "hybrid":
+        knob = features_df[list(KNOB_COLS)].to_numpy(dtype=float)
+        knob_cols = KNOB_COLS
+        knob_mean = knob.mean(axis=0)
+        knob_scale = _safe_scale(knob.std(axis=0))
+    else:  # "behavior" -- no knob block at all (see module docstring)
+        knob_cols = ()
+        knob_mean = np.zeros(0)
+        knob_scale = np.zeros(0)
 
     return ZSpec(
-        knob_cols=KNOB_COLS, knob_mean=knob_mean, knob_scale=knob_scale,
+        knob_cols=knob_cols, knob_mean=knob_mean, knob_scale=knob_scale,
         p_hat_mean=p_hat_mean, p_hat_scale=p_hat_scale,
         p_stage_mean=p_stage_mean, p_stage_scale=p_stage_scale,
         stages=tuple(models.metadata.get("stages", STAGES)),
+        descriptor=descriptor,
     )
 
 
@@ -201,27 +306,36 @@ def transform_z(features_df: pd.DataFrame, models: map_fit.MapModels, z_spec: ZS
     refitting. This is the pool-row path (design item 5: "demo -> z(demo) ...
     evaluated from the fitted models ... -> nearest centroid"): calling this
     with the diag-fit `z_spec` on pool rows is what keeps diag-condition-space
-    and pool-demo-space commensurable."""
-    knob = features_df[list(z_spec.knob_cols)].to_numpy(dtype=float)
-    knob_z = (knob - z_spec.knob_mean) / z_spec.knob_scale
-
+    and pool-demo-space commensurable. Branches on `z_spec.descriptor`: for
+    "behavior", the knob block is entirely skipped (and `features_df` need
+    not even carry KNOB_COLS) -- this is how `wells.assign_regions` honors a
+    frozen arms.yaml's descriptor without needing any descriptor-specific
+    logic of its own."""
     p_hat = models.predict_p(features_df).astype(float)
     p_hat_z = ((p_hat - z_spec.p_hat_mean) / z_spec.p_hat_scale).reshape(-1, 1)
 
     p_stage = models.predict_stage(features_df).astype(float)
     p_stage_z = (p_stage - z_spec.p_stage_mean) / z_spec.p_stage_scale
 
+    if z_spec.descriptor == "behavior":
+        return np.hstack([p_hat_z, p_stage_z])
+
+    knob = features_df[list(z_spec.knob_cols)].to_numpy(dtype=float)
+    knob_z = (knob - z_spec.knob_mean) / z_spec.knob_scale
     return np.hstack([knob_z, p_hat_z, p_stage_z])
 
 
-def build_z(features_df: pd.DataFrame, models: map_fit.MapModels, z_spec: ZSpec = None):
+def build_z(features_df: pd.DataFrame, models: map_fit.MapModels, z_spec: ZSpec = None,
+            descriptor: str = "hybrid"):
     """(Z, z_spec). `z_spec=None` FITS a fresh one on `features_df` (the
-    diag-condition path); a supplied `z_spec` is applied UNCHANGED (the
-    pool-row path) -- see module docstring. Always returns the pair (rather
-    than a bare array) so a caller on the fit path can persist `z_spec`
-    (arms.yaml's `z_spec` block) regardless of which path was taken."""
+    diag-condition path, using `descriptor`); a supplied `z_spec` is applied
+    UNCHANGED (the pool-row path -- its OWN `.descriptor` governs the
+    transform, the `descriptor` argument here is ignored in that case) -- see
+    module docstring. Always returns the pair (rather than a bare array) so a
+    caller on the fit path can persist `z_spec` (arms.yaml's `z_spec` block)
+    regardless of which path was taken."""
     if z_spec is None:
-        z_spec = fit_z_spec(features_df, models)
+        z_spec = fit_z_spec(features_df, models, descriptor=descriptor)
     Z = transform_z(features_df, models, z_spec)
     return Z, z_spec
 
@@ -429,14 +543,17 @@ def build_arms_entries(labels, features_df: pd.DataFrame, models: map_fit.MapMod
     """Per-cluster arms.yaml entries: `{name: "UNNAMED_<i>", index, centroid:
     {standardized, raw}, cov_diag, share, dominant_stage}`.
 
-    `centroid.standardized` is the cluster's mean Z-space (11-dim) vector --
-    what `wells.assign_regions`'s nearest-centroid rule compares pool rows
-    against. `centroid.raw` / `cov_diag` are the cluster's mean/variance of
-    the RAW KNOB_COLS values (a dict keyed by KNOB_COLS) -- the human-readable
-    pair the design's "per-arm samplers: truncated Gaussian (mean/cov of
-    member conditions, clipped to knob ranges)" (item 5) needs for its dormant
-    backup channel: you can only clip a physical knob (h, w, x_rel, y_rel,
-    side) to a "knob range", not a Z-space coordinate.
+    `centroid.standardized` is the cluster's mean Z-space vector -- 11-dim for
+    `z_spec.descriptor == "hybrid"`, 6-dim for `"behavior"` (see module
+    docstring's "descriptor modes" section) -- what `wells.assign_regions`'s
+    nearest-centroid rule compares pool rows against. `centroid.raw` /
+    `cov_diag` are the cluster's mean/variance of the RAW KNOB_COLS values (a
+    dict keyed by KNOB_COLS), ALWAYS computed straight from `features_df`
+    regardless of descriptor -- the human-readable pair the design's "per-arm
+    samplers: truncated Gaussian (mean/cov of member conditions, clipped to
+    knob ranges)" (item 5) needs for its dormant backup channel: you can only
+    clip a physical knob (h, w, x_rel, y_rel, side) to a "knob range", not a
+    Z-space coordinate.
     """
     labels = np.asarray(labels)
     features_df = features_df.reset_index(drop=True)
@@ -496,14 +613,27 @@ def _load_diag_features(ledger_dir=None) -> pd.DataFrame:
     return df[needed]
 
 
-def compute_draft(ledger_dir=None, pool_parquet=None, map_models_path=None) -> dict:
+def compute_draft(ledger_dir=None, pool_parquet=None, map_models_path=None,
+                   descriptor: str = "hybrid", k: int = None) -> dict:
     """Full Task-10 compute pipeline: load diag conditions + MapModels + the
-    pool table, fit z_spec on the diag conditions, cluster (`choose_k`, which
-    internally applies `merge_small`), build cluster cards + arms entries
-    (placeholder names), apply the SAME frozen z_spec to the pool's W rows to
-    get the well-count table and the proposed B. Returns everything the CLI
-    needs to print and persist, so the DRAFT yaml and the printed report are
-    always built from one single, internally-consistent computation.
+    pool table, fit z_spec on the diag conditions (using `descriptor` --
+    "hybrid" (default, backward-compatible) or "behavior", see module
+    docstring), cluster (`choose_k`, which internally applies `merge_small`),
+    build cluster cards + arms entries (placeholder names), apply the SAME
+    frozen z_spec to the pool's W rows to get the well-count table and the
+    proposed B. Returns everything the CLI needs to print and persist, so the
+    DRAFT yaml and the printed report are always built from one single,
+    internally-consistent computation.
+
+    `k`, if given, PINS `choose_k`'s sweep to that single candidate (`k_range
+    =(k,)`) instead of the automatic silhouette sweep over `config.K_RANGE` --
+    an explicit owner override, not a new selection rule: the automatic
+    sweep's silhouette can be genuinely close between two adjacent k (e.g.
+    k=3 vs k=4 differing by ~0.02 -- "within refit noise", see
+    weakregion/BANDIT_V1_WALKTHROUGH.md section C), so a human-approved k
+    takes precedence over whichever one silhouette happens to nudge ahead.
+    `merge_small` still runs on the pinned k exactly as it would on an
+    auto-chosen one.
 
     `ledger_dir`/`pool_parquet`/`map_models_path` are overrides purely for
     testability (subprocess-driven CLI tests in a tmp dir) -- default to the
@@ -516,8 +646,10 @@ def compute_draft(ledger_dir=None, pool_parquet=None, map_models_path=None) -> d
     models = map_fit.load(map_models_path)
     diag_df = _load_diag_features(ledger_dir)
 
-    Z, z_spec = build_z(diag_df, models)
-    k, labels, silhouette_table = choose_k(Z)
+    Z, z_spec = build_z(diag_df, models, descriptor=descriptor)
+    k_range = (int(k),) if k is not None else None
+    k_final, labels, silhouette_table = choose_k(Z, k_range=k_range)
+    k = k_final
     cards = summarize(labels, diag_df, models)
     arms_entries = build_arms_entries(labels, diag_df, models, z_spec, Z=Z)
 
@@ -647,6 +779,60 @@ def load_arms_yaml(path=None) -> dict:
     return yaml.safe_load(path.read_text())
 
 
+def append_arms_freeze_to_config_yaml(final_arms_yaml: dict, well_table_df: pd.DataFrame,
+                                       B: int, path=None) -> Path:
+    """Append an `arms_freeze:` block (arms_frozen_at, descriptor, k, names,
+    B, well_counts) to ledger/config.yaml, recording the finalized arms step
+    for the run record -- the freeze-time counterpart of
+    `eval_set.append_baseline_to_config_yaml`'s baseline block.
+
+    Deliberately APPENDS plain text (never a yaml.safe_load-then-dump
+    round-trip of the whole file) for the exact same reason
+    `append_baseline_to_config_yaml` does: config.yaml is a human-authored,
+    richly commented file, and a generic re-serialization would silently
+    discard every existing comment. Only the NEW block is built via
+    `yaml.safe_dump`, then appended after a short comment header.
+
+    `final_arms_yaml` is a loaded (or in-memory) FINAL arms.yaml dict (the
+    `finalize()` return value's content, i.e. what `load_arms_yaml` reads
+    back) -- `k`/`descriptor`/`names` are read off it directly rather than
+    re-derived, so this can never silently diverge from what was actually
+    frozen. `well_table_df` is `wells.well_table`'s output; `B` is
+    `wells.choose_B`'s first return value."""
+    path = Path(config.LEDGER_DIR) / "config.yaml" if path is None else Path(path)
+    arms = sorted(final_arms_yaml["arms"], key=lambda a: a["index"])
+    names = [a["name"] for a in arms]
+    z_spec_dict = final_arms_yaml["z_spec"]
+    well_counts = {str(row["arm"]): int(row["count"])
+                   for row in well_table_df.to_dict(orient="records")}
+
+    block = {
+        "arms_freeze": {
+            "arms_frozen_at": final_arms_yaml["frozen_at"],
+            "descriptor": z_spec_dict.get("descriptor", "hybrid"),
+            "k": len(arms),
+            "names": names,
+            "B": int(B),
+            "well_counts": well_counts,
+            "map_hash": final_arms_yaml["map_hash"],
+            "written_at": datetime.now(timezone.utc).isoformat(),
+        }
+    }
+    header = (
+        "\n# bandit_v1 Task 10: FROZEN arms (clustering.py finalize + "
+        "wells.py well table/B rule), written once at freeze time -- never\n"
+        "# edited mid-run, same frozen-constant convention as the rest of "
+        "this file (bandit_v1/config.py's docstring).\n"
+    )
+    dumped = yaml.safe_dump(block, sort_keys=False, default_flow_style=False)
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a") as f:
+        f.write(header)
+        f.write(dumped)
+    return path
+
+
 # =============================================================================
 # CLI
 # =============================================================================
@@ -665,6 +851,22 @@ def _main():
                           "pool.build_pool_table() (testability)")
     ap.add_argument("--map-models-path", default=None,
                      help="override config.MAP_MODELS_JOBLIB (testability)")
+    ap.add_argument("--descriptor", default="hybrid", choices=list(DESCRIPTORS),
+                     help="z-space descriptor to fit on the diag conditions: "
+                          "'hybrid' (default, backward-compatible: knob+p_hat"
+                          "+p_stage, 11-dim) or 'behavior' (p_hat+p_stage "
+                          "only, 6-dim, no knob block -- cluster_study.py's "
+                          "Z3_behavior). Ignored on a --names finalize run "
+                          "(finalize reads the draft's own frozen z_spec, "
+                          "descriptor included, and never recomputes).")
+    ap.add_argument("--k", type=int, default=None,
+                     help="pin the cluster count to exactly this k instead "
+                          "of the automatic silhouette sweep over "
+                          "config.K_RANGE -- an explicit owner override, for "
+                          "when the auto-picked k is within refit noise of "
+                          "an adjacent candidate (see compute_draft's "
+                          "docstring). merge_small still runs on the pinned "
+                          "k. Ignored on a --names finalize run.")
     ap.add_argument("--draft-path", default=None,
                      help="override DRAFT_ARMS_YAML (testability)")
     ap.add_argument("--out-path", default=None,
@@ -697,9 +899,10 @@ def _main():
         sys.exit(0)
 
     result = compute_draft(ledger_dir=args.ledger_dir, pool_parquet=args.pool_parquet,
-                            map_models_path=args.map_models_path)
+                            map_models_path=args.map_models_path, descriptor=args.descriptor,
+                            k=args.k)
 
-    print(f"clustering: chosen k={result['k']} clusters (+ Random)")
+    print(f"clustering: chosen k={result['k']} clusters (+ Random), descriptor={args.descriptor!r}")
     print("SILHOUETTE_TABLE")
     print(result["silhouette_table"].to_string(index=False))
     print("CLUSTER_CARDS")

@@ -89,6 +89,61 @@ def test_assign_regions_raises_on_empty_arms():
         wells.assign_regions(pool_df, _ConstantModels(), arms_spec)
 
 
+def _identity_behavior_z_spec() -> clustering.ZSpec:
+    """Same identity-scaling idea as `_identity_z_spec`, but for
+    descriptor="behavior" (no knob block at all -- p_hat(1) + p_stage(5),
+    6-dim total)."""
+    return clustering.ZSpec(
+        descriptor="behavior",
+        knob_cols=(), knob_mean=np.zeros(0), knob_scale=np.zeros(0),
+        p_hat_mean=0.0, p_hat_scale=1.0,
+        p_stage_mean=np.array([0.2] * 5), p_stage_scale=1.0,
+        stages=clustering.STAGES,
+    )
+
+
+class _PHatFromH:
+    """predict_p reads the pool row's `h` column directly as a stand-in
+    probability -- descriptor="behavior" has no knob block at all, so this is
+    the only lever available to make different pool rows land in different
+    arms. predict_stage is a constant uniform [0.2]*5 vector, paired with
+    `_identity_behavior_z_spec`'s p_stage_mean=[0.2]*5/p_stage_scale=1.0 so
+    the p_stage block is always exactly 0 and never affects the
+    nearest-centroid decision -- isolating it to the p_hat block alone."""
+
+    def predict_p(self, df):
+        return df["h"].to_numpy(dtype=float)
+
+    def predict_stage(self, df):
+        return np.tile(np.array([0.2] * 5), (len(df), 1))
+
+
+def test_assign_regions_behavior_descriptor_uses_p_hat_only_no_knob_block():
+    pool_df = _make_pool([
+        {"episode_index": 1, "category": "jar", "h": 0.90, "in_d0": True},
+        {"episode_index": 2, "category": "jar", "h": 0.85, "in_d0": False},
+        {"episode_index": 3, "category": "jar", "h": 0.10, "in_d0": False},
+        {"episode_index": 4, "category": "jar", "h": 0.05, "in_d0": True},
+    ])
+    arms_spec = {
+        "z_spec": _identity_behavior_z_spec().to_dict(),
+        "arms": [
+            {"name": "armHigh", "index": 0,
+             "centroid": {"standardized": [0.9, 0.0, 0.0, 0.0, 0.0, 0.0]}},
+            {"name": "armLow", "index": 1,
+             "centroid": {"standardized": [0.1, 0.0, 0.0, 0.0, 0.0, 0.0]}},
+        ],
+    }
+
+    regions = wells.assign_regions(pool_df, _PHatFromH(), arms_spec)
+
+    # D0 rows (episode_index 1 and 4) must never appear, at all.
+    assert set(regions.index) == {2, 3}
+    assert regions.loc[2] == "armHigh"
+    assert regions.loc[3] == "armLow"
+    assert regions.index.name == "episode_index"
+
+
 def test_assign_regions_all_d0_yields_empty_series():
     pool_df = _make_pool([
         {"episode_index": 1, "category": "jar", "h": 1, "in_d0": True},

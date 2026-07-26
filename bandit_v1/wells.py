@@ -24,13 +24,24 @@ def assign_regions(pool_df: pd.DataFrame, models, arms_spec: dict) -> pd.Series:
     all, not just excluded from later draws).
 
     `arms_spec` is a loaded arms.yaml-shaped dict: `{"arms": [{"name",
-    "centroid": {"standardized": [...11 floats...], ...}, ...}, ...],
+    "centroid": {"standardized": [...floats...], ...}, ...}, ...],
     "z_spec": {...}}` (draft or final -- both have this shape; see
     clustering.py). Each W row's feature vector is embedded via
     `clustering.transform_z` using `arms_spec["z_spec"]` (the SAME frozen
     standardization the arms' centroids themselves were computed in) and
     assigned to whichever arm's `centroid.standardized` is nearest in
     Euclidean z-space.
+
+    This function is descriptor-agnostic BY CONSTRUCTION: `z_spec`'s own
+    `descriptor` field ("hybrid" -- knob+p_hat+p_stage, 11-dim -- or
+    "behavior" -- p_hat+p_stage only, 6-dim, no knob block; see clustering.py's
+    module docstring) is read by `clustering.ZSpec.from_dict` and dispatched
+    on inside `clustering.transform_z` itself, so a "behavior"-frozen
+    arms.yaml is honored automatically here -- `well_df` (this module's own
+    variable) is embedded through whichever blocks the frozen `z_spec` names,
+    and the resulting `Z`'s width always matches `centroids`' width (both were
+    produced by the same frozen `z_spec`), so the nearest-centroid distance
+    computation below never needs to know or care which descriptor is live.
 
     Returns a `pd.Series` indexed by `episode_index` (W rows only), values =
     arm name strings -- exactly the shape `draw.pull_demos`'s `regions`
