@@ -85,6 +85,52 @@ def test_run_skips_pairs_already_present_without_calling_rollout_one(tmp_path, m
     assert len(ledger.read("episodes")) == 3
 
 
+def test_run_episodes_sink_default_still_appends_to_ledger_episodes_table(tmp_path, monkeypatch):
+    """episodes_sink omitted (the default, None) must be byte-identical to
+    behavior before this parameter existed: every row still lands in ledger
+    table "episodes" via ledger.append_rows, one call per row."""
+    calls = []
+    _patch_common(monkeypatch, tmp_path, calls)
+    d0 = tmp_path / "start_000"
+    _write_synthetic_start(d0)
+
+    append_calls = []
+    orig_append = ledger.append_rows
+
+    def counting_append(table, rows):
+        append_calls.append((table, len(rows)))
+        orig_append(table, rows)
+    monkeypatch.setattr(ledger, "append_rows", counting_append)
+
+    rows = rollout.run("host", 1, [d0], repeats=2, phase="diag", policy_id="pi0")
+
+    assert len(rows) == 2
+    assert append_calls == [("episodes", 1), ("episodes", 1)]  # per-episode, unchanged
+    assert len(ledger.read("episodes")) == 2
+
+
+def test_run_episodes_sink_override_bypasses_ledger_append_entirely(tmp_path, monkeypatch):
+    """This is the seam parallel_eval.py's workers use: when episodes_sink is
+    supplied, rollout.run must route every completed row through it INSTEAD
+    of ledger.append_rows("episodes", ...) -- the shared table must be
+    untouched."""
+    calls = []
+    _patch_common(monkeypatch, tmp_path, calls)
+    d0 = tmp_path / "start_000"
+    d1 = tmp_path / "start_001"
+    _write_synthetic_start(d0)
+    _write_synthetic_start(d1, cat="mug")
+
+    sunk = []
+    rows = rollout.run("host", 1, [d0, d1], repeats=2, phase="diag", policy_id="pi0",
+                        episodes_sink=lambda row: sunk.append(row))
+
+    assert len(rows) == 4
+    assert len(sunk) == 4
+    assert sunk == rows  # same row dicts, in completion order
+    assert not (tmp_path / "ledger" / "episodes.parquet").exists()  # shared table never written
+
+
 def test_run_skips_entire_start_when_all_its_repeats_are_done(tmp_path, monkeypatch):
     calls = []
     _patch_common(monkeypatch, tmp_path, calls)

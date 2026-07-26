@@ -397,6 +397,71 @@ def test_eval_checkpoint_passes_policy_id_and_pull_id_through_separately():
 
 
 # =============================================================================
+# workers opt-in wiring (rollout-speedup #1): None/1 = serial rollout.run
+# unchanged; >1 = parallel_eval.run_parallel; explicit run_fn always wins.
+# =============================================================================
+
+def test_eval_checkpoint_workers_none_or_one_uses_plain_rollout_run(monkeypatch):
+    manifest = _make_manifest(n_per_stratum=2)
+    n_calls = {"rollout_run": 0}
+
+    def fake_rollout_run(host, port, start_dirs, reps, phase, policy_id, arm=None,
+                          pull_id=None, skip_pairs=None):
+        n_calls["rollout_run"] += 1
+        return [{"start_id": Path(sd).name, "repeat_idx": r, "success": True}
+                for sd in start_dirs for r in range(reps)]
+    monkeypatch.setattr(eval_set.rollout, "run", fake_rollout_run)
+
+    eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                              repeats=1, manifest=manifest, workers=None)
+    eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                              repeats=1, manifest=manifest, workers=1)
+
+    assert n_calls["rollout_run"] == 2  # both calls took the serial path
+
+
+def test_eval_checkpoint_workers_gt_one_routes_through_parallel_eval(monkeypatch):
+    from bandit_v1 import parallel_eval
+    manifest = _make_manifest(n_per_stratum=2)
+    seen = {}
+
+    def fake_run_parallel(host, port, start_dirs, reps, phase, policy_id, workers=4,
+                           arm=None, pull_id=None, skip_pairs=None):
+        seen.update(workers=workers, phase=phase, policy_id=policy_id)
+        return [{"start_id": Path(sd).name, "repeat_idx": r, "success": True}
+                for sd in start_dirs for r in range(reps)]
+    monkeypatch.setattr(parallel_eval, "run_parallel", fake_run_parallel)
+
+    def fail_rollout_run(*a, **k):
+        raise AssertionError("rollout.run must not be called when workers > 1")
+    monkeypatch.setattr(eval_set.rollout, "run", fail_rollout_run)
+
+    eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                              repeats=1, manifest=manifest, workers=3)
+
+    assert seen == {"workers": 3, "phase": "eval", "policy_id": "pi0_baseline"}
+
+
+def test_eval_checkpoint_explicit_run_fn_wins_over_workers(monkeypatch):
+    """An explicit run_fn (the pre-existing test seam) must always win,
+    exactly like before `workers` existed -- workers > 1 must never silently
+    override a caller-supplied run_fn."""
+    from bandit_v1 import parallel_eval
+    manifest = _make_manifest(n_per_stratum=2)
+
+    def fail_run_parallel(*a, **k):
+        raise AssertionError("parallel_eval.run_parallel must not be reached")
+    monkeypatch.setattr(parallel_eval, "run_parallel", fail_run_parallel)
+
+    fake_run = _fake_run_from_table(_SUCCESS_TABLE)
+    result = eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                       repeats=2, manifest=manifest, run_fn=fake_run,
+                                       workers=8)
+
+    assert result["mean"] == pytest.approx(0.5)
+
+
+# =============================================================================
 # shape-compatibility with pull.compute_delta
 # =============================================================================
 

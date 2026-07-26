@@ -284,7 +284,7 @@ def load_manifest(path=None) -> pd.DataFrame:
 
 def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
                      host="127.0.0.1", manifest=None, manifest_path=None,
-                     run_fn=None, log=print) -> dict:
+                     run_fn=None, workers=None, log=print) -> dict:
     """Evaluate the checkpoint served at (host, policy_port) on the frozen
     150-start eval set E, `repeats` independent passes (default
     config.EVAL_REPEATS=3). This is the ONE function pull.run_pull's
@@ -297,6 +297,17 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
     like every diag/pull episode -- this function does no ledger writing of
     its own beyond what rollout.run already does; it only aggregates the rows
     `run_fn` (default rollout.run) returns.
+
+    `workers` (bandit_v1 rollout-speedup #1, OPT-IN -- default None): None or
+    1 leaves the serial `rollout.run` path completely unchanged (the only
+    behavior this function had before `workers` existed); an int > 1 instead
+    routes through `parallel_eval.run_parallel` with that many worker
+    subprocesses, sharding the 150 E-set starts round-robin across them (see
+    parallel_eval.py's module docstring for why this preserves the warm-
+    restore speedup and how ledger writes stay concurrency-safe). Ignored
+    entirely when `run_fn` is explicitly supplied (see below) -- an explicit
+    `run_fn` always wins, exactly as before `workers` existed, so every
+    existing run_fn-based test is unaffected.
 
     `manifest`/`manifest_path` let a caller supply an already-loaded manifest
     DataFrame or an alternate path (default: `load_manifest()` against
@@ -342,7 +353,12 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
         manifest = load_manifest(manifest_path)
     if "start_id" not in manifest.columns or "stratum" not in manifest.columns:
         raise ValueError("eval_checkpoint: manifest must have 'start_id' and 'stratum' columns")
-    run_fn = rollout.run if run_fn is None else run_fn
+    if run_fn is None:
+        if workers is not None and workers > 1:
+            from . import parallel_eval as _parallel_eval
+            run_fn = lambda *a, **kw: _parallel_eval.run_parallel(*a, workers=workers, **kw)
+        else:
+            run_fn = rollout.run
 
     e_dir = config.E_DIR
     start_dirs = [e_dir / sid for sid in manifest["start_id"]]
@@ -525,6 +541,11 @@ def _main():
     eval_p.add_argument("--policy_id", default="pi0_baseline")
     eval_p.add_argument("--repeats", type=int, default=config.EVAL_REPEATS)
     eval_p.add_argument("--checkpoint_id", default=None)
+    eval_p.add_argument("--workers", type=int, default=None,
+                         help="rollout-speedup #1 (opt-in): >1 runs eval_checkpoint's rollout "
+                              "over this many parallel worker subprocesses against the same "
+                              "served policy (see parallel_eval.py); omitted/1 is the original "
+                              "serial rollout.run path, unchanged")
 
     args = ap.parse_args()
 
@@ -535,7 +556,7 @@ def _main():
 
     elif args.cmd == "eval-baseline":
         result = eval_checkpoint(args.port, args.policy_id, None, args.policy_id,
-                                  repeats=args.repeats, host=args.host)
+                                  repeats=args.repeats, host=args.host, workers=args.workers)
         print("BASELINE_MEAN", result["mean"])
         print("BASELINE_PER_STRATUM", json.dumps(result["per_stratum_mean"]))
 

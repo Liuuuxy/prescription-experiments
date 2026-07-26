@@ -170,7 +170,7 @@ def _rollout_one(env, client, start_dir, horizon):
 
 
 def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=None,
-        pull_id=None, skip_pairs=None):
+        pull_id=None, skip_pairs=None, episodes_sink=None):
     """Roll the policy served at (policy_host, policy_port) out on every start in
     `start_dirs`, `repeats` times each. Appends every episode to ledger table
     "episodes" as it completes (crash-safe -- mirrors the rest of bandit_v1's
@@ -185,8 +185,27 @@ def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=Non
     the caller queries the ledger for already-completed (start_id, repeat_idx)
     pairs before each chunk and passes them here so a rerun after a crash
     never redoes a completed episode, at per-episode (not just per-chunk)
-    granularity."""
+    granularity.
+
+    `episodes_sink` (optional, default None -- identical behavior to before
+    this parameter existed: each completed row is appended to ledger table
+    "episodes" via `ledger.append_rows`): a callable taking one completed row
+    dict, called in place of the default ledger append. This is the seam
+    parallel_eval.py's worker subprocesses use to redirect every row into
+    their own per-worker shard file (bandit_v1/ledger/shards/<run-tag>_
+    <worker>.parquet, via ledger.append_rows_to_path) instead of the shared
+    "episodes" table -- N worker processes all calling
+    `ledger.append_rows("episodes", ...)` concurrently would race on that
+    table's whole-parquet read-modify-write (see ledger.py's module
+    docstring); routing each worker's rows to its own file sidesteps that
+    entirely, with the parent process merging every shard back into
+    "episodes" with a single append_rows call once every worker has exited.
+    `append_rows`'s own semantics are completely untouched by this -- the
+    default sink below is byte-identical to the unconditional call this
+    function made before `episodes_sink` existed."""
     horizon = int(get_task_horizon(config.TASK))
+    sink = episodes_sink if episodes_sink is not None else (
+        lambda row: ledger.append_rows("episodes", [row]))
     client = _wcp.WebsocketClientPolicy(policy_host, policy_port)
     env = states.make_env_for_rollout()
     rows = []
@@ -215,7 +234,7 @@ def run(policy_host, policy_port, start_dirs, repeats, phase, policy_id, arm=Non
                     **feats,
                 }
                 rows.append(row)
-                ledger.append_rows("episodes", [row])
+                sink(row)
     finally:
         states.close_env(env)
     return rows
