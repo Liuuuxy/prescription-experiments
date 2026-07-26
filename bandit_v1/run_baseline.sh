@@ -41,6 +41,18 @@
 # Run detached so it survives the session:
 #   nohup bash /data/xinyua11/robocasa/bandit_v1/run_baseline.sh \
 #     > /data/xinyua11/tmp/bandit_baseline_orch_stdout.log 2>&1 &
+#
+# Adaptation (arms already frozen at 8e76d12, this run's map already fit and
+# gate-passed -- see ledger/arms.yaml's map_hash / ledger/config.yaml's
+# arms_freeze block): Step 2 below now SKIPS the map refit entirely when
+# ledger/map_models.joblib + map_validation_report.json already show a
+# gate-passed fit on disk (arms.yaml pins that exact joblib's sha256 -- a
+# refit here would silently invalidate that pin). EGL is broken box-wide
+# (driver update) so every env-touching step now runs MUJOCO_GL=osmesa
+# instead of egl. The baseline eval (Step 5) now runs with
+# --workers "$EVAL_WORKERS" (parallel_eval.py, opt-in). The serve-retry loop
+# and the AUC-gate refusal path (exit 3) are otherwise UNCHANGED -- both
+# still apply verbatim for a future run against a fresh, not-yet-frozen map.
 set -uo pipefail
 
 REPO=/data/xinyua11/robocasa
@@ -58,6 +70,11 @@ PORT=8125               # brief's assigned port for the baseline serve
 POLL_SECS=120            # precondition-wait poll interval (matches run_diagnosis.sh)
 PORT_WAIT_TRIES=90       # 90 x 5s = 7.5 min max wait for the server socket to accept
 PORT_WAIT_SLEEP=5
+
+EVAL_WORKERS=4           # bandit_v1 rollout-speedup #1, opt-in (parallel_eval.py):
+                          # shards the 150 E-set starts round-robin across this many
+                          # worker subprocesses hitting the same served policy --
+                          # see eval_set.eval_checkpoint's `workers` param docstring.
 
 SERVE_MAX_ATTEMPTS=6      # identical serve-retry policy to run_diagnosis.sh
 SERVE_RETRY_SLEEP=300
@@ -111,29 +128,72 @@ done
 log ">>> diagnosis batch confirmed complete -- proceeding to the real map fit"
 
 # --- Step 2: fit the REAL difficulty map on the diag rows, AUC-gated -------
+# Frozen-map fast path: if bandit_v1/ledger/map_models.joblib already exists
+# AND map_validation_report.json shows its winning family cleared the same
+# AUC_GATE_MIN gate map_fit._main itself enforces, the map is FROZEN (see
+# ledger/arms.yaml's map_hash -- clustering/wells were built against that
+# exact joblib's sha256, which arms.yaml pins). Refitting here would silently
+# rewrite map_models.joblib out from under that pin, so this path never calls
+# bandit_v1.map_fit at all in that case -- it only reads the two files below.
+# The gate-refusal path (exit 3 on a real AUC-gate failure) is UNCHANGED for
+# the general case: a fresh diag batch with no frozen map yet still goes
+# through the exact same map_fit CLI + gate as before.
 cd "$REPO" || { log "FATAL cd $REPO"; exit 4; }
-log ">>> fitting bandit_v1.map_fit on real diag data (gate: AUC >= ${AUC_GATE_MIN}) -> $MAPFIT_LOG"
-"$ROBOCASA_PY" -u -m bandit_v1.map_fit > "$MAPFIT_LOG" 2>&1
-RC=$?
-tail -60 "$MAPFIT_LOG" >> "$ORCH_LOG"
-if [ "$RC" -ne 0 ]; then
-  log "!!! MAP FIT GATE FAILED (rc=$RC) -- held-out AUC likely < ${AUC_GATE_MIN}, or a real"
-  log "!!! error (wrong join, leaked constants -- see task-8-brief.md Step 3 / $MAPFIT_LOG)."
-  log "!!! Refusing to build E or run the baseline. map_models.joblib was NOT written on"
-  log "!!! a gate failure (see bandit_v1/map_fit.py's _main). Investigate, fix, and"
-  log "!!! relaunch this script from the top."
-  exit 3
+
+MAP_JOBLIB="$REPO/bandit_v1/ledger/map_models.joblib"
+MAP_REPORT="$REPO/bandit_v1/ledger/map_validation_report.json"
+
+map_frozen_sha(){
+  # Prints the existing joblib's sha256 on stdout iff both files exist AND
+  # the report's winning family's AUC clears AUC_GATE_MIN (imported from
+  # bandit_v1.map_fit -- single source of truth, same convention as this
+  # script's own AUC_GATE_MIN log-message-only constant above). Prints
+  # nothing and exits nonzero otherwise (missing files, missing/NaN auc, or
+  # gate not cleared) -- caller falls back to the normal refit path.
+  "$ROBOCASA_PY" -c "
+import json, hashlib, os, sys
+p = r'$MAP_JOBLIB'
+rp = r'$MAP_REPORT'
+if not (os.path.exists(p) and os.path.exists(rp)):
+    sys.exit(1)
+report = json.load(open(rp))
+winner = report.get('winner')
+fam = report.get(winner) or {}
+auc = fam.get('auc')
+from bandit_v1.map_fit import AUC_GATE_MIN
+if auc is None or not (auc >= AUC_GATE_MIN):
+    sys.exit(1)
+print(hashlib.sha256(open(p, 'rb').read()).hexdigest())
+" 2>/dev/null
+}
+
+FROZEN_SHA=$(map_frozen_sha)
+if [ -n "$FROZEN_SHA" ]; then
+  log ">>> map already frozen (sha ${FROZEN_SHA:0:12}) -- skipping refit"
+else
+  log ">>> fitting bandit_v1.map_fit on real diag data (gate: AUC >= ${AUC_GATE_MIN}) -> $MAPFIT_LOG"
+  "$ROBOCASA_PY" -u -m bandit_v1.map_fit > "$MAPFIT_LOG" 2>&1
+  RC=$?
+  tail -60 "$MAPFIT_LOG" >> "$ORCH_LOG"
+  if [ "$RC" -ne 0 ]; then
+    log "!!! MAP FIT GATE FAILED (rc=$RC) -- held-out AUC likely < ${AUC_GATE_MIN}, or a real"
+    log "!!! error (wrong join, leaked constants -- see task-8-brief.md Step 3 / $MAPFIT_LOG)."
+    log "!!! Refusing to build E or run the baseline. map_models.joblib was NOT written on"
+    log "!!! a gate failure (see bandit_v1/map_fit.py's _main). Investigate, fix, and"
+    log "!!! relaunch this script from the top."
+    exit 3
+  fi
+  log ">>> map fit gate PASSED -- full validation report is in $MAPFIT_LOG and"
+  log ">>> bandit_v1/ledger/map_validation_report.json (HUMAN CHECKPOINT: eyeball the"
+  log ">>> held-out AUC/log-loss/calibration there before trusting E -- this script does"
+  log ">>> not pause for that review itself; it was already implicitly satisfied by the"
+  log ">>> controller reviewing the diagnosis results before even launching this script)."
 fi
-log ">>> map fit gate PASSED -- full validation report is in $MAPFIT_LOG and"
-log ">>> bandit_v1/ledger/map_validation_report.json (HUMAN CHECKPOINT: eyeball the"
-log ">>> held-out AUC/log-loss/calibration there before trusting E -- this script does"
-log ">>> not pause for that review itself; it was already implicitly satisfied by the"
-log ">>> controller reviewing the diagnosis results before even launching this script)."
 log ">>> proceeding to build eval set E"
 
 # --- Step 3: build the frozen 150-start eval set E --------------------------
 log ">>> building eval set E (bandit_v1.eval_set build-e) -> $BUILDE_LOG"
-MUJOCO_GL=egl "$ROBOCASA_PY" -u -m bandit_v1.eval_set build-e > "$BUILDE_LOG" 2>&1
+MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa "$ROBOCASA_PY" -u -m bandit_v1.eval_set build-e > "$BUILDE_LOG" 2>&1
 RC=$?
 tail -60 "$BUILDE_LOG" >> "$ORCH_LOG"
 if [ "$RC" -ne 0 ]; then
@@ -167,7 +227,7 @@ while [ "$attempt" -le "$SERVE_MAX_ATTEMPTS" ]; do
   done
 
   log ">>> serve attempt ${attempt}/${SERVE_MAX_ATTEMPTS}: serving pi0_ppc2sink_pi0base from $CKPT_DIR on :$PORT (gpu0 free=${f}MiB)"
-  CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_MEM_FRACTION=0.25 MUJOCO_GL=egl \
+  CUDA_VISIBLE_DEVICES=0 XLA_PYTHON_CLIENT_MEM_FRACTION=0.25 MUJOCO_GL=osmesa \
     TMPDIR=/data/xinyua11/tmp HF_HOME=/data/xinyua11/.cache/huggingface \
     "$OPENPI_PY" scripts/serve_policy.py --port "$PORT" policy:checkpoint \
     --policy.config pi0_ppc2sink_pi0base --policy.dir "$CKPT_DIR" \
@@ -219,10 +279,10 @@ fi
 
 # --- Step 5: eval_checkpoint x3 (baseline), record into config.yaml --------
 cd "$REPO" || { log "FATAL cd $REPO"; exit 4; }
-log ">>> running baseline eval (bandit_v1.eval_set eval-baseline, repeats=3, policy_id=pi0_baseline) -> $EVAL_LOG"
-MUJOCO_GL=egl PYOPENGL_PLATFORM=egl "$ROBOCASA_PY" -u -m bandit_v1.eval_set eval-baseline \
+log ">>> running baseline eval (bandit_v1.eval_set eval-baseline, repeats=3, policy_id=pi0_baseline, workers=${EVAL_WORKERS}) -> $EVAL_LOG"
+MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa "$ROBOCASA_PY" -u -m bandit_v1.eval_set eval-baseline \
   --host 127.0.0.1 --port "$PORT" --policy_id pi0_baseline --repeats 3 \
-  --checkpoint_id "$CKPT_DIR" > "$EVAL_LOG" 2>&1
+  --checkpoint_id "$CKPT_DIR" --workers "$EVAL_WORKERS" > "$EVAL_LOG" 2>&1
 RC=$?
 tail -60 "$EVAL_LOG" >> "$ORCH_LOG"
 
