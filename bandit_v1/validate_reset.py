@@ -26,6 +26,20 @@ Internal (re-invoked as a fresh subprocess per start; not meant to be called
 directly):
   python -m bandit_v1.validate_reset --restore_only \\
       --start_dir <start_dir> --out_file <start_dir>/fingerprint_restored.json
+
+--warm-check mode (rollout-speedup task): a SECOND, separate gate for
+states.restore()'s two speedups (skip the throwaway pre-reset once an env has
+been reset at least once; skip both of reset_to's internal model recompiles
+entirely when the incoming start's model.xml hash matches the last-restored
+one). Captures 3 starts (A, B, C) then, IN THE SAME PROCESS, restores them into
+two independent envs -- one always called with warm=True, one always with
+warm=False -- following the fixed interleaved sequence A,A,A,B,A,C,C (repeat
+-hits for A and C exercise the fast path; the A->B, B->A, A->C transitions
+exercise hash-invalidation back onto the full path). At every step, compares
+the two envs' fingerprints and full flattened mujoco state vectors
+(np.allclose, atol=0 rtol=0 -- exact). Usage:
+  conda run -n robocasa python -m bandit_v1.validate_reset --warm-check \\
+      --seed_base 920000 --out /data/xinyua11/tmp/reset_gate_warm
 """
 import argparse
 import json
@@ -165,11 +179,97 @@ def run_gate(n, seed_base, out_dir):
     return gate_pass
 
 
+WARM_CHECK_SEQUENCE = ["A", "A", "A", "B", "A", "C", "C"]
+WARM_CHECK_LABELS = ["A", "B", "C"]
+
+
+def _state_vec(env):
+    """Full flattened mujoco state vector for `env` (time, qpos, qvel), the same
+    representation env.get_state()["states"] / capture_start's state.npz use."""
+    return np.asarray(env.env.sim.get_state().flatten(), dtype=float)
+
+
+def run_warm_check(seed_base, out_dir):
+    """--warm-check gate (rollout-speedup task): captures 3 starts (A, B, C),
+    then restores them IN THE SAME PROCESS into two independent envs -- env_warm
+    always via states.restore(..., warm=True) (both speedups active: skip the
+    pre-reset once initialized, warm-model fast path on a repeated model.xml
+    hash), env_cold always via states.restore(..., warm=False) (the original,
+    unmodified full path) -- following the fixed interleaved sequence
+    A,A,A,B,A,C,C. This sequence deliberately exercises: back-to-back repeats of
+    the SAME start (A x3, then C x2 -- the fast path engages on the 2nd+ hit of
+    each run), and hash-invalidating transitions onto a genuinely different start
+    (A->B, B->A, A->C -- must fall back to the full path). At every step,
+    compares fingerprints (states.fingerprint_diff, expect []) and the full
+    flattened mujoco state vector (np.allclose, atol=0 rtol=0 -- exact equality)
+    between the two envs. Returns True iff every step matches on both axes."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    start_dirs = {}
+    print(f"[warm-check] capturing {len(WARM_CHECK_LABELS)} starts at "
+          f"seed_base={seed_base} -> {out_dir}")
+    for i, label in enumerate(WARM_CHECK_LABELS):
+        seed = seed_base + i
+        start_dir = out_dir / f"start_{label}"
+        fp = states.capture_start(seed, start_dir)
+        start_dirs[label] = start_dir
+        print(f"  start {label}: seed={seed} category={fp['category']} "
+              f"layout={fp['layout_id']} style={fp['style_id']} obj_xyz={fp['obj_xyz']}")
+
+    env_warm = states.make_env()
+    env_cold = states.make_env()
+    all_ok = True
+    try:
+        print(f"\n[warm-check] sequence: {','.join(WARM_CHECK_SEQUENCE)}  "
+              "(env_warm via warm=True, env_cold via warm=False, same process)")
+        for step, label in enumerate(WARM_CHECK_SEQUENCE):
+            start_dir = start_dirs[label]
+            states.restore(env_warm, start_dir, warm=True)
+            states.restore(env_cold, start_dir, warm=False)
+
+            fp_warm = states.fingerprint(env_warm)
+            fp_cold = states.fingerprint(env_cold)
+            fp_diff = states.fingerprint_diff(fp_warm, fp_cold)
+
+            vec_warm = _state_vec(env_warm)
+            vec_cold = _state_vec(env_cold)
+            vec_match = (vec_warm.shape == vec_cold.shape) and np.allclose(
+                vec_warm, vec_cold, atol=0, rtol=0)
+
+            ok = (not fp_diff) and vec_match
+            all_ok = all_ok and ok
+            status = "OK" if ok else "FAIL"
+            print(f"  [{status}] step {step} (start {label}): fingerprint_diff={fp_diff}, "
+                  f"state_vec_exact_match={vec_match}")
+            if not ok:
+                print(f"    fp_warm={fp_warm}")
+                print(f"    fp_cold={fp_cold}")
+                if vec_warm.shape == vec_cold.shape:
+                    max_abs_diff = float(np.max(np.abs(vec_warm - vec_cold)))
+                    print(f"    max abs state-vec diff: {max_abs_diff:.3e}")
+                else:
+                    print(f"    state vec shape mismatch: warm={vec_warm.shape} cold={vec_cold.shape}")
+    finally:
+        states.close_env(env_warm)
+        states.close_env(env_cold)
+
+    n = len(WARM_CHECK_SEQUENCE)
+    if all_ok:
+        print(f"\n{n}/{n} steps: warm/cold fingerprints + state vectors match exactly; PASS")
+    else:
+        print("\nWARM-CHECK GATE FAILED: see [FAIL] steps above")
+    return all_ok
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--n", type=int, default=10)
     p.add_argument("--seed_base", type=int, default=900000)
     p.add_argument("--out", default="/tmp/reset_gate")
+    p.add_argument("--warm-check", action="store_true",
+                    help="Run the warm/cold restore-path equivalence gate "
+                         "(states.restore()'s speedups) instead of the cross-process gate")
     # internal child-process mode, not part of the public CLI contract
     p.add_argument("--restore_only", action="store_true", help=argparse.SUPPRESS)
     p.add_argument("--start_dir", default=None, help=argparse.SUPPRESS)
@@ -180,6 +280,10 @@ def main():
         assert args.start_dir and args.out_file, "--restore_only requires --start_dir and --out_file"
         _restore_only(args.start_dir, args.out_file)
         return
+
+    if args.warm_check:
+        gate_pass = run_warm_check(args.seed_base, args.out)
+        sys.exit(0 if gate_pass else 1)
 
     gate_pass = run_gate(args.n, args.seed_base, args.out)
     sys.exit(0 if gate_pass else 1)

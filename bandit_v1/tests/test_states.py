@@ -1,12 +1,17 @@
-"""Pure-part tests for bandit_v1/states.py (task 3, step 2).
+"""Pure-part tests for bandit_v1/states.py (task 3, step 2; rollout-speedup
+hash-cache decision added later).
 
 Covers only the parts that don't touch a live robocasa env: fingerprint_diff
 (dict comparison) and start_features (ep_meta.json + fingerprint.json parsing).
 The env-touching parts (capture_start, restore, make_env, fingerprint) are
 validated end-to-end by the validate_reset.py gate run (task 3, step 4), per the
-brief -- TDD applies only to these pure parts.
+brief -- TDD applies only to these pure parts. `_restore_plan` (restore()'s
+hash-cache/pre-reset decision logic) is likewise pure -- no mujoco/robosuite
+object is touched, just plain attributes on a stand-in "env" object -- so it is
+unit-tested here too, against a bare `types.SimpleNamespace`.
 """
 import json
+import types
 
 from bandit_v1 import states
 
@@ -119,3 +124,49 @@ def test_fingerprint_diff_different_instance_compares_unequal_regardless_of_cate
     diff = states.fingerprint_diff(captured, restored)
     assert "instance" in diff
     assert "category" not in diff
+
+
+# --- restore()'s hash-cache/pre-reset decision (rollout speedups 2+3) ---------
+
+def test_restore_plan_fresh_env_takes_full_path_with_prereset():
+    """A never-restored env (no `_bandit_initialized` attribute at all) must
+    always pay the explicit pre-reset, regardless of warm, since the fast path's
+    "reuse the already-compiled model" premise cannot hold when nothing has been
+    compiled/restored yet on this env."""
+    env = types.SimpleNamespace()
+    assert states._restore_plan(env, model_hash="abc123", warm=True) == "full_with_prereset"
+    assert states._restore_plan(env, model_hash="abc123", warm=False) == "full_with_prereset"
+
+
+def test_restore_plan_same_hash_after_init_takes_fast_path():
+    """Second (or later) restore of the SAME start (matching model.xml hash) on
+    an already-initialized env, with warm=True -> the fast path, no recompile."""
+    env = types.SimpleNamespace(_bandit_initialized=True, _bandit_model_hash="abc123")
+    assert states._restore_plan(env, model_hash="abc123", warm=True) == "fast"
+
+
+def test_restore_plan_different_hash_takes_full_path_without_prereset():
+    """A genuinely different start (model.xml hash differs from the last-restored
+    one) on an already-initialized env still needs the full reset_to() path (the
+    compiled model must actually change), but the throwaway pre-reset is skipped
+    since some reset has already happened on this env."""
+    env = types.SimpleNamespace(_bandit_initialized=True, _bandit_model_hash="abc123")
+    assert states._restore_plan(env, model_hash="different_hash", warm=True) == "full_no_prereset"
+
+
+def test_restore_plan_warm_false_forces_full_path_even_with_matching_hash():
+    """warm=False (validate_reset.py --warm-check's cold-restore arm) must force
+    the full path unconditionally, even when the hash would otherwise qualify for
+    the fast path -- this is the gate's clean "old behavior" baseline."""
+    env = types.SimpleNamespace(_bandit_initialized=True, _bandit_model_hash="abc123")
+    assert states._restore_plan(env, model_hash="abc123", warm=False) == "full_with_prereset"
+
+
+def test_restore_plan_initialized_but_no_cached_hash_takes_full_path_without_prereset():
+    """An initialized env that has never gone through the full/hash-caching
+    branch (e.g. only ever restored via the fast path so far -- not reachable in
+    practice since the fast path requires a prior full restore to seed the hash,
+    but exercised directly here) has no `_bandit_model_hash` attribute at all;
+    getattr(..., None) must not accidentally equal a real hash string."""
+    env = types.SimpleNamespace(_bandit_initialized=True)
+    assert states._restore_plan(env, model_hash="abc123", warm=True) == "full_no_prereset"

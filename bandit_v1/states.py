@@ -31,6 +31,7 @@ ground truth; `category` is canonicalized via categories.canonical_category
 everywhere it is compared or emitted (fingerprint_diff, start_features) so this
 no longer registers as a mismatch.
 """
+import hashlib
 import json
 from pathlib import Path
 
@@ -174,18 +175,164 @@ def capture_start(seed, out_dir):
         close_env(env)
 
 
-def restore(env, start_dir):
-    """env.reset_to() the saved start in `start_dir`. Mirrors
+def _model_hash(model_xml):
+    """sha256 of a model.xml string's exact bytes. Used to detect "this start's
+    compiled scene is byte-identical to what's already loaded in env.sim.model" --
+    the condition restore()'s warm-model fast path requires."""
+    return hashlib.sha256(model_xml.encode("utf-8")).hexdigest()
+
+
+def _restore_plan(env, model_hash, warm):
+    """Pure decision logic for restore()'s two speedups (bandit_v1 rollout-speedup
+    task): given the env object's own bookkeeping attributes (`_bandit_initialized`,
+    `_bandit_model_hash`, both absent on a never-restored env) and the caller's
+    `warm` flag, decide which of three restore strategies to use. Kept separate
+    from restore() itself (which does the actual mujoco/robomimic calls) so this
+    decision can be unit-tested against a bare monkeypatched stand-in for `env` --
+    no live env, no mujoco -- covering exactly the three cases that matter:
+      - "full_with_prereset": a fresh/never-restored env (no `_bandit_initialized`),
+        or warm=False (the gate's cold-restore cross-check, and reset_to's/rollout
+        speedup (2)'s explicit fallback) -- always pays the explicit throwaway
+        env.reset() before env.reset_to(), exactly the pre-existing behavior.
+      - "full_no_prereset": env already initialized, warm=True, but the incoming
+        start's model.xml hash does not match the last-restored one (a genuinely
+        different scene) -- skips the throwaway pre-reset (speedup (2): reset_to's
+        own internal reset(unset_ep_meta=False) already suffices once *some* reset
+        has happened on this env, per the original restore() docstring/gate
+        history) but still does the full env.reset_to() (both of its internal
+        model recompiles), since the compiled model must actually change.
+      - "fast": env already initialized, warm=True, and the incoming start's
+        model.xml hash matches the last-restored one -- i.e. this is a REPEAT of
+        the same start (or, in principle, coincidentally-identical scenes). No
+        recompile is needed at all; see _restore_warm's docstring for exactly what
+        this path does and does not reproduce from a full reset_to().
+    """
+    initialized = getattr(env, "_bandit_initialized", False)
+    if warm and initialized and getattr(env, "_bandit_model_hash", None) == model_hash:
+        return "fast"
+    if (not warm) or (not initialized):
+        return "full_with_prereset"
+    return "full_no_prereset"
+
+
+def _restore_full(env, states_arr, model_xml, ep_meta_json):
+    """The original (pre-speedup) reset_to()-based restore, unchanged: both of
+    reset_to's internal model recompiles (the ep_meta-driven `_load_model` +
+    `_initialize_sim` inside its `self.reset(unset_ep_meta=False)` call, and the
+    exact-xml `reset_from_xml_string`) run unconditionally. Always correct;
+    used whenever no cached compiled model can be reused."""
+    return env.reset_to({"states": states_arr, "model": model_xml, "ep_meta": ep_meta_json})
+
+
+def _restore_warm(env, states_arr, ep_meta_json):
+    """Warm-model fast path (rollout-speedup (3)): used only when the incoming
+    start's model.xml is byte-identical (by sha256) to the one already compiled
+    into `env.env.sim.model` -- i.e. a repeat of the same start. Skips BOTH of
+    reset_to's model recompiles entirely and instead:
+
+      1. Reapplies ep_meta (set_attrs_from_ep_meta / set_ep_meta) -- lang,
+         layout/style ids, gen_textures record, saved robot base target, etc.
+         (mirrors reset_to's first step).
+      2. Runs ONE soft (non-recompiling) reset by forcing
+         `env.env.deterministic_reset = True` around a normal
+         `env.reset(unset_ep_meta=False)` call, then setting it back to False
+         (exactly mirroring reset_from_xml_string's own use of this flag, see
+         robosuite/environments/base.py). With `deterministic_reset=True` and
+         `sim` already built, robosuite's own reset() takes its "soft" branch
+         (`self.sim.reset()`, i.e. mj_resetData -- no `_load_model()` /
+         `_initialize_sim()` recompile) but still runs `_reset_internal()`
+         unconditionally. This step is NOT optional: `_reset_internal()` is what
+         resets each robot's composite-controller internal state
+         (robosuite/robots/robot.py: `robot.reset()` calls
+         `composite_controller.update_state()` + `.reset()` -- interpolators,
+         ramped/filtered goals, etc.) and repositions the robot base from
+         `ep_meta["init_robot_base_pos"/"init_robot_base_ori"]`. None of that is
+         touched by `set_state_from_flattened`, which only overwrites MuJoCo's
+         raw (time, qpos, qvel) -- so a bare
+         `sim.reset() + set_state_from_flattened + forward` with NO reset() call
+         at all (the naive reading of "state-set only") would leave a REPEAT's
+         controller state stale from wherever the previous rollout's real policy
+         actions left it, instead of matching the freshly-restored pose. This was
+         found by inspection (robot.reset() is unconditionally invoked from
+         `_reset_internal()`, itself unconditionally invoked from every reset()
+         variant regardless of hard/soft branching) and is the "dependency the
+         recompile provides that state-set alone does not" the design flagged as
+         a risk to check for. Using robosuite's own deterministic_reset soft-reset
+         mechanism (rather than hand-calling `robot.reset()` directly) reuses
+         already-tested upstream code for this instead of re-implementing it.
+         Nothing here recompiles the mujoco model, so per-episode textures /
+         object id mappings / body addresses (baked into the compiled model,
+         unchanged since we are, by construction, restoring the SAME model.xml
+         that's already loaded) are untouched and still correct.
+      3. Applies the exact captured state via set_state_from_flattened + forward,
+         overwriting whatever step 2's soft reset put in qpos/qvel (matching the
+         saved snapshot exactly, same as reset_to's own tail).
+      4. update_sites/update_state + get_observation, matching reset_to's tail.
+    """
+    raw = env.env
+    ep_meta = json.loads(ep_meta_json)
+    if hasattr(raw, "set_attrs_from_ep_meta"):
+        raw.set_attrs_from_ep_meta(ep_meta)
+    elif hasattr(raw, "set_ep_meta"):
+        raw.set_ep_meta(ep_meta)
+
+    raw.deterministic_reset = True
+    env.reset(unset_ep_meta=False)
+    raw.deterministic_reset = False
+
+    raw.sim.set_state_from_flattened(states_arr)
+    raw.sim.forward()
+    if hasattr(raw, "update_sites"):
+        raw.update_sites()
+    if hasattr(raw, "update_state"):
+        raw.update_state()
+    return env.get_observation()
+
+
+def restore(env, start_dir, warm=True):
+    """Restore the saved start in `start_dir` into `env`. Mirrors
     check_train_eval_disjoint.py's `env.reset(); env.reset_to(initial_state)`
     pattern (reset_to's own internal reset(unset_ep_meta=False) call is not a
-    substitute for this on a freshly-constructed, never-reset env). Returns the
-    post-restore observation dict."""
+    substitute for the explicit pre-reset on a freshly-constructed, never-reset
+    env) -- EXCEPT that, per the ledger cost analysis (each episode was paying
+    this throwaway pre-reset PLUS reset_to's own two internal recompiles, ~16.2s
+    fixed cost/episode), two speedups are applied once it is safe to do so:
+
+      (2) The explicit pre-reset above is skipped once `env` has completed at
+          least one reset ever (tracked via `env._bandit_initialized`, set by
+          this function) -- the pre-reset is genuinely required only for a
+          never-reset env, per the original gate history; it is pure waste on
+          every subsequent call, since reset_to's own internal reset already
+          establishes a valid scene before overwriting it.
+      (3) If, in addition, the incoming start's model.xml hash matches the last
+          -restored one (`env._bandit_model_hash`, also set by this function) --
+          i.e. this is a repeat of the same start -- reset_to's two internal
+          model recompiles are skipped entirely via `_restore_warm` (see its
+          docstring for exactly what is and is not reproduced).
+
+    `warm=False` disables both speedups unconditionally (always pre-reset, always
+    the full reset_to path) -- used by validate_reset.py's --warm-check gate as
+    the "cold restore" comparison arm, and to preserve the original behavior for
+    any caller that needs it. `warm=True` (the default) is what rollout.py uses.
+
+    Returns the post-restore observation dict."""
     start_dir = Path(start_dir)
     states_arr = np.load(start_dir / "state.npz")["states"]
     model_xml = (start_dir / "model.xml").read_text()
     ep_meta_json = (start_dir / "ep_meta.json").read_text()  # reset_to() json.loads's this itself
-    env.reset()
-    return env.reset_to({"states": states_arr, "model": model_xml, "ep_meta": ep_meta_json})
+    model_hash = _model_hash(model_xml)
+
+    plan = _restore_plan(env, model_hash, warm)
+    if plan == "fast":
+        obs = _restore_warm(env, states_arr, ep_meta_json)
+    else:
+        if plan == "full_with_prereset":
+            env.reset()
+        obs = _restore_full(env, states_arr, model_xml, ep_meta_json)
+        env._bandit_model_hash = model_hash
+
+    env._bandit_initialized = True
+    return obs
 
 
 _CATEGORY_HW = None

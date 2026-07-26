@@ -129,7 +129,7 @@ def _rollout_one(env, client, start_dir, horizon):
     """Restore `start_dir` into `env` and roll the served policy out for up to
     `horizon` steps. Returns the per-episode outcome dict (no identity/ledger
     fields -- run() adds those)."""
-    obs = states.restore(env, start_dir)
+    obs = states.restore(env, start_dir, warm=True)
     rs = env.env
     lang = rs.get_ep_meta().get("lang", "")
 
