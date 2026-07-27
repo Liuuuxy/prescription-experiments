@@ -524,6 +524,7 @@ def wait_for_free_gpu(gpus=(0, 1), need_mib=TRAIN_GPU_NEED_MIB, poll_secs=GPU_PO
 
 def _train_env(gpu: int) -> dict:
     env = dict(os.environ)
+    env.pop("PYOPENGL_PLATFORM", None)  # parent may run osmesa (rollouts); mujoco's egl guard rejects a leftover
     env.update(TMPDIR="/data/xinyua11/tmp", HF_HOME="/data/xinyua11/.cache/huggingface",
                MUJOCO_GL="egl", WANDB_MODE="offline", WANDB_DIR="/data/xinyua11/wandb",
                CUDA_VISIBLE_DEVICES=str(gpu), XLA_PYTHON_CLIENT_MEM_FRACTION="0.9")
@@ -570,6 +571,7 @@ def serve_cmd(config_name: str, ckpt_dir, port: int) -> list:
 
 def _serve_env(gpu: int) -> dict:
     env = dict(os.environ)
+    env.pop("PYOPENGL_PLATFORM", None)  # parent may run osmesa (rollouts); mujoco's egl guard rejects a leftover
     env.update(TMPDIR="/data/xinyua11/tmp", HF_HOME="/data/xinyua11/.cache/huggingface",
                MUJOCO_GL="egl", CUDA_VISIBLE_DEVICES=str(gpu), XLA_PYTHON_CLIENT_MEM_FRACTION="0.25")
     return env
