@@ -119,3 +119,15 @@ arms_freeze:
 # above. Logs: /data/xinyua11/tmp/bandit_baseline.log (nohup stdout/stderr),
 # /data/xinyua11/tmp/bandit_baseline_orch.log (the script's own structured log).
 baseline_chain_pid: 4077116
+
+# bandit_v1 run_race: gradient-analysis retention note (owner request) --
+# nothing pull.py writes (checkpoints at every save interval, per-pull
+# demo_ids, paired training seeds) is ever deleted; every pull row also
+# carries a training_artifacts_json field recording exactly where each
+# of these landed on disk, for a future per-demo gradient/influence pass.
+gradient_analysis:
+  retained:
+  - lora adapter ckpts at all save intervals
+  - demo_ids per pull
+  - paired seeds
+  rationale: future per-demo gradient/influence analysis

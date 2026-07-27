@@ -68,6 +68,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import re
 import yaml
 
 from . import clustering, config, draw, eval_set, ledger, map_fit, pool, pull, scheduler, wells
@@ -179,8 +180,22 @@ def append_noise_floor_to_config_yaml(null_deltas, sigma_e, path=None, log=lambd
     if path.exists():
         doc = yaml.safe_load(path.read_text()) or {}
         if isinstance(doc, dict) and "noise_floor" in doc:
-            log(f"noise_floor block already present in {path} -- not re-appending")
-            return path
+            existing = doc["noise_floor"]
+            same = (existing.get("sigma_e") == float(sigma_e)
+                    and [float(x) for x in existing.get("null_deltas", [])]
+                    == [float(x) for x in null_deltas])
+            if same:
+                log(f"noise_floor block already present in {path} -- not re-appending")
+                return path
+            # A mismatched pre-existing block is stale/foreign (e.g. test junk
+            # written via a defaulted path): replace it LOUDLY with the real
+            # measurement rather than silently keeping the wrong numbers.
+            log(f"WARNING: replacing mismatched noise_floor block in {path} "
+                f"(had {existing}, real = null_deltas={list(null_deltas)}, sigma_e={sigma_e})")
+            text = path.read_text()
+            text = re.sub(r"\n?#[^\n]*Phase NULLS[^\n]*\n(#[^\n]*\n)*noise_floor:\n(  [^\n]*\n)*", "", text)
+            text = re.sub(r"noise_floor:\n(  [^\n]*\n|  - [^\n]*\n)*", "", text)
+            path.write_text(text)
 
     block = {"noise_floor": {"null_deltas": [float(x) for x in null_deltas], "sigma_e": float(sigma_e)}}
     header = (

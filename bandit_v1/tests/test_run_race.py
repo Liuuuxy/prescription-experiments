@@ -170,9 +170,14 @@ def test_append_noise_floor_to_config_yaml_writes_block_and_guards_against_doubl
     assert doc["noise_floor"]["sigma_e"] == pytest.approx(0.05)
 
     before = cfg.read_text()
-    rr.append_noise_floor_to_config_yaml([0.99, 0.99], 999.0, path=cfg, log=_quiet_log)
+    rr.append_noise_floor_to_config_yaml([0.01, -0.02], 0.05, path=cfg, log=_quiet_log)  # same values: no-op
     after = cfg.read_text()
-    assert after == before  # guard fired -- second call is a pure no-op
+    assert after == before  # identical values: pure no-op
+    # mismatched values must be REPLACED loudly, not silently kept
+    rr.append_noise_floor_to_config_yaml([0.99, 0.99], 999.0, path=cfg, log=_quiet_log)
+    doc = yaml.safe_load(cfg.read_text())
+    assert doc["noise_floor"]["sigma_e"] == pytest.approx(999.0)
+    assert doc["noise_floor"]["null_deltas"] == [0.99, 0.99]
 
 
 # =============================================================================
@@ -296,44 +301,45 @@ def test_missing_null_rounds_various_states():
     assert rr.missing_null_rounds(_pulls([("null", 1, None, "failed")])) == [1, 2]
 
 
-def test_run_null_phase_skips_when_both_already_ok():
+def test_run_null_phase_skips_when_both_already_ok(tmp_path):
     fl = FakeLedger(preseed=_pulls([("null", 1, 0.01), ("null", 2, -0.02)]).to_dict("records"))
-    sigma_e = rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.03, log=_quiet_log)
+    sigma_e = rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.03,
+                                cfg_path=tmp_path / "config.yaml", log=_quiet_log)
     assert fl.calls == []  # never re-pulled
     assert sigma_e == pytest.approx(max(float(np.std([0.01, -0.02], ddof=1)), 0.03))
 
 
-def test_run_null_phase_runs_only_the_missing_round():
+def test_run_null_phase_runs_only_the_missing_round(tmp_path):
     fl = FakeLedger(preseed=_pulls([("null", 1, 0.01)]).to_dict("records"),
                      delta_fn=lambda arm, j: -0.015)
-    rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=_quiet_log)
+    rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=_quiet_log, cfg_path=tmp_path / 'config.yaml')
     assert fl.calls == [("null", 2)]
 
 
-def test_run_null_phase_computes_sigma_e_as_max_of_null_std_and_eval_floor():
+def test_run_null_phase_computes_sigma_e_as_max_of_null_std_and_eval_floor(tmp_path):
     fl = FakeLedger(delta_fn=lambda arm, j: {1: 0.20, 2: -0.20}[j])
     sigma_e = rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.01,
-                                 claimable_fn=lambda: False, log=_quiet_log)
+                                 claimable_fn=lambda: False, log=_quiet_log, cfg_path=tmp_path / 'config.yaml')
     expected_null_std = float(np.std([0.20, -0.20], ddof=1))
     assert expected_null_std > 0.01
     assert sigma_e == pytest.approx(expected_null_std)
     assert fl.calls == [("null", 1), ("null", 2)]
 
 
-def test_run_null_phase_logs_loud_warning_when_delta_exceeds_threshold():
+def test_run_null_phase_logs_loud_warning_when_delta_exceeds_threshold(tmp_path):
     logs = []
     fl = FakeLedger(delta_fn=lambda arm, j: 0.2 if j == 1 else 0.0)
-    rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=logs.append)
+    rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=logs.append, cfg_path=tmp_path / 'config.yaml')
     assert any("LOUD WARNING" in line for line in logs)
 
 
-def test_run_null_phase_raises_when_still_fewer_than_2_ok_after_running():
+def test_run_null_phase_raises_when_still_fewer_than_2_ok_after_running(tmp_path):
     fl = FakeLedger(fail_set={("null", 1), ("null", 2)})
     with pytest.raises(RuntimeError, match="HUMAN INTERVENTION"):
-        rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=_quiet_log)
+        rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.0, log=_quiet_log, cfg_path=tmp_path / 'config.yaml')
 
 
-def test_run_null_phase_two_wide_when_claimable():
+def test_run_null_phase_two_wide_when_claimable(tmp_path):
     fl = FakeLedger()
     # a 2-party barrier proves the 2 missing null pulls actually ran
     # concurrently when claimable_fn says both slots are free.
@@ -345,7 +351,7 @@ def test_run_null_phase_two_wide_when_claimable():
         return orig_run_one(spec)
 
     rr.run_null_phase(fl.read, barriered_run_one, sigma_e_eval=0.0,
-                       claimable_fn=lambda: True, log=_quiet_log)
+                       claimable_fn=lambda: True, log=_quiet_log, cfg_path=tmp_path / 'config.yaml')
     assert set(fl.calls) == {("null", 1), ("null", 2)}
 
 
