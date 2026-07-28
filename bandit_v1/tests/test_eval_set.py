@@ -546,3 +546,218 @@ def test_append_baseline_to_config_yaml_single_repeat_sigma_is_zero(tmp_path):
     eval_set.append_baseline_to_config_yaml(result, path=cfg_path)
     doc = yaml.safe_load(cfg_path.read_text())
     assert doc["baseline"]["sigma_e_eval"] == 0.0
+
+
+# =============================================================================
+# resume / skip_pairs (baseline-chain recovery: eval-baseline must be safely
+# rerunnable after a partial/crashed prior attempt, run_diagnosis.py-style)
+# =============================================================================
+
+def test_done_pairs_reads_ledger_and_filters_phase_and_policy_id(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path)
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path)
+    ledger.append_rows("episodes", [
+        {"phase": "eval", "policy_id": "pi0_baseline", "start_id": "start_00000", "repeat_idx": 0, "success": True},
+        {"phase": "eval", "policy_id": "pi0_baseline", "start_id": "start_00000", "repeat_idx": 1, "success": False},
+        {"phase": "eval", "policy_id": "OTHER", "start_id": "start_00000", "repeat_idx": 0, "success": True},
+        {"phase": "diag", "policy_id": "pi0_baseline", "start_id": "start_00000", "repeat_idx": 0, "success": True},
+    ])
+
+    got = eval_set.done_pairs(policy_id="pi0_baseline")
+
+    assert got == {("start_00000", 0), ("start_00000", 1)}
+
+
+def test_done_pairs_empty_set_when_ledger_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path)
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path)
+    assert eval_set.done_pairs(policy_id="pi0_baseline") == set()
+
+
+def test_done_pairs_requires_policy_id():
+    with pytest.raises(ValueError, match="policy_id"):
+        eval_set.done_pairs(policy_id=None)
+
+
+def test_eval_checkpoint_forwards_skip_pairs_to_run_fn():
+    manifest = _make_manifest(n_per_stratum=2)
+    seen = {}
+    skip = {("start_00003", 1)}
+
+    def fake_run(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                 skip_pairs=None):
+        seen["skip_pairs"] = skip_pairs
+        rows = []
+        for ordinal, sd in enumerate(start_dirs):
+            for r in range(reps):
+                if (Path(sd).name, r) in (skip_pairs or ()):
+                    continue
+                rows.append({"start_id": Path(sd).name, "repeat_idx": r,
+                              "success": _SUCCESS_TABLE[(ordinal, r)]})
+        return rows
+
+    # skip_pairs=None (unset) is not exercised here -- see the ledger-reaggregation
+    # test below for the resume path, which is the only path that ever needs a
+    # non-None skip_pairs (a fully-fresh run has nothing to skip).
+    eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                              repeats=2, manifest=manifest, run_fn=fake_run, skip_pairs=None)
+    assert seen["skip_pairs"] is None
+
+
+def test_eval_checkpoint_resume_aggregates_from_full_ledger_not_just_new_rows(tmp_path, monkeypatch):
+    """The core recovery-path guarantee: when `skip_pairs` is non-empty (a
+    resume), `run_fn` only returns the NEWLY-run pairs (the skipped ones are
+    never re-run and never re-appended) -- aggregating over that partial
+    return alone would wrongly raise "missing" for every already-done pair.
+    eval_checkpoint must instead re-read the full (phase=eval, policy_id=...)
+    slice from the ledger (which now holds both the pre-existing rows AND
+    whatever run_fn just appended) and aggregate over THAT."""
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path)
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path)
+    manifest = _make_manifest(n_per_stratum=2)  # 6 starts x 2 repeats = 12 pairs
+
+    # Pre-existing ledger rows: every pair EXCEPT (start_00003, r1) and
+    # (start_00005, r1), as if an earlier crashed run got that far.
+    pre_existing = [
+        {"phase": "eval", "policy_id": "pi0_baseline", "start_id": sid, "repeat_idx": r,
+         "success": _SUCCESS_TABLE[(ordinal, r)]}
+        for ordinal, sid in enumerate(manifest["start_id"])
+        for r in range(2)
+        if (ordinal, r) not in {(3, 1), (5, 1)}
+    ]
+    ledger.append_rows("episodes", pre_existing)
+    # Build the real skip set the CLI's done_pairs() would compute:
+    skip_pairs = eval_set.done_pairs(policy_id="pi0_baseline")
+    assert skip_pairs == {(sid, r) for ordinal, sid in enumerate(manifest["start_id"])
+                           for r in range(2) if (ordinal, r) not in {(3, 1), (5, 1)}}
+
+    def fake_run_fn(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                     skip_pairs=None):
+        # Only run + append the two still-missing pairs, exactly like
+        # rollout.run/parallel_eval.run_parallel would with this skip_pairs.
+        new_rows = []
+        for ordinal, sd in enumerate(start_dirs):
+            sid = Path(sd).name
+            for r in range(reps):
+                if skip_pairs is not None and (sid, r) in skip_pairs:
+                    continue
+                row = {"phase": phase, "policy_id": policy_id, "start_id": sid,
+                       "repeat_idx": r, "success": _SUCCESS_TABLE[(ordinal, r)]}
+                ledger.append_rows("episodes", [row])
+                new_rows.append(row)
+        return new_rows
+
+    result = eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                       repeats=2, manifest=manifest, run_fn=fake_run_fn,
+                                       skip_pairs=skip_pairs)
+
+    # Same hand-computed aggregation as the full-table test above.
+    assert result["per_repeat_means"] == pytest.approx([0.5, 0.5])
+    assert result["per_stratum_mean"] == pytest.approx({"hard": 0.25, "mid": 0.5, "easy": 0.75})
+    # and the ledger really does now hold all 12 pairs, not just the 10 pre-existing + 2 new
+    # counted separately
+    full = ledger.read("episodes")
+    full = full[(full["phase"] == "eval") & (full["policy_id"] == "pi0_baseline")]
+    assert len(full) == 12
+
+
+# =============================================================================
+# resume=True (emergency null-takeover fix: eval_checkpoint computes its own
+# skip_pairs from the ledger -- no caller-side done_pairs()/skip_pairs wiring
+# needed, so a killed-and-relaunched pull eval is safely rerunnable by
+# construction). See bandit_v1/run_race.py's _make_eval_fn, which now always
+# passes resume=True.
+# =============================================================================
+
+def test_eval_checkpoint_resume_true_computes_skip_pairs_from_ledger(tmp_path, monkeypatch):
+    """resume=True must reproduce exactly the same behavior the CLI's old
+    manual `skip_pairs=done_pairs(...)` wiring achieved by hand: the ledger's
+    existing (start_id, repeat_idx) pairs for this policy_id are forwarded to
+    run_fn as skip_pairs, and the final result is aggregated from the FULL
+    ledger slice (pre-existing + newly-run rows), not just run_fn's partial
+    return."""
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path)
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path)
+    manifest = _make_manifest(n_per_stratum=2)  # 6 starts x 2 repeats = 12 pairs
+
+    pre_existing = [
+        {"phase": "eval", "policy_id": "pi0_baseline", "start_id": sid, "repeat_idx": r,
+         "success": _SUCCESS_TABLE[(ordinal, r)]}
+        for ordinal, sid in enumerate(manifest["start_id"])
+        for r in range(2)
+        if (ordinal, r) not in {(3, 1), (5, 1)}
+    ]
+    ledger.append_rows("episodes", pre_existing)
+    expected_skip = {(sid, r) for ordinal, sid in enumerate(manifest["start_id"])
+                      for r in range(2) if (ordinal, r) not in {(3, 1), (5, 1)}}
+
+    seen = {}
+
+    def fake_run_fn(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                     skip_pairs=None):
+        seen["skip_pairs"] = skip_pairs
+        new_rows = []
+        for ordinal, sd in enumerate(start_dirs):
+            sid = Path(sd).name
+            for r in range(reps):
+                if skip_pairs is not None and (sid, r) in skip_pairs:
+                    continue
+                row = {"phase": phase, "policy_id": policy_id, "start_id": sid,
+                       "repeat_idx": r, "success": _SUCCESS_TABLE[(ordinal, r)]}
+                ledger.append_rows("episodes", [row])
+                new_rows.append(row)
+        return new_rows
+
+    result = eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                       repeats=2, manifest=manifest, run_fn=fake_run_fn,
+                                       resume=True)
+
+    assert seen["skip_pairs"] == expected_skip
+    assert result["per_repeat_means"] == pytest.approx([0.5, 0.5])
+    assert result["per_stratum_mean"] == pytest.approx({"hard": 0.25, "mid": 0.5, "easy": 0.75})
+    full = ledger.read("episodes")
+    full = full[(full["phase"] == "eval") & (full["policy_id"] == "pi0_baseline")]
+    assert len(full) == 12
+
+
+def test_eval_checkpoint_resume_true_with_no_prior_rows_is_unchanged(tmp_path, monkeypatch):
+    """The 'no behavior change when ledger has no prior rows' guarantee:
+    resume=True against an empty ledger must produce the IDENTICAL result
+    (and IDENTICAL run_fn skip_pairs argument, None-equivalent/empty) as a
+    plain resume=False call -- resume=True is a provable no-op the first
+    time any given policy_id is ever evaluated."""
+    monkeypatch.setattr(config, "LEDGER_DIR", tmp_path)
+    monkeypatch.setattr(ledger, "LEDGER_DIR", tmp_path)
+    manifest = _make_manifest(n_per_stratum=2)
+
+    seen_skip_pairs = []
+
+    def fake_run_fn(host, port, start_dirs, reps, phase, policy_id, arm=None, pull_id=None,
+                     skip_pairs=None):
+        seen_skip_pairs.append(skip_pairs)
+        rows = []
+        for ordinal, sd in enumerate(start_dirs):
+            for r in range(reps):
+                rows.append({"start_id": Path(sd).name, "repeat_idx": r,
+                              "success": _SUCCESS_TABLE[(ordinal, r)]})
+        return rows
+
+    result_resume = eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                              repeats=2, manifest=manifest, run_fn=fake_run_fn,
+                                              resume=True)
+    # empty set, not None -- done_pairs() always returns a set -- but falsy either way
+    assert not seen_skip_pairs[0]
+
+    fake_run = _fake_run_from_table(_SUCCESS_TABLE)
+    result_plain = eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                             repeats=2, manifest=manifest, run_fn=fake_run)
+
+    assert result_resume == result_plain
+
+
+def test_eval_checkpoint_resume_true_and_explicit_skip_pairs_raises():
+    manifest = _make_manifest(n_per_stratum=2)
+    with pytest.raises(ValueError, match="ambiguous"):
+        eval_set.eval_checkpoint(9999, "pi0_baseline", None, "pi0_baseline",
+                                  repeats=2, manifest=manifest, run_fn=lambda *a, **k: [],
+                                  resume=True, skip_pairs={("start_00000", 0)})

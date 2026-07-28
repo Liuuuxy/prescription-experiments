@@ -77,7 +77,18 @@ POLL_SECS = 120                 # preconditions-wait poll interval
 NULL_ROUNDS = (1, 2)            # seeds 1001/1002 via config.pull_seed
 RACE_FIRST_ROUND = 3            # real race rounds start where the null seeds leave off
 NULL_DELTA_LOUD_THRESHOLD = 0.05
-EVAL_WORKERS = 4                # matches run_baseline.sh's EVAL_WORKERS (parallel_eval opt-in)
+# LOUD: SERIAL IS THE DEFAULT FOR EVALS, NOT A FALLBACK (emergency null-
+# takeover fix, task-nulltakeover-report.md). This box hangs 4-worker
+# parallel_eval evals under CPU contention (see task-baselinerecover-
+# report.md/task-r3overlap-report.md: repeated 2-4 workers stuck importing
+# for 3h, self-killed by parallel_eval's own timeout, no useful speedup
+# ever realized in practice) -- `None` routes eval_set.eval_checkpoint
+# through the plain serial rollout.run path every time, which is slower per
+# pull but has never once hung. DO NOT bump this back up to a parallel
+# worker count until the underlying box-contention/driver-hang issue is
+# actually fixed and re-verified under a real multi-hour eval -- revisit
+# then, not before.
+EVAL_WORKERS = None
 SLOT_GPU = {"a": 0, "b": 1}     # slot <-> physical GPU pinning for 2-wide concurrent pulls
 
 
@@ -609,8 +620,18 @@ def dry_run_report(read_pulls_fn=None, cfg_path=None, e_manifest_path=None,
 # =============================================================================
 
 def _make_eval_fn(workers=EVAL_WORKERS):
+    """eval_fn for pull.run_pull: ALWAYS resumable (emergency null-takeover
+    fix -- resume=True is unconditional, not an opt-in flag) -- a pull's eval
+    step can be killed and rerun (crashed worker, box-wide contention, a
+    human takeover) at any point and this eval_fn will pick up only the
+    still-missing (start_id, repeat_idx) pairs for that pull's policy_id
+    rather than redoing (or double-counting) whatever's already durably in
+    the ledger. See eval_set.eval_checkpoint's `resume` docstring for why
+    this is a provable no-op the first time any given policy_id is
+    evaluated (nothing to resume from yet). `workers` defaults to
+    EVAL_WORKERS (None == serial -- see that constant's own comment)."""
     def eval_fn(port, policy_id, arm, pull_id):
-        return eval_set.eval_checkpoint(port, policy_id, arm, pull_id, workers=workers)
+        return eval_set.eval_checkpoint(port, policy_id, arm, pull_id, workers=workers, resume=True)
     return eval_fn
 
 

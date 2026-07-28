@@ -282,9 +282,31 @@ def load_manifest(path=None) -> pd.DataFrame:
 # 2. Baseline-eval aggregation
 # =============================================================================
 
+def done_pairs(phase=EVAL_PHASE, policy_id=None) -> set:
+    """Set of (start_id, repeat_idx) tuples already present in ledger table
+    "episodes" for this (phase, policy_id), re-read fresh from disk on every
+    call -- same resume idiom as run_diagnosis.py's `done_pairs` (see its
+    docstring), adapted for eval_set's baseline/eval-checkpoint runs. Empty
+    set if the ledger table doesn't exist yet (nothing has ever been written).
+
+    `policy_id` is required (unlike run_diagnosis.py's single fixed
+    POLICY_ID, eval_set serves many distinct policy_ids -- pi0_baseline, a
+    pull's own policy_id, etc. -- so there is no sane default to fall back
+    to); raises ValueError if omitted."""
+    if policy_id is None:
+        raise ValueError("done_pairs: policy_id is required")
+    try:
+        df = ledger.read("episodes")
+    except FileNotFoundError:
+        return set()
+    d = df[(df["phase"] == phase) & (df["policy_id"] == policy_id)]
+    return set(zip(d["start_id"], d["repeat_idx"]))
+
+
 def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
                      host="127.0.0.1", manifest=None, manifest_path=None,
-                     run_fn=None, workers=None, log=print) -> dict:
+                     run_fn=None, workers=None, skip_pairs=None, resume=False,
+                     log=print) -> dict:
     """Evaluate the checkpoint served at (host, policy_port) on the frozen
     150-start eval set E, `repeats` independent passes (default
     config.EVAL_REPEATS=3). This is the ONE function pull.run_pull's
@@ -315,6 +337,41 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
     test_rollout.py/test_run_diagnosis.py already use elsewhere in this
     codebase, letting every test here run with no live env, GPU, or policy
     server.
+
+    `skip_pairs` (bandit_v1's resume mechanism, run_diagnosis.py-style --
+    default None, identical behavior to before this parameter existed):
+    forwarded verbatim to `run_fn` (both rollout.run and
+    parallel_eval.run_parallel already accept it) so a rerun after a
+    partial/crashed prior eval-checkpoint call never redoes an
+    (start_id, repeat_idx) pair already durable in the ledger. Pass
+    `done_pairs(policy_id=...)` for the caller's own policy_id to compute it.
+    Because a skipped pair is never re-run and never re-appended, `run_fn`'s
+    return value in a resume call only contains the NEWLY-run rows -- NOT the
+    full repeats x starts set `_aggregate_eval_rows` requires -- so when
+    `skip_pairs` is truthy, this function ignores `run_fn`'s return value for
+    aggregation purposes and instead re-reads the authoritative full
+    (phase="eval", policy_id=policy_id) slice fresh from ledger table
+    "episodes" (which by then holds both the pre-existing rows and whatever
+    `run_fn` just appended) and aggregates over THAT. A falsy `skip_pairs`
+    (None or empty) leaves the original behavior -- aggregate directly over
+    `run_fn`'s return value -- completely unchanged.
+
+    `resume` (bandit_v1 emergency-null-takeover fix -- default False, ZERO
+    behavior change when omitted): when True, `skip_pairs` is computed HERE,
+    automatically, as `done_pairs(EVAL_PHASE, policy_id=policy_id)` -- i.e.
+    the caller no longer has to know/compute its own skip set (contrast the
+    CLI's older manual `--resume` flag, which calls `done_pairs` itself and
+    passes the result as `skip_pairs`). This is what makes a caller like
+    run_race.py's per-pull `eval_fn` (which runs unattended for hours and
+    must survive a killed-and-relaunched worker mid-eval) safely rerunnable
+    by construction, with no special-cased retry path. Passing BOTH
+    `resume=True` and an explicit `skip_pairs` is ambiguous (which set should
+    win?) and raises ValueError rather than silently picking one. When the
+    ledger has zero pre-existing rows for this (phase, policy_id) --
+    including the always-true case of a policy_id's very first eval call --
+    `done_pairs` returns an empty set, which is falsy, so the aggregation
+    path below is IDENTICAL to a plain `resume=False` call: `resume=True` is
+    provably a no-op the first time any given policy_id is evaluated.
 
     Returns (see pull.compute_delta's docstring for the two keys it actually
     reads -- kept byte-identical in shape here):
@@ -353,6 +410,14 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
         manifest = load_manifest(manifest_path)
     if "start_id" not in manifest.columns or "stratum" not in manifest.columns:
         raise ValueError("eval_checkpoint: manifest must have 'start_id' and 'stratum' columns")
+    if resume:
+        if skip_pairs is not None:
+            raise ValueError(
+                "eval_checkpoint: resume=True computes skip_pairs from the ledger itself -- "
+                "passing an explicit skip_pairs at the same time is ambiguous")
+        skip_pairs = done_pairs(EVAL_PHASE, policy_id=policy_id)
+        log(f"eval_checkpoint: resume=True -- {len(skip_pairs)} (start_id, repeat_idx) pairs "
+            f"already in ledger for phase={EVAL_PHASE} policy_id={policy_id} -- skipping those")
     if run_fn is None:
         if workers is not None and workers > 1:
             from . import parallel_eval as _parallel_eval
@@ -363,7 +428,14 @@ def eval_checkpoint(policy_port, policy_id, arm, pull_id, repeats=None, *,
     e_dir = config.E_DIR
     start_dirs = [e_dir / sid for sid in manifest["start_id"]]
     result_rows = run_fn(host, policy_port, start_dirs, repeats, phase=EVAL_PHASE,
-                          policy_id=policy_id, arm=arm, pull_id=pull_id)
+                          policy_id=policy_id, arm=arm, pull_id=pull_id, skip_pairs=skip_pairs)
+
+    if skip_pairs:
+        # Resume path -- see docstring: result_rows is only the newly-run
+        # subset, so aggregate over the full ledger slice instead.
+        df_all = ledger.read("episodes")
+        df_all = df_all[(df_all["phase"] == EVAL_PHASE) & (df_all["policy_id"] == policy_id)]
+        result_rows = df_all.to_dict("records")
 
     return _aggregate_eval_rows(result_rows, manifest, repeats)
 
@@ -546,6 +618,16 @@ def _main():
                               "over this many parallel worker subprocesses against the same "
                               "served policy (see parallel_eval.py); omitted/1 is the original "
                               "serial rollout.run path, unchanged")
+    eval_p.add_argument("--resume", action="store_true",
+                         help="recover a partial/crashed prior eval-baseline run for the same "
+                              "--policy_id: eval_checkpoint(resume=True) queries the ledger for "
+                              "(start_id, repeat_idx) pairs already recorded under phase=eval "
+                              "policy_id=<policy_id> (done_pairs()) and skips them, so only the "
+                              "still-missing pairs are actually rolled out -- the final "
+                              "b/per-stratum-b/sigma_e_eval are then computed over the FULL "
+                              "150*repeats set (old + newly-run rows), same as a from-scratch "
+                              "run. A no-op (identical to omitting --resume) the first time this "
+                              "policy_id is ever evaluated, since done_pairs() is then empty.")
 
     args = ap.parse_args()
 
@@ -556,7 +638,8 @@ def _main():
 
     elif args.cmd == "eval-baseline":
         result = eval_checkpoint(args.port, args.policy_id, None, args.policy_id,
-                                  repeats=args.repeats, host=args.host, workers=args.workers)
+                                  repeats=args.repeats, host=args.host, workers=args.workers,
+                                  resume=args.resume)
         print("BASELINE_MEAN", result["mean"])
         print("BASELINE_PER_STRATUM", json.dumps(result["per_stratum_mean"]))
 
