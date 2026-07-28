@@ -210,6 +210,17 @@ def test_ckpt_final_dir_default_step_vs_num_train_steps_override(isolated):
     assert d2.name == "59"  # step == num_train_steps - 1, per scripts/train.py's save condition
 
 
+def test_train_env_mem_fraction_default_and_env_override(monkeypatch):
+    # default (no BANDIT_TRAIN_MEM_FRACTION set) -- unchanged from before this override existed.
+    monkeypatch.delenv("BANDIT_TRAIN_MEM_FRACTION", raising=False)
+    assert pull._train_env(0)["XLA_PYTHON_CLIENT_MEM_FRACTION"] == "0.9"
+
+    # override respected -- lets a caller (e.g. a manual overlap-train driver sharing a
+    # GPU with live eval serving) request a smaller fraction without touching the default.
+    monkeypatch.setenv("BANDIT_TRAIN_MEM_FRACTION", "0.4")
+    assert pull._train_env(0)["XLA_PYTHON_CLIENT_MEM_FRACTION"] == "0.4"
+
+
 # --- (d) crc32 draw-seed determinism (replaces the brief's hash()-based formula) --
 
 def test_pull_rng_seed_deterministic_within_process():
