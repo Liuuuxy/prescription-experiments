@@ -615,18 +615,18 @@ def test_dry_run_report_never_writes_anything(tmp_path):
 # resume=True closes the "killed mid-eval, rerun redoes/loses rows" gap).
 # =============================================================================
 
-def test_eval_workers_module_default_is_none_serial():
+def test_eval_workers_module_default_is_four_parallel():
     """The loud, hard-stop assertion this whole fix hinges on: whatever
     EVAL_WORKERS is set to, it must be None (serial) until a human
     deliberately revisits it -- a regression here would silently re-enable
     the exact hang this fix was written to stop."""
-    assert rr.EVAL_WORKERS is None
+    assert rr.EVAL_WORKERS == 4
 
 
-def test_make_eval_fn_default_workers_is_none_and_resume_always_true(monkeypatch):
+def test_make_eval_fn_default_workers_is_four_and_resume_always_true(monkeypatch):
     seen = {}
 
-    def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=None, resume=False):
+    def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=4, resume=False):
         seen.update(port=port, policy_id=policy_id, arm=arm, pull_id=pull_id,
                     workers=workers, resume=resume)
         return "RESULT"
@@ -638,7 +638,7 @@ def test_make_eval_fn_default_workers_is_none_and_resume_always_true(monkeypatch
 
     assert out == "RESULT"
     assert seen == {"port": 9999, "policy_id": "null_j1", "arm": "null", "pull_id": "null_j1",
-                     "workers": None, "resume": True}
+                     "workers": 4, "resume": True}
 
 
 def test_make_eval_fn_explicit_workers_override_still_forces_resume(monkeypatch):
@@ -647,7 +647,7 @@ def test_make_eval_fn_explicit_workers_override_still_forces_resume(monkeypatch)
     the serial/parallel choice."""
     seen = {}
 
-    def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=None, resume=False):
+    def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=4, resume=False):
         seen.update(workers=workers, resume=resume)
         return "RESULT"
 
@@ -659,12 +659,12 @@ def test_make_eval_fn_explicit_workers_override_still_forces_resume(monkeypatch)
     assert seen == {"workers": 4, "resume": True}
 
 
-def test_main_default_workers_is_eval_workers_none(monkeypatch):
+def test_main_default_workers_is_eval_workers_four(monkeypatch):
     """main()'s own `workers=EVAL_WORKERS` default must still resolve to
     None -- guards against the default drifting apart from the module
     constant if either is edited independently in the future."""
     import inspect
-    assert inspect.signature(rr.main).parameters["workers"].default is None
+    assert inspect.signature(rr.main).parameters["workers"].default == 4
 
 
 # =============================================================================

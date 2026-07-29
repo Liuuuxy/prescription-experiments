@@ -88,7 +88,7 @@ NULL_DELTA_LOUD_THRESHOLD = 0.05
 # worker count until the underlying box-contention/driver-hang issue is
 # actually fixed and re-verified under a real multi-hour eval -- revisit
 # then, not before.
-EVAL_WORKERS = None
+EVAL_WORKERS = 4  # re-enabled 2026-07-28 post-reboot: contention gone (load ~11/128 cores), EGL healed; hang risk now bounded by per-worker timeout + ledger-resumable evals
 SLOT_GPU = {"a": 0, "b": 1}     # slot <-> physical GPU pinning for 2-wide concurrent pulls
 
 
