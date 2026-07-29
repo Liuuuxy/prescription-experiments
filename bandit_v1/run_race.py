@@ -77,7 +77,9 @@ POLL_SECS = 120                 # preconditions-wait poll interval
 NULL_ROUNDS = (1, 2)            # seeds 1001/1002 via config.pull_seed
 RACE_FIRST_ROUND = 3            # real race rounds start where the null seeds leave off
 NULL_DELTA_LOUD_THRESHOLD = 0.05
-# LOUD: SERIAL IS THE DEFAULT FOR EVALS, NOT A FALLBACK (emergency null-
+# (historical -- superseded, see the "FLIPPED TO 4" block just above
+# SLOT_GPU below for the current, deliberate contract) LOUD: SERIAL IS THE
+# DEFAULT FOR EVALS, NOT A FALLBACK (emergency null-
 # takeover fix, task-nulltakeover-report.md). This box hangs 4-worker
 # parallel_eval evals under CPU contention (see task-baselinerecover-
 # report.md/task-r3overlap-report.md: repeated 2-4 workers stuck importing
@@ -88,7 +90,7 @@ NULL_DELTA_LOUD_THRESHOLD = 0.05
 # worker count until the underlying box-contention/driver-hang issue is
 # actually fixed and re-verified under a real multi-hour eval -- revisit
 # then, not before.
-EVAL_WORKERS = None  # SERIAL, FINAL: 2026-07-29 re-test on an IDLE box (load 11/128) reproduced the 4-worker import-stage deadlock (workers hang after robosuite import warnings; retry cycles burned a full night) -- the hang is concurrency-count-triggered, NOT contention. Serial per-episode evals are the only proven mode; 2 pulls still eval concurrently (one per GPU).
+# (historical -- superseded below) EVAL_WORKERS = None  # SERIAL, FINAL: 2026-07-29 re-test on an IDLE box (load 11/128) reproduced the 4-worker import-stage deadlock (workers hang after robosuite import warnings; retry cycles burned a full night) -- the hang is concurrency-count-triggered, NOT contention. Serial per-episode evals are the only proven mode; 2 pulls still eval concurrently (one per GPU).
 # import-hang root cause (task-importhang-report.md, 2026-07-29): logging
 # blind spot -- rollout.py's per-episode loop prints NOTHING, so a worker's
 # log looks identical ("stuck" right after the robosuite/robocasa import
@@ -109,6 +111,32 @@ EVAL_WORKERS = None  # SERIAL, FINAL: 2026-07-29 re-test on an IDLE box (load 11
 # was never reproduced in CPU-only isolation (no GPU/real-policy load), so
 # this is a verified hardening + diagnosability fix, not a proven-sufficient
 # root-cause fix -- flip to 4 only after one supervised parallel wave.
+#
+# FLIPPED TO 4 (task-ledgerlock-report.md, 2026-07-29): both prerequisites
+# the fix above called for have now landed. (1) One supervised parallel
+# wave, run for real against a live served policy -- easy_band_j3: 4
+# workers, 171 rollouts, clean finish, merge into "episodes" verified --
+# exactly the "flip to 4 only after one supervised parallel wave" bar set
+# above. (2) The OTHER real risk this box has actually hit is now closed
+# too -- not the import hang, but a genuine cross-process race in
+# ledger.append_rows itself, surfaced by tonight's incident: an external
+# bulk append and this runner's own per-episode appends both doing
+# read-concat-write-tmp-rename against the SAME "episodes" table at the
+# same time (one writer's tmp file vanished out from under the other --
+# FileNotFoundError -- and a row landing between another writer's read and
+# write could be silently lost; self-healed by eval-resume that time, zero
+# dupes, but not something to rely on happening again). append_rows now
+# holds a cross-process fcntl.flock across its whole read-concat-write-
+# rename (LOCK_TIMEOUT_S=120s, loud TimeoutError naming the table + a
+# holder hint on timeout, never a silent indefinite hang) plus a per-pid
+# tmp filename as belt-and-braces, so `merge_shards`'s single append_rows
+# call (parallel_eval.py, the parent-side merge after every worker exits)
+# and this runner's own serial per-episode appends can never interleave
+# again. Both prerequisites now hold. Revisit back to None only if a NEW
+# multi-hour stall surfaces under real GPU/training load -- per the caveat
+# above, that specific failure mode was hardened against, never actually
+# reproduced end-to-end.
+EVAL_WORKERS = 4
 SLOT_GPU = {"a": 0, "b": 1}     # slot <-> physical GPU pinning for 2-wide concurrent pulls
 
 
@@ -649,7 +677,9 @@ def _make_eval_fn(workers=EVAL_WORKERS):
     the ledger. See eval_set.eval_checkpoint's `resume` docstring for why
     this is a provable no-op the first time any given policy_id is
     evaluated (nothing to resume from yet). `workers` defaults to
-    EVAL_WORKERS (None == serial -- see that constant's own comment)."""
+    EVAL_WORKERS (4 == parallel, since task-ledgerlock-report.md,
+    2026-07-29; None would mean serial -- see that constant's own comment
+    for the full history and why this default changed)."""
     def eval_fn(port, policy_id, arm, pull_id):
         return eval_set.eval_checkpoint(port, policy_id, arm, pull_id, workers=workers, resume=True)
     return eval_fn

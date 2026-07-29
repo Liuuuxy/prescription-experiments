@@ -610,20 +610,32 @@ def test_dry_run_report_never_writes_anything(tmp_path):
 
 
 # =============================================================================
-# _make_eval_fn: serial-by-default + always-resumable (emergency null-
-# takeover fix -- parallel workers hang under this box's contention;
-# resume=True closes the "killed mid-eval, rerun redoes/loses rows" gap).
+# _make_eval_fn: parallel-by-default (task-ledgerlock-report.md, 2026-07-29)
+# + always-resumable (emergency null-takeover fix; resume=True closes the
+# "killed mid-eval, rerun redoes/loses rows" gap regardless of worker count).
+# EVAL_WORKERS was serial-only (None) while two prerequisites were missing:
+# a supervised real parallel wave (now done -- easy_band_j3, 4 workers, 171
+# rollouts, clean merge) and a concurrency-safe ledger.append_rows (now
+# landed -- cross-process fcntl.flock, see ledger.py/test_ledger.py). Both
+# now hold, so the module default flipped to 4 -- see run_race.py's
+# EVAL_WORKERS comment for the full history and reasoning.
 # =============================================================================
 
-def test_eval_workers_module_default_is_none_serial():
+def test_eval_workers_module_default_is_4_parallel():
     """The loud, hard-stop assertion this whole fix hinges on: whatever
-    EVAL_WORKERS is set to, it must be None (serial) until a human
+    EVAL_WORKERS is set to, it must be 4 (parallel) until a human
     deliberately revisits it -- a regression here would silently re-enable
-    the exact hang this fix was written to stop."""
-    assert rr.EVAL_WORKERS is None
+    the exact hang this fix was written to stop.
+
+    Once serial-only, note well: since 2026-07-29 (task-ledgerlock-
+    report.md) the prerequisites that kept this at None -- one supervised
+    parallel wave + a concurrency-safe ledger.append_rows -- have both
+    landed, so the flipped-to-4 value is the current, deliberate contract,
+    not a regression to guard against."""
+    assert rr.EVAL_WORKERS == 4
 
 
-def test_make_eval_fn_default_workers_is_none_and_resume_always_true(monkeypatch):
+def test_make_eval_fn_default_workers_is_4_and_resume_always_true(monkeypatch):
     seen = {}
 
     def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=None, resume=False):
@@ -638,13 +650,13 @@ def test_make_eval_fn_default_workers_is_none_and_resume_always_true(monkeypatch
 
     assert out == "RESULT"
     assert seen == {"port": 9999, "policy_id": "null_j1", "arm": "null", "pull_id": "null_j1",
-                     "workers": None, "resume": True}
+                     "workers": 4, "resume": True}
 
 
 def test_make_eval_fn_explicit_workers_override_still_forces_resume(monkeypatch):
-    """A caller that overrides `workers` (e.g. a future re-enable of the
-    parallel path) must still get resume=True -- resumability is not tied to
-    the serial/parallel choice."""
+    """A caller that overrides `workers` away from the module default (e.g.
+    a one-off serial fallback) must still get resume=True -- resumability is
+    not tied to the serial/parallel choice either way."""
     seen = {}
 
     def fake_eval_checkpoint(port, policy_id, arm, pull_id, workers=None, resume=False):
@@ -659,12 +671,12 @@ def test_make_eval_fn_explicit_workers_override_still_forces_resume(monkeypatch)
     assert seen == {"workers": None, "resume": True}
 
 
-def test_main_default_workers_is_eval_workers_none(monkeypatch):
-    """main()'s own `workers=EVAL_WORKERS` default must still resolve to
-    None -- guards against the default drifting apart from the module
-    constant if either is edited independently in the future."""
+def test_main_default_workers_is_eval_workers_default(monkeypatch):
+    """main()'s own `workers=EVAL_WORKERS` default must still resolve to 4
+    -- guards against the default drifting apart from the module constant
+    if either is edited independently in the future."""
     import inspect
-    assert inspect.signature(rr.main).parameters["workers"].default is None
+    assert inspect.signature(rr.main).parameters["workers"].default == 4
 
 
 # =============================================================================

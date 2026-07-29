@@ -38,17 +38,25 @@ running in parallel across workers -- just not the served model's own compute,
 which remains a shared, serialized resource.
 
 Concurrency-safety mechanics: ledger.append_rows (ledger.py) is a whole-
-parquet read-modify-write against table "episodes" and was never meant to be
-called by more than one process at a time. Rather than touch that contract,
-each worker's rollout.run call is given a `episodes_sink` (rollout.py's new
-seam) that redirects every completed row to that worker's OWN shard file
-(bandit_v1/ledger/shards/<run-tag>_<worker>.parquet, via ledger.
-append_rows_to_path -- a SEPARATE, per-path read-modify-write with no shared
-state between workers). Only after every worker subprocess has exited does the
-parent call `merge_shards`, which reads every shard file that exists,
-concatenates them, and appends the union to "episodes" in exactly ONE
-append_rows call -- so the shared table is still only ever written by a
-single process, still only ever via the existing, unmodified append_rows.
+parquet read-modify-write against table "episodes". As of task-ledgerlock-
+report.md (2026-07-29) it holds a cross-process fcntl.flock across that
+whole read-concat-write-rename, so it IS now safe to call from more than one
+process at a time -- but this module still does not have every worker call
+it directly, for a performance reason as much as the original correctness
+one: N workers all serializing on one lock per episode would bottleneck the
+whole point of running them in parallel. Instead, each worker's rollout.run
+call is given an `episodes_sink` (rollout.py's seam) that redirects every
+completed row to that worker's OWN shard file (bandit_v1/ledger/shards/
+<run-tag>_<worker>.parquet, via ledger.append_rows_to_path -- a SEPARATE,
+per-path read-modify-write with no shared state between workers, and
+deliberately not lock-protected itself -- see its docstring). Only after
+every worker subprocess has exited does the parent call `merge_shards`,
+which reads every shard file that exists, concatenates them, and appends the
+union to "episodes" in exactly ONE append_rows call -- so the shared table
+is still only ever written by a single process at a time here, and that
+single call is now ALSO safe against any other concurrent writer elsewhere
+in bandit_v1 (e.g. run_race.py's own serial per-episode appends racing this
+same merge -- tonight's incident) thanks to append_rows's own lock.
 
 Crash isolation: a worker that dies partway (bad action, OOM, policy server
 hiccup, ...) has already durably written every episode it completed so far to
