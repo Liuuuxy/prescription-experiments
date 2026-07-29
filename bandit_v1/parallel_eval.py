@@ -128,14 +128,41 @@ def run_worker_inline(spec: dict) -> None:
     unit-testable with a monkeypatched `rollout.run` and a plain in-memory
     spec dict -- no subprocess, no spec file on disk, no live env or policy
     server involved.
+
+    Progress visibility (task-importhang-report.md): `rollout.run`'s own
+    per-episode loop prints nothing at all -- a worker's stdout, once
+    robosuite/robocasa's import-time warnings are done, is otherwise
+    permanently silent for the rest of its run, whether it is healthy and
+    still grinding through a long shard or genuinely stuck. This made a
+    worker's log tail useless for telling the two apart in practice: a
+    fully healthy, successfully-completed 4-worker run's logs were verified
+    to end at the EXACT SAME "mimicgen not installed" line a genuinely
+    hung run's would, since that line is the last thing printed before
+    `rollout.run` is ever called. `sink` below now prints one flushed line
+    per completed episode (count + elapsed seconds), plus a marker line
+    right before `rollout.run` is called at all, so a worker that is merely
+    slow (or has every pair already in skip_pairs -- see the empty-shard
+    case) is now visibly distinguishable, in its own log file, from one
+    that truly never advances -- see `_worker_env`'s PYTHONUNBUFFERED
+    default for why these prints reliably reach the log file promptly.
     """
     skip_pairs = {tuple(p) for p in (spec.get("skip_pairs") or [])}
     start_dirs = [Path(p) for p in spec["start_dirs"]]
     shard_path = Path(spec["shard_path"])
 
-    def sink(row):
-        ledger.append_rows_to_path(shard_path, [row])
+    t_start = time.time()
+    n_done = 0
 
+    def sink(row):
+        nonlocal n_done
+        ledger.append_rows_to_path(shard_path, [row])
+        n_done += 1
+        print(f"parallel_eval worker: {n_done} episode(s) written to shard "
+              f"(elapsed {time.time() - t_start:.1f}s)", flush=True)
+
+    print(f"parallel_eval worker: starting rollout.run over {len(start_dirs)} "
+          f"start(s), {spec['repeats']} repeat(s) each ({len(skip_pairs)} pair(s) "
+          "already done upstream, will be skipped)", flush=True)
     rollout.run(
         spec["policy_host"], spec["policy_port"], start_dirs, spec["repeats"],
         phase=spec["phase"], policy_id=spec["policy_id"],
@@ -143,6 +170,8 @@ def run_worker_inline(spec: dict) -> None:
         skip_pairs=(skip_pairs if skip_pairs else None),
         episodes_sink=sink,
     )
+    print(f"parallel_eval worker: done, {n_done} new episode(s) written in "
+          f"{time.time() - t_start:.1f}s", flush=True)
 
 
 def _main():
@@ -161,22 +190,72 @@ if __name__ == "__main__":
 # Parent-side: spawn, wait, merge
 # =============================================================================
 
+# Per-worker resource caps (task-importhang-report.md): without these, every
+# worker's numpy/BLAS AND Mesa's llvmpipe (the osmesa software renderer
+# bandit_v1's CPU-only eval envs use) size their own thread pools to
+# os.cpu_count() by default -- verified directly on this box: a single
+# worker with none of these set spins up ~322 OS threads (32 of them
+# llvmpipe render-pool workers) for just ONE persistent rollout env.
+# `workers` concurrent worker subprocesses then each independently
+# oversubscribe to that SAME core count, which is a property of how many
+# workers are spawned, not of what else is running on the box at the time
+# (consistent with the "reproduced on an idle box" observation in
+# run_race.py's EVAL_WORKERS comment). Capping each pool to a small fixed
+# size bounds every worker's thread footprint regardless of `workers`,
+# without touching rollout.py/states.py's rendering or numeric code at all.
+#
+# PYTHONUNBUFFERED=1 additionally guarantees run_worker_inline's own
+# progress prints (see its docstring) reach the log file promptly instead
+# of sitting in an unflushed block buffer -- `-m bandit_v1.parallel_eval`
+# is invoked below without `-u`, so a worker's stdout, redirected to a log
+# FILE (not a tty), is block-buffered by default.
+#
+# Every key here is only a DEFAULT (`dict.setdefault`): a caller that has
+# already set any of these in its own environment before calling
+# run_parallel keeps that value untouched.
+_WORKER_THREAD_CAP = "2"
+_WORKER_ENV_DEFAULTS = {
+    "OMP_NUM_THREADS": _WORKER_THREAD_CAP,
+    "OPENBLAS_NUM_THREADS": _WORKER_THREAD_CAP,
+    "MKL_NUM_THREADS": _WORKER_THREAD_CAP,
+    "NUMEXPR_NUM_THREADS": _WORKER_THREAD_CAP,
+    "LP_NUM_THREADS": _WORKER_THREAD_CAP,   # Mesa llvmpipe (osmesa) render-thread pool
+    "PYTHONUNBUFFERED": "1",
+}
+
+
+def _worker_env() -> dict:
+    """The full parent environment (`os.environ`), with `_WORKER_ENV_DEFAULTS`
+    filled in for any key the caller has not already set (`setdefault`
+    semantics -- an explicit, pre-existing value in the parent's own
+    environment always wins over these defaults). See
+    `_WORKER_ENV_DEFAULTS`'s comment for why these particular defaults
+    exist."""
+    env = os.environ.copy()
+    for k, v in _WORKER_ENV_DEFAULTS.items():
+        env.setdefault(k, v)
+    return env
+
+
 def _spawn_worker(spec_path, log_path):
     """Launch one worker subprocess: the SAME python interpreter this parent
     process is already running under (`sys.executable` -- "direct env
     python", i.e. whichever conda env is already active, not a `conda run -n
     ...` wrapper), invoked as `python -m bandit_v1.parallel_eval --spec
     <spec_path>`, with stdout+stderr both redirected to `log_path` and the
-    full parent environment forwarded as-is (`env=os.environ.copy()`) so
-    MUJOCO_GL/CUDA_VISIBLE_DEVICES/etc. come from whatever the caller already
-    has set, never hardcoded here. Returns the `subprocess.Popen` handle."""
+    full parent environment forwarded (`_worker_env()`, see its docstring)
+    so MUJOCO_GL/CUDA_VISIBLE_DEVICES/etc. still come from whatever the
+    caller already has set, never hardcoded here -- only a small, fixed set
+    of thread-count/output-buffering env vars get a DEFAULT value layered on
+    top when the caller has not already set them. Returns the
+    `subprocess.Popen` handle."""
     log_path = Path(log_path)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with open(log_path, "w") as log_f:
         return subprocess.Popen(
             [sys.executable, "-m", "bandit_v1.parallel_eval", "--spec", str(spec_path)],
             stdout=log_f, stderr=subprocess.STDOUT,
-            cwd=str(config.REPO), env=os.environ.copy(),
+            cwd=str(config.REPO), env=_worker_env(),
         )
 
 

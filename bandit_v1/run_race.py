@@ -89,6 +89,26 @@ NULL_DELTA_LOUD_THRESHOLD = 0.05
 # actually fixed and re-verified under a real multi-hour eval -- revisit
 # then, not before.
 EVAL_WORKERS = None  # SERIAL, FINAL: 2026-07-29 re-test on an IDLE box (load 11/128) reproduced the 4-worker import-stage deadlock (workers hang after robosuite import warnings; retry cycles burned a full night) -- the hang is concurrency-count-triggered, NOT contention. Serial per-episode evals are the only proven mode; 2 pulls still eval concurrently (one per GPU).
+# import-hang root cause (task-importhang-report.md, 2026-07-29): logging
+# blind spot -- rollout.py's per-episode loop prints NOTHING, so a worker's
+# log looks identical ("stuck" right after the robosuite/robocasa import
+# warnings) whether it is genuinely hung OR healthy and just finished
+# (verified directly: a fully-successful 4-worker run's logs end at that
+# exact line too), compounded by a REAL, verified thread-oversubscription
+# bug (each worker defaulted to ~322 OS threads -- unset OMP_NUM_THREADS/
+# OPENBLAS_NUM_THREADS/MKL_NUM_THREADS/NUMEXPR_NUM_THREADS/LP_NUM_THREADS
+# let numpy/BLAS/Mesa-llvmpipe each size their pool to nproc=128 -- N
+# workers self-inflict N*~300 threads independent of ambient box load,
+# matching "reproduces on an idle box"). Fix: parallel_eval.py's
+# `_worker_env` (thread caps + PYTHONUNBUFFERED=1) + `run_worker_inline`
+# per-episode progress prints, validated in isolation 2026-07-29 (repro.py/
+# repro_real.py/validate_run_parallel.py: n=2/4/6/8, osmesa+egl, plain
+# imports through full fake-server rollout episodes via the REAL
+# `run_parallel`/`_spawn_worker` path, 3x clean each, thread count 322->12
+# confirmed on live spawned workers). Caveat: a genuine multi-hour stall
+# was never reproduced in CPU-only isolation (no GPU/real-policy load), so
+# this is a verified hardening + diagnosability fix, not a proven-sufficient
+# root-cause fix -- flip to 4 only after one supervised parallel wave.
 SLOT_GPU = {"a": 0, "b": 1}     # slot <-> physical GPU pinning for 2-wide concurrent pulls
 
 

@@ -431,3 +431,107 @@ def test_spawn_worker_builds_expected_argv_and_creates_log_file(tmp_path, monkey
     assert captured["argv"][1:] == ["-m", "bandit_v1.parallel_eval", "--spec", str(spec_path)]
     assert captured["kwargs"]["cwd"] == str(config.REPO)
     assert log_path.exists()  # parent dir created + log file opened for the child to write into
+
+
+# =============================================================================
+# _worker_env: per-worker thread-count caps + unbuffered output
+# (task-importhang-report.md)
+# =============================================================================
+
+def test_worker_env_sets_thread_caps_and_unbuffered_by_default(monkeypatch):
+    for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS",
+              "NUMEXPR_NUM_THREADS", "LP_NUM_THREADS", "PYTHONUNBUFFERED"):
+        monkeypatch.delenv(k, raising=False)
+
+    env = parallel_eval._worker_env()
+
+    assert env["OMP_NUM_THREADS"] == parallel_eval._WORKER_THREAD_CAP
+    assert env["OPENBLAS_NUM_THREADS"] == parallel_eval._WORKER_THREAD_CAP
+    assert env["MKL_NUM_THREADS"] == parallel_eval._WORKER_THREAD_CAP
+    assert env["NUMEXPR_NUM_THREADS"] == parallel_eval._WORKER_THREAD_CAP
+    assert env["LP_NUM_THREADS"] == parallel_eval._WORKER_THREAD_CAP
+    assert env["PYTHONUNBUFFERED"] == "1"
+
+
+def test_worker_env_does_not_override_a_caller_supplied_value(monkeypatch):
+    monkeypatch.setenv("OMP_NUM_THREADS", "17")
+    monkeypatch.setenv("PYTHONUNBUFFERED", "0")
+
+    env = parallel_eval._worker_env()
+
+    assert env["OMP_NUM_THREADS"] == "17"      # caller's explicit value wins
+    assert env["PYTHONUNBUFFERED"] == "0"
+
+
+def test_worker_env_forwards_unrelated_vars_as_is(monkeypatch):
+    monkeypatch.setenv("MUJOCO_GL", "osmesa")
+    monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "1")
+
+    env = parallel_eval._worker_env()
+
+    assert env["MUJOCO_GL"] == "osmesa"
+    assert env["CUDA_VISIBLE_DEVICES"] == "1"
+
+
+def test_spawn_worker_uses_worker_env(tmp_path, monkeypatch):
+    captured = {}
+
+    class FakePopen:
+        def __init__(self, argv, **kwargs):
+            captured["kwargs"] = kwargs
+
+    monkeypatch.setattr(parallel_eval.subprocess, "Popen", FakePopen)
+    sentinel_env = {"SENTINEL": "yes"}
+    monkeypatch.setattr(parallel_eval, "_worker_env", lambda: sentinel_env)
+
+    parallel_eval._spawn_worker(tmp_path / "spec.json", tmp_path / "worker0.log")
+
+    assert captured["kwargs"]["env"] is sentinel_env
+
+
+# =============================================================================
+# run_worker_inline progress prints (task-importhang-report.md): a worker's
+# log must show visible forward progress, not just the import-time warnings,
+# so a genuinely stuck worker is distinguishable from a slow-but-alive one.
+# =============================================================================
+
+def test_run_worker_inline_prints_start_marker_and_per_episode_progress(
+        tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(parallel_eval.rollout, "run", _fake_rollout_run)
+
+    shard_path = tmp_path / "shard0.parquet"
+    spec = {
+        "policy_host": "h", "policy_port": 123,
+        "start_dirs": [str(tmp_path / "start_000"), str(tmp_path / "start_001")],
+        "repeats": 2, "phase": "eval", "policy_id": "pi0",
+        "skip_pairs": [], "shard_path": str(shard_path),
+    }
+
+    parallel_eval.run_worker_inline(spec)
+
+    out = capsys.readouterr().out
+    assert "starting rollout.run" in out
+    # 2 starts x 2 repeats = 4 episodes -> 4 "written to shard" progress lines
+    assert out.count("written to shard") == 4
+    assert "done, 4 new episode(s)" in out
+
+
+def test_run_worker_inline_prints_start_marker_even_when_everything_is_skipped(
+        tmp_path, monkeypatch, capsys):
+    """A resumed worker whose whole shard is already done (skip_pairs covers
+    every pair) never calls `sink` at all -- the start-marker print must
+    still fire so the log is never silent from t=0, even in this case."""
+    monkeypatch.setattr(parallel_eval.rollout, "run", _fake_rollout_run)
+
+    spec = {
+        "policy_host": "h", "policy_port": 123,
+        "start_dirs": [str(tmp_path / "start_000")],
+        "repeats": 1, "phase": "eval", "policy_id": "pi0",
+        "skip_pairs": [["start_000", 0]], "shard_path": str(tmp_path / "shard0.parquet"),
+    }
+
+    parallel_eval.run_worker_inline(spec)
+
+    out = capsys.readouterr().out
+    assert "starting rollout.run" in out
+    assert "done, 0 new episode(s)" in out
