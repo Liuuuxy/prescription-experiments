@@ -88,7 +88,7 @@ NULL_DELTA_LOUD_THRESHOLD = 0.05
 # worker count until the underlying box-contention/driver-hang issue is
 # actually fixed and re-verified under a real multi-hour eval -- revisit
 # then, not before.
-EVAL_WORKERS = 4  # re-enabled 2026-07-28 post-reboot: contention gone (load ~11/128 cores), EGL healed; hang risk now bounded by per-worker timeout + ledger-resumable evals
+EVAL_WORKERS = None  # SERIAL, FINAL: 2026-07-29 re-test on an IDLE box (load 11/128) reproduced the 4-worker import-stage deadlock (workers hang after robosuite import warnings; retry cycles burned a full night) -- the hang is concurrency-count-triggered, NOT contention. Serial per-episode evals are the only proven mode; 2 pulls still eval concurrently (one per GPU).
 SLOT_GPU = {"a": 0, "b": 1}     # slot <-> physical GPU pinning for 2-wide concurrent pulls
 
 
