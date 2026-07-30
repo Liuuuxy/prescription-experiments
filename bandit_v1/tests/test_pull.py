@@ -534,6 +534,120 @@ def test_run_pull_first_attempt_fails_second_succeeds_then_completes_eval(isolat
     assert len(train_popen_calls) == 2  # exactly one train.py launch per attempt
 
 
+# --- (h2) wait_for_checkpoint: hard timeout + heartbeat (task-stickyslot-report.md) ---
+# Closes the secondary mystery behind tonight's stall: this loop previously
+# had NO bound at all -- a training process that hangs, or one that's
+# simply still legitimately running (many hours from its final checkpoint,
+# e.g. an unnecessary retrain launched onto the wrong slot -- see
+# resolve_sticky_slots) wedged the whole race runner forever with zero
+# visible signal in between.
+
+class _FakeClock:
+    """Deterministic, injectable now_fn: advances by `step` every call (one
+    call per wait_for_checkpoint loop iteration when the process hasn't
+    exited), starting from `step` on the very first call (never 0.0, so
+    `elapsed = now - start` is always computed from two DISTINCT calls, same
+    as the real `time.monotonic` -- start is call #1, the first in-loop
+    check is call #2)."""
+    def __init__(self, step):
+        self.t = 0.0
+        self.step = step
+
+    def __call__(self):
+        self.t += self.step
+        return self.t
+
+
+def test_default_wait_timeout_secs_full_recipe():
+    assert pull.default_wait_timeout_secs() == pytest.approx(20000 * 2.5 + 3600)
+
+
+def test_default_wait_timeout_secs_scales_with_num_train_steps_override():
+    assert pull.default_wait_timeout_secs(num_train_steps=60) == pytest.approx(60 * 2.5 + 3600)
+
+
+def test_wait_for_checkpoint_never_exits_never_appears_times_out_kills_and_returns_false():
+    """The exact class of stall this fix targets: `proc.poll()` always None
+    (never exits) AND the checkpoint never appears -- must not wait forever;
+    past `timeout_secs` it kills the process and returns False, loudly."""
+    proc = FakeProc(always=None)
+    logs = []
+    killed = []
+
+    ok = pull.wait_for_checkpoint(
+        proc, "/nonexistent/ckpt/dir", exists_fn=lambda: False,
+        sleep_fn=lambda secs: None, log=logs.append,
+        timeout_secs=100, poll_secs=10, now_fn=_FakeClock(step=10),
+        kill_fn=lambda: killed.append(True),
+    )
+
+    assert ok is False
+    assert killed == [True]
+    assert any("LOUD TIMEOUT" in m for m in logs)
+
+
+def test_wait_for_checkpoint_default_kill_fn_calls_stop_process_on_the_real_proc():
+    """No `kill_fn` override: the default must actually terminate `proc`
+    (via `stop_process`), not just log and walk away."""
+    proc = FakeProc(always=None)
+    ok = pull.wait_for_checkpoint(
+        proc, "/nonexistent/ckpt/dir", exists_fn=lambda: False,
+        sleep_fn=lambda secs: None, log=lambda *a: None,
+        timeout_secs=10, poll_secs=10, now_fn=_FakeClock(step=10),
+    )
+    assert ok is False
+    assert proc.terminated is True
+    assert proc.waited is True
+
+
+def test_wait_for_checkpoint_heartbeat_fires_during_a_long_wait_before_timeout():
+    proc = FakeProc(always=None)
+    logs = []
+    ok = pull.wait_for_checkpoint(
+        proc, "/nonexistent/ckpt/dir", exists_fn=lambda: False,
+        sleep_fn=lambda secs: None, log=logs.append,
+        timeout_secs=10000, poll_secs=100, heartbeat_secs=500,
+        now_fn=_FakeClock(step=100),
+    )
+    assert ok is False  # this test's timeout is finite, so the loop does end
+    heartbeats = [m for m in logs if "still waiting" in m]
+    assert len(heartbeats) >= 5
+
+
+def test_wait_for_checkpoint_exits_with_rc_before_timeout_is_ever_relevant():
+    """Unchanged ordinary-failure behavior: a process that exits quickly
+    (rc=1) is reported via the existing rc-exit branch, never as a timeout,
+    regardless of how the (irrelevant, never-reached) timeout is set."""
+    proc = FakeProc(always=1)
+    logs = []
+    ok = pull.wait_for_checkpoint(
+        proc, "/nonexistent/ckpt/dir", exists_fn=lambda: False,
+        sleep_fn=lambda secs: None, log=logs.append,
+        timeout_secs=5, now_fn=_FakeClock(step=1000),
+    )
+    assert ok is False
+    assert any("exited rc=1" in m for m in logs)
+    assert not any("TIMEOUT" in m for m in logs)
+
+
+def test_wait_for_checkpoint_succeeds_using_real_default_timeout_and_clock():
+    """Sanity: the new timeout/heartbeat machinery does not regress the
+    ordinary success path using the REAL (huge, ~14h) default timeout and
+    the REAL time.monotonic clock -- proves the default never fires during
+    a normal fast-running test."""
+    calls = {"n": 0}
+
+    def exists_fn():
+        calls["n"] += 1
+        return calls["n"] >= 2
+
+    ok = pull.wait_for_checkpoint(
+        FakeProc(always=None), "/nonexistent/ckpt/dir",
+        exists_fn=exists_fn, sleep_fn=lambda secs: None, log=lambda *a: None,
+    )
+    assert ok is True
+
+
 # --- (i) gradient-analysis training_artifacts (owner request) -----------------
 
 def test_ckpt_steps_present_empty_when_dir_missing(isolated):
@@ -731,6 +845,82 @@ def test_run_pull_skips_training_when_final_checkpoint_already_complete(isolated
     ledger_rows = ledger.read("pulls")
     assert len(ledger_rows) == 1
     assert ledger_rows.iloc[0]["status"] == "ok"
+
+
+# --- (j2) resolve_sticky_slots (task-stickyslot-report.md) -------------------
+# Root cause of the round-3 stalls: run_race.py's slot alternation
+# (`pull.SLOTS[i % 2]`) is index-based, with no memory of which slot an
+# arm's PRIOR attempt actually used -- a resumed dispatch computing a
+# different `to_pull`/`missing` roster shifts that index, and can re-pair an
+# arm onto the OTHER slot than its real, already-complete checkpoint lives
+# under. `checkpoint_looks_complete`'s fast path then looks in the WRONG
+# slot's checkpoint dir, misses it, and launches a needless `--overwrite`
+# retrain. `resolve_sticky_slots` makes the dispatch's slot assignment
+# irrelevant to this by checking both slots directly.
+
+def test_resolve_sticky_slots_forces_slot_when_checkpoint_exists_under_other_slot(isolated):
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_b", "easy_band_j3"))
+
+    logs = []
+    specs = [{"arm": "easy_band", "j": 3, "slot": "a"}]
+    resolved = pull.resolve_sticky_slots(specs, log=logs.append)
+
+    assert resolved == [{"arm": "easy_band", "j": 3, "slot": "b"}]
+    assert specs == [{"arm": "easy_band", "j": 3, "slot": "a"}]  # input never mutated
+    assert any("sticky slot: easy_band_j3 -> slot b (existing checkpoint)" in m for m in logs)
+
+
+def test_resolve_sticky_slots_still_logs_when_checkpoint_already_under_the_assigned_slot(isolated):
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "mid_band_j3"))
+
+    logs = []
+    resolved = pull.resolve_sticky_slots([{"arm": "mid_band", "j": 3, "slot": "a"}], log=logs.append)
+
+    assert resolved == [{"arm": "mid_band", "j": 3, "slot": "a"}]
+    assert any("sticky slot: mid_band_j3 -> slot a (existing checkpoint)" in m for m in logs)
+
+
+def test_resolve_sticky_slots_uses_normal_alternation_when_no_checkpoint_exists_yet(isolated):
+    logs = []
+    resolved = pull.resolve_sticky_slots([{"arm": "random", "j": 4, "slot": "b"}], log=logs.append)
+
+    assert resolved == [{"arm": "random", "j": 4, "slot": "b"}]
+    assert not any("sticky slot" in m for m in logs)
+
+
+def test_resolve_sticky_slots_leaves_alternation_when_both_slots_already_complete(isolated):
+    """Pathological both-slots-complete case: ambiguous, so this function
+    declines to force either way rather than guessing -- must not crash."""
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "tall_j5"))
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_b", "tall_j5"))
+
+    logs = []
+    resolved = pull.resolve_sticky_slots([{"arm": "tall", "j": 5, "slot": "a"}], log=logs.append)
+
+    assert resolved == [{"arm": "tall", "j": 5, "slot": "a"}]
+    assert not any("sticky slot" in m for m in logs)
+
+
+def test_resolve_sticky_slots_handles_a_multi_arm_round_independently(isolated):
+    """Mirrors the actual round-3 incident this fix responds to: 3 arms
+    dispatched together, 2 needing correction onto the opposite slot from
+    what the alternation picked, 1 fresh arm left alone."""
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_b", "easy_band_j3"))
+    _write_complete_checkpoint(pull.ckpt_final_dir("pi0_ppc2sink_bandit_a", "mid_band_j3"))
+    # "random_j3" has no checkpoint anywhere yet -- fresh this round.
+
+    specs = [
+        {"arm": "easy_band", "j": 3, "slot": "a"},   # wrong -- real ckpt under b
+        {"arm": "mid_band", "j": 3, "slot": "b"},    # wrong -- real ckpt under a
+        {"arm": "random", "j": 3, "slot": "a"},      # fresh -- alternation stands
+    ]
+    resolved = pull.resolve_sticky_slots(specs, log=lambda *a: None)
+
+    assert resolved == [
+        {"arm": "easy_band", "j": 3, "slot": "b"},
+        {"arm": "mid_band", "j": 3, "slot": "a"},
+        {"arm": "random", "j": 3, "slot": "a"},
+    ]
 
 
 def test_run_pull_eval_fn_exception_writes_eval_failed_row_and_reraises(isolated):

@@ -118,6 +118,29 @@ PORT_WAIT_TRIES = 90
 PORT_WAIT_SLEEP = 5
 MAX_TRAIN_ATTEMPTS = 2                    # brief: "re-run once" == 2 total attempts
 
+# --- wait_for_checkpoint hard timeout (task-stickyslot-report.md, secondary
+# fix): a training process that neither produces the final checkpoint NOR
+# ever exits (hung, deadlocked, or -- per tonight's incident -- silently
+# still running for hours on data `checkpoint_looks_complete` will never see
+# because it targets the wrong step) previously wedged `wait_for_checkpoint`
+# forever -- there was no bound at all. `default_wait_timeout_secs` gives a
+# generous (a full un-overridden 20000-step recipe at ~2.5s/it plus a 1h
+# margin -- comfortably above the ~8h a real run needs) but FINITE ceiling;
+# past it, `wait_for_checkpoint` kills the process, logs LOUDLY, and returns
+# False -- feeding run_pull's existing retry/failed-row machinery instead of
+# hanging the whole race runner. `num_train_steps` (when the caller overrides
+# it, e.g. a smoke test) scales the timeout down with it, same as
+# `ckpt_final_dir`'s own final-step-name computation.
+TRAIN_TIMEOUT_SECS_PER_STEP = 2.5
+TRAIN_TIMEOUT_MARGIN_SECS = 3600
+DEFAULT_TRAIN_STEPS_FOR_TIMEOUT = config.FINAL_CKPT_STEP + 1   # 20000, the full recipe
+HEARTBEAT_SECS = 1800                     # ~30 min -- silent multi-hour waits are how tonight's stall hid
+
+
+def default_wait_timeout_secs(num_train_steps=None) -> float:
+    steps = num_train_steps if num_train_steps is not None else DEFAULT_TRAIN_STEPS_FOR_TIMEOUT
+    return steps * TRAIN_TIMEOUT_SECS_PER_STEP + TRAIN_TIMEOUT_MARGIN_SECS
+
 PULLS_TABLE = "pulls"
 ARMS_SUBDIR = "pull_arms"                 # ledger/pull_arms/<pull_id>.json (provenance, kept)
 LOGS_SUBDIR = "pull_logs"                 # ledger/pull_logs/<pull_id>_*.log
@@ -491,6 +514,59 @@ def checkpoint_looks_complete(ckpt_dir) -> bool:
     return params_dir.is_dir() and any(params_dir.iterdir())
 
 
+# --- 4d. resume-safety: STICKY SLOTS (task-stickyslot-report.md) -----------
+# Root cause of the round-3 stalls this fix responds to: `run_race.py`'s slot
+# assignment (`pull.SLOTS[i % 2]`, alternating a/b by an arm's INDEX in that
+# dispatch's `to_pull`/`missing` list) has NO memory of which slot an arm's
+# PRIOR (possibly crashed-before-ledger-row) attempt actually used. If a
+# resumed run_race.py recomputes `to_pull` with a different roster (some
+# arms already ok, some eliminated) than the original dispatch had, the
+# index-based alternation shifts, and an arm can get re-paired onto the
+# OTHER slot than the one its real, already-complete checkpoint lives under.
+# `checkpoint_looks_complete`'s fast path (section 4c) then looks in the
+# WRONG slot's checkpoint dir, finds nothing, and launches a needless
+# `--overwrite` retrain -- wasting GPU time and (verified directly against
+# tonight's incident) potentially OOM-crashing a genuinely-still-running
+# leftover training process for the SAME (arm, round) that a PRIOR crashed
+# run_race.py never killed.
+#
+# `resolve_sticky_slots` closes this by making the resume dispatch's slot
+# assignment irrelevant: before a spec list is handed to `run_batch_two_wide`,
+# every spec's (arm, round) is checked against BOTH slots' checkpoint dirs;
+# if a complete checkpoint already exists under EXACTLY ONE slot, that spec
+# is forced onto it regardless of what the alternation picked. If neither
+# slot (a fresh arm/round) or -- pathologically -- BOTH slots (should not
+# happen in practice, but is not this function's problem to resolve) already
+# have one, the caller's original alternation-assigned slot is left
+# untouched.
+def resolve_sticky_slots(specs: list, log=lambda *a: None) -> list:
+    """Return a copy of `specs` (each a dict carrying at least "arm", "j",
+    "slot") with any spec whose (arm, j) already has a complete checkpoint
+    under exactly one slot forced onto that slot, logging
+    `"sticky slot: <arm>_j<j> -> slot <X> (existing checkpoint)"` every time
+    this happens (whether or not the forced slot differs from what the
+    caller's alternation had already picked -- this line is the audit trail
+    a resumed run confirms the fast path will actually fire). Never mutates
+    the input `specs` list/dicts."""
+    resolved = []
+    for spec in specs:
+        arm, j, slot = spec["arm"], spec["j"], spec["slot"]
+        exp_name = train_exp_name(arm, j)
+        existing_slots = [
+            s for s in SLOTS
+            if checkpoint_looks_complete(ckpt_final_dir(train_config_name_for_slot(s), exp_name))
+        ]
+        new_spec = dict(spec)
+        if len(existing_slots) == 1:
+            forced = existing_slots[0]
+            log(f"sticky slot: {exp_name} -> slot {forced} (existing checkpoint)")
+            new_spec["slot"] = forced
+        # len == 0 (fresh arm/round) or == 2 (pathological both-slots-complete):
+        # leave the caller's normal alternation-assigned slot untouched.
+        resolved.append(new_spec)
+    return resolved
+
+
 # --- 5. GPU selection (mirrors launch_pi0.sh's wait-for-GPU loop) ----------
 
 def free_mib(gpu: int, query=None) -> int:
@@ -543,16 +619,36 @@ def launch_training(cmd: list, gpu: int, log_path, popen_fn=subprocess.Popen):
 
 
 def wait_for_checkpoint(proc, ckpt_dir, poll_secs=CKPT_POLL_SECS, sleep_fn=time.sleep,
-                         exists_fn=None, poll_fn=None, log=lambda *a: None) -> bool:
-    """Poll every `poll_secs` until EITHER `ckpt_dir` exists (True, success)
-    OR `proc` has exited without producing it (False, failure) -- the same
-    shape as run_diagnosis.sh's server-wait loop (`kill -0` check + break on
-    death), applied to a checkpoint directory instead of an open port.
-    `exists_fn`/`poll_fn` default to `Path(ckpt_dir).is_dir` / `proc.poll`
-    and exist only so tests can override them; production callers should
-    never need to."""
+                         exists_fn=None, poll_fn=None, log=lambda *a: None, *,
+                         timeout_secs=None, num_train_steps=None,
+                         heartbeat_secs=HEARTBEAT_SECS, now_fn=time.monotonic,
+                         kill_fn=None) -> bool:
+    """Poll every `poll_secs` until ONE of THREE things happens: `ckpt_dir`
+    exists (True, success); `proc` has exited without producing it (False,
+    failure -- the same shape as run_diagnosis.sh's server-wait loop, `kill
+    -0` check + break on death, applied to a checkpoint directory instead of
+    an open port); or `timeout_secs` elapses with the process neither exited
+    nor done (False, failure -- LOUDLY logged, and `proc` is killed before
+    returning). This third case is what closes tonight's stall: previously
+    this loop had NO bound at all, so a training process that hangs, or one
+    that's simply still legitimately running against the wrong slot (see
+    `resolve_sticky_slots`) with the final checkpoint many hours away, wedged
+    the whole race runner forever with zero visible signal. `timeout_secs`
+    defaults to `default_wait_timeout_secs(num_train_steps)` but is always
+    kwarg-overridable (e.g. a test's fake clock). A heartbeat log line fires
+    every `heartbeat_secs` (default ~30min) while still waiting, so a live
+    multi-hour wait is never silent again. `exists_fn`/`poll_fn`/`now_fn`/
+    `kill_fn` default to `Path(ckpt_dir).is_dir` / `proc.poll` /
+    `time.monotonic` / `stop_process(proc)` and exist only so tests can
+    override them; production callers should never need to.
+    """
     exists_fn = exists_fn if exists_fn is not None else (lambda: Path(ckpt_dir).is_dir())
     poll_fn = poll_fn if poll_fn is not None else proc.poll
+    kill_fn = kill_fn if kill_fn is not None else (lambda: stop_process(proc))
+    timeout_secs = timeout_secs if timeout_secs is not None else default_wait_timeout_secs(num_train_steps)
+
+    start = now_fn()
+    last_heartbeat = start
     while True:
         if exists_fn():
             return True
@@ -560,6 +656,19 @@ def wait_for_checkpoint(proc, ckpt_dir, poll_secs=CKPT_POLL_SECS, sleep_fn=time.
         if rc is not None:
             log(f"wait_for_checkpoint: training process exited rc={rc} before {ckpt_dir} appeared")
             return False
+        now = now_fn()
+        elapsed = now - start
+        if elapsed >= timeout_secs:
+            log(f"wait_for_checkpoint: LOUD TIMEOUT -- no checkpoint at {ckpt_dir} and training "
+                f"process still hasn't exited after {elapsed / 3600:.1f}h "
+                f"(timeout={timeout_secs / 3600:.1f}h) -- killing it now and giving up on this "
+                f"attempt (run_pull's existing retry/failed-row machinery takes it from here)")
+            kill_fn()
+            return False
+        if now - last_heartbeat >= heartbeat_secs:
+            log(f"wait_for_checkpoint: still waiting for {ckpt_dir} -- "
+                f"{elapsed / 60:.0f}min elapsed (timeout at {timeout_secs / 60:.0f}min)")
+            last_heartbeat = now
         sleep_fn(poll_secs)
 
 
@@ -850,7 +959,8 @@ def run_pull(arm: str, j: int, slot: str, B: int, eval_fn=None, dry_run=False, *
             train_log = config.LEDGER_DIR / LOGS_SUBDIR / f"{pull_id}_train_attempt{attempt}.log"
             last_train_log = train_log
             proc = launch_training(tcmd, train_gpu, train_log, popen_fn=popen_fn)
-            ok = wait_for_checkpoint(proc, ckpt_dir, sleep_fn=sleep_fn, log=log)
+            ok = wait_for_checkpoint(proc, ckpt_dir, sleep_fn=sleep_fn, log=log,
+                                      num_train_steps=num_train_steps)
             if ok:
                 break
             if attempt < max_train_attempts:

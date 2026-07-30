@@ -414,6 +414,7 @@ def run_null_phase(read_pulls_fn, run_one, sigma_e_eval, claimable_fn=both_slots
     else:
         log(f"Phase NULLS: running missing null pull(s) j={missing}")
         specs = [{"arm": "null", "j": j, "slot": pull.SLOTS[i % 2]} for i, j in enumerate(missing)]
+        specs = pull.resolve_sticky_slots(specs, log=log)
         run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log)
         pulls_df = read_pulls_fn()
 
@@ -572,6 +573,7 @@ def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_
             log(f"Round {j}: to_pull={to_pull} (already ok this round: "
                 f"{sorted(set(alive) - set(to_pull))})")
             specs = [{"arm": a, "j": j, "slot": pull.SLOTS[i % 2]} for i, a in enumerate(to_pull)]
+            specs = pull.resolve_sticky_slots(specs, log=log)
             run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log,
                                 should_stop_fn=_t_cap_reached)
 

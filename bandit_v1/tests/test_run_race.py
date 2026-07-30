@@ -17,7 +17,7 @@ import pandas as pd
 import pytest
 import yaml
 
-from bandit_v1 import config, run_race as rr
+from bandit_v1 import config, pull, run_race as rr
 
 
 PULLS_COLS = ["pull_id", "arm", "round_j", "delta", "status"]
@@ -355,6 +355,38 @@ def test_run_null_phase_two_wide_when_claimable(tmp_path):
     assert set(fl.calls) == {("null", 1), ("null", 2)}
 
 
+def test_run_null_phase_routes_specs_through_resolve_sticky_slots(tmp_path, monkeypatch):
+    """Integration point for the sticky-slot fix (task-stickyslot-report.md):
+    run_null_phase must hand its alternation-assigned specs through
+    pull.resolve_sticky_slots before dispatch, so a resumed run's index-based
+    slot pick can never override an arm's real, already-complete checkpoint
+    slot. Exercised end-to-end against real checkpoint_looks_complete/
+    ckpt_final_dir (config.OPENPI monkeypatched to tmp_path), not by mocking
+    resolve_sticky_slots itself."""
+    monkeypatch.setattr(config, "OPENPI", tmp_path / "openpi")
+    # null_j1's real checkpoint already lives under slot "b" -- the
+    # single-missing-round alternation (index 0) would otherwise pick "a".
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_b", "null_j1")
+    ckpt_dir.mkdir(parents=True)
+    (ckpt_dir / pull.CKPT_METADATA_FILE).write_text("{}")
+    (ckpt_dir / "params").mkdir()
+    (ckpt_dir / "params" / "x").write_text("x")
+
+    seen_slots = []
+    fl = FakeLedger(preseed=_pulls([("null", 2, -0.01)]).to_dict("records"))
+
+    def run_one(spec):
+        seen_slots.append(spec["slot"])
+        return fl.run_one(spec)
+
+    logs = []
+    rr.run_null_phase(fl.read, run_one, sigma_e_eval=0.0, log=logs.append,
+                       cfg_path=tmp_path / "config.yaml")
+
+    assert seen_slots == ["b"]  # forced away from the "a" alternation would have picked
+    assert any("sticky slot: null_j1 -> slot b (existing checkpoint)" in m for m in logs)
+
+
 # =============================================================================
 # resume/round-reconstruction helpers (pure)
 # =============================================================================
@@ -442,6 +474,36 @@ def test_run_race_phase_t_cap_stops_with_multiple_survivors():
     assert set(decision["survivors"]) == {"A", "B"}
     assert decision["eliminated"] == {}
     assert len(fl.calls) == 4  # exactly t_max ok pulls, no more
+
+
+def test_run_race_phase_routes_specs_through_resolve_sticky_slots(tmp_path, monkeypatch):
+    """Same wiring check as run_null_phase's, for Phase RACE's own dispatch
+    site -- the ACTUAL site tonight's round-3 stall hit (task-stickyslot-
+    report.md): easy_band's real checkpoint already lives under slot "b",
+    but the bootstrap round's index-based alternation (2 arms, index 0)
+    would otherwise pick "a" for it."""
+    monkeypatch.setattr(config, "OPENPI", tmp_path / "openpi")
+    ckpt_dir = pull.ckpt_final_dir("pi0_ppc2sink_bandit_b", "easy_band_j3")
+    ckpt_dir.mkdir(parents=True)
+    (ckpt_dir / pull.CKPT_METADATA_FILE).write_text("{}")
+    (ckpt_dir / "params").mkdir()
+    (ckpt_dir / "params" / "x").write_text("x")
+
+    seen_slots = {}
+    fl = FakeLedger()
+
+    def run_one(spec):
+        seen_slots[spec["arm"]] = spec["slot"]
+        return fl.run_one(spec)
+
+    logs = []
+    rr.run_race_phase(sigma_e=0.01, read_pulls_fn=fl.read, run_one=run_one,
+                       all_arms=["easy_band", "mid_band"], claimable_fn=lambda: False,
+                       t_max=2, log=logs.append)
+
+    assert seen_slots["easy_band"] == "b"  # forced away from the "a" alternation would have picked
+    assert seen_slots["mid_band"] == "b"   # no checkpoint anywhere yet -- alternation's own pick stands
+    assert any("sticky slot: easy_band_j3 -> slot b (existing checkpoint)" in m for m in logs)
 
 
 def test_run_batch_two_wide_should_stop_fn_checked_before_each_pull():
