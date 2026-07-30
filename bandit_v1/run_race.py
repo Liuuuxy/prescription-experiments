@@ -304,7 +304,7 @@ def _run_one_capturing(run_one, spec, errors, results):
 
 
 def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=print,
-                        should_stop_fn=None) -> list:
+                        should_stop_fn=None, sleep_fn=time.sleep) -> list:
     """Run `specs` (each a dict, at minimum carrying "slot") via
     `run_one(spec)`: one at a time, UNLESS `claimable_fn()` says both GPU
     slots are currently claimable, in which case each adjacent PAIR of specs
@@ -349,7 +349,20 @@ def run_batch_two_wide(specs, run_one, claimable_fn=both_slots_claimable, log=pr
                 f"({[s.get('arm', s.get('slot')) for s in specs[i:]]})")
             break
         pair = specs[i:i + 2]
-        if len(pair) == 2 and claimable_fn():
+        # Claimability can be transiently false right after a kill/restart while
+        # GPU memory is still releasing -- one stale glance must not commit the
+        # whole pair to a ~9h sequential path. Poll briefly before falling back.
+        pair_claimable = False
+        if len(pair) == 2:
+            for _attempt in range(20):                       # up to ~5 min
+                if claimable_fn():
+                    pair_claimable = True
+                    break
+                if _attempt == 0:
+                    log("run_batch_two_wide: slots not claimable yet -- polling up to "
+                        "5 min before falling back to sequential")
+                sleep_fn(15)
+        if pair_claimable:
             log(f"run_batch_two_wide: both GPU slots claimable -- running "
                 f"{[s.get('arm', s.get('slot')) for s in pair]} concurrently")
             threads = [threading.Thread(target=_run_one_capturing, args=(run_one, spec, errors, results))
@@ -389,7 +402,7 @@ def missing_null_rounds(pulls_df) -> list:
 
 
 def run_null_phase(read_pulls_fn, run_one, sigma_e_eval, claimable_fn=both_slots_claimable,
-                    cfg_path=None, log=print) -> float:
+                    cfg_path=None, log=print, sleep_fn=time.sleep) -> float:
     """Run whichever of the 2 null pulls (seeds 1001/1002) aren't `ok` yet
     (no-op if both already are -- the resumable "phase is a no-op if
     already complete" contract), then compute + record sigma_e =
@@ -415,7 +428,7 @@ def run_null_phase(read_pulls_fn, run_one, sigma_e_eval, claimable_fn=both_slots
         log(f"Phase NULLS: running missing null pull(s) j={missing}")
         specs = [{"arm": "null", "j": j, "slot": pull.SLOTS[i % 2]} for i, j in enumerate(missing)]
         specs = pull.resolve_sticky_slots(specs, log=log)
-        run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log)
+        run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log, sleep_fn=sleep_fn)
         pulls_df = read_pulls_fn()
 
     ok_null = pulls_df[(pulls_df["arm"] == "null") & (pulls_df["status"] == "ok")]
@@ -526,7 +539,7 @@ def _ok_non_null_pull_count(pulls_df) -> int:
 
 
 def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_slots_claimable,
-                    t_max=config.T_MAX_PULLS, delta=config.DELTA_CONF, log=print) -> dict:
+                    t_max=config.T_MAX_PULLS, delta=config.DELTA_CONF, log=print, sleep_fn=time.sleep) -> dict:
     """Successive-elimination race over `all_arms`, starting at
     RACE_FIRST_ROUND (3). Resumable: recomputes (round, live roster) from
     the ledger on every iteration (see `_current_round_and_roster`), pulls
@@ -574,7 +587,7 @@ def run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms, claimable_fn=both_
                 f"{sorted(set(alive) - set(to_pull))})")
             specs = [{"arm": a, "j": j, "slot": pull.SLOTS[i % 2]} for i, a in enumerate(to_pull)]
             specs = pull.resolve_sticky_slots(specs, log=log)
-            run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log,
+            run_batch_two_wide(specs, run_one, claimable_fn=claimable_fn, log=log, sleep_fn=sleep_fn,
                                 should_stop_fn=_t_cap_reached)
 
             pulls_df = read_pulls_fn()
@@ -726,9 +739,9 @@ def main(log=print, sleep_fn=time.sleep, workers=EVAL_WORKERS,
         log(f"pull done: pull_id={row['pull_id']} status={row['status']}")
         return row
 
-    sigma_e = run_null_phase(read_pulls_fn, run_one, sigma_e_eval, claimable_fn=claimable_fn, log=log)
+    sigma_e = run_null_phase(read_pulls_fn, run_one, sigma_e_eval, claimable_fn=claimable_fn, log=log, sleep_fn=sleep_fn)
     decision = run_race_phase(sigma_e, read_pulls_fn, run_one, all_arms,
-                               claimable_fn=claimable_fn, log=log)
+                               claimable_fn=claimable_fn, log=log, sleep_fn=sleep_fn)
     return decision
 
 

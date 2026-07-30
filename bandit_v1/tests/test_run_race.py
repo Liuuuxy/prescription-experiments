@@ -220,7 +220,7 @@ def test_run_batch_two_wide_sequential_when_not_claimable():
         return spec["slot"]
 
     out = rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}], run_one,
-                                 claimable_fn=lambda: False, log=_quiet_log)
+                                 claimable_fn=lambda: False, log=_quiet_log, sleep_fn=lambda s: None)
     assert order == ["a", "b"]
     assert out == ["a", "b"]
 
@@ -239,7 +239,7 @@ def test_run_batch_two_wide_runs_concurrently_when_both_claimable():
         return spec["slot"]
 
     out = rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}], run_one,
-                                 claimable_fn=lambda: True, log=_quiet_log)
+                                 claimable_fn=lambda: True, log=_quiet_log, sleep_fn=lambda s: None)
     assert set(seen) == {"a", "b"}
     assert set(out) == {"a", "b"}
 
@@ -258,7 +258,7 @@ def test_run_batch_two_wide_sequential_mode_would_break_a_barrier():
 
     with pytest.raises(threading.BrokenBarrierError):
         rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}], run_one,
-                               claimable_fn=lambda: False, log=_quiet_log)
+                               claimable_fn=lambda: False, log=_quiet_log, sleep_fn=lambda s: None)
 
 
 def test_run_batch_two_wide_all_specs_attempted_even_if_one_raises():
@@ -272,7 +272,7 @@ def test_run_batch_two_wide_all_specs_attempted_even_if_one_raises():
 
     with pytest.raises(RuntimeError, match="boom"):
         rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}], run_one,
-                               claimable_fn=lambda: True, log=_quiet_log)
+                               claimable_fn=lambda: True, log=_quiet_log, sleep_fn=lambda s: None)
     assert completed == ["b"]  # sibling still ran despite the other's exception
 
 
@@ -284,7 +284,7 @@ def test_run_batch_two_wide_odd_length_trailing_item_runs_alone():
         return spec["slot"]
 
     out = rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}, {"slot": "c"}], run_one,
-                                 claimable_fn=lambda: True, log=_quiet_log)
+                                 claimable_fn=lambda: True, log=_quiet_log, sleep_fn=lambda s: None)
     assert set(order) == {"a", "b", "c"}
     assert set(out) == {"a", "b", "c"}
 
@@ -319,7 +319,7 @@ def test_run_null_phase_runs_only_the_missing_round(tmp_path):
 def test_run_null_phase_computes_sigma_e_as_max_of_null_std_and_eval_floor(tmp_path):
     fl = FakeLedger(delta_fn=lambda arm, j: {1: 0.20, 2: -0.20}[j])
     sigma_e = rr.run_null_phase(fl.read, fl.run_one, sigma_e_eval=0.01,
-                                 claimable_fn=lambda: False, log=_quiet_log, cfg_path=tmp_path / 'config.yaml')
+                                 claimable_fn=lambda: False, log=_quiet_log, cfg_path=tmp_path / 'config.yaml', sleep_fn=lambda s: None)
     expected_null_std = float(np.std([0.20, -0.20], ddof=1))
     assert expected_null_std > 0.01
     assert sigma_e == pytest.approx(expected_null_std)
@@ -451,7 +451,7 @@ def test_run_race_phase_clean_separation_converges_to_single_survivor():
     fl = FakeLedger(delta_fn=delta_fn)
     decision = rr.run_race_phase(sigma_e=0.01, read_pulls_fn=fl.read, run_one=fl.run_one,
                                   all_arms=["hi", "mid", "lo"], claimable_fn=lambda: False,
-                                  log=_quiet_log)
+                                  log=_quiet_log, sleep_fn=lambda s: None)
     assert decision["survivors"] == ["hi"]
     assert decision["done"] is True
     assert "mid" in decision["eliminated"]
@@ -469,7 +469,7 @@ def test_run_race_phase_t_cap_stops_with_multiple_survivors():
     fl = FakeLedger(delta_fn=lambda arm, j: {"A": 0.10, "B": 0.11}[arm])
     decision = rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
                                   all_arms=["A", "B"], claimable_fn=lambda: False,
-                                  t_max=4, log=_quiet_log)
+                                  t_max=4, log=_quiet_log, sleep_fn=lambda s: None)
     assert decision["done"] is True
     assert set(decision["survivors"]) == {"A", "B"}
     assert decision["eliminated"] == {}
@@ -499,7 +499,7 @@ def test_run_race_phase_routes_specs_through_resolve_sticky_slots(tmp_path, monk
     logs = []
     rr.run_race_phase(sigma_e=0.01, read_pulls_fn=fl.read, run_one=run_one,
                        all_arms=["easy_band", "mid_band"], claimable_fn=lambda: False,
-                       t_max=2, log=logs.append)
+                       t_max=2, log=logs.append, sleep_fn=lambda s: None)
 
     assert seen_slots["easy_band"] == "b"  # forced away from the "a" alternation would have picked
     assert seen_slots["mid_band"] == "b"   # no checkpoint anywhere yet -- alternation's own pick stands
@@ -521,7 +521,7 @@ def test_run_batch_two_wide_should_stop_fn_checked_before_each_pull():
     out = rr.run_batch_two_wide(
         [{"slot": "a"}, {"slot": "b"}, {"slot": "c"}, {"slot": "d"}],
         run_one, claimable_fn=lambda: False, log=_quiet_log,
-        should_stop_fn=lambda: count["n"] >= 2)
+        should_stop_fn=lambda: count["n"] >= 2, sleep_fn=lambda s: None)
 
     assert calls == ["a", "b"]   # c, d never started
     assert out == ["a", "b"]
@@ -532,7 +532,7 @@ def test_run_batch_two_wide_should_stop_fn_none_never_stops_batch():
     calls = []
     rr.run_batch_two_wide([{"slot": "a"}, {"slot": "b"}, {"slot": "c"}],
                            lambda spec: calls.append(spec["slot"]),
-                           claimable_fn=lambda: False, log=_quiet_log)
+                           claimable_fn=lambda: False, log=_quiet_log, sleep_fn=lambda s: None)
     assert calls == ["a", "b", "c"]
 
 
@@ -543,7 +543,7 @@ def test_run_race_phase_t_cap_checked_mid_round_stops_with_zero_further_calls():
     fl = FakeLedger(delta_fn=lambda arm, j: 0.1)
     decision = rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
                                   all_arms=["A", "B", "C", "D"], claimable_fn=lambda: False,
-                                  t_max=2, log=_quiet_log)
+                                  t_max=2, log=_quiet_log, sleep_fn=lambda s: None)
     assert fl.calls == [("A", rr.RACE_FIRST_ROUND), ("B", rr.RACE_FIRST_ROUND)]
     assert decision["done"] is True
 
@@ -566,7 +566,7 @@ def test_run_race_phase_t_cap_stops_mid_round_after_elimination_shrinks_roster()
     # isolating the T-cap behavior from elimination logic.
     decision = rr.run_race_phase(sigma_e=1.0, read_pulls_fn=fl.read, run_one=fl.run_one,
                                   all_arms=["A", "B", "C"], claimable_fn=lambda: False,
-                                  t_max=16, log=_quiet_log)
+                                  t_max=16, log=_quiet_log, sleep_fn=lambda s: None)
 
     assert len(fl.calls) == 1   # NOT the full 3-arm round -- stops right at t_max
     assert decision["done"] is True
@@ -581,7 +581,7 @@ def test_run_race_phase_resumes_eval_failed_row_by_repulling_that_arm():
     fl = FakeLedger(preseed=preseed.to_dict("records"), delta_fn=lambda arm, j: 0.10)
     rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
                        all_arms=["A", "B"], claimable_fn=lambda: False,
-                       t_max=3, log=_quiet_log)
+                       t_max=3, log=_quiet_log, sleep_fn=lambda s: None)
     assert ("A", rr.RACE_FIRST_ROUND) in fl.calls
     assert ("B", rr.RACE_FIRST_ROUND) not in fl.calls
 
@@ -592,7 +592,7 @@ def test_run_race_phase_resumes_mid_round_never_re_pulls_already_ok_arms():
                      delta_fn=lambda arm, j: 0.10)
     rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
                        all_arms=["A", "B", "C"], claimable_fn=lambda: False,
-                       t_max=3, log=_quiet_log)
+                       t_max=3, log=_quiet_log, sleep_fn=lambda s: None)
     assert ("C", rr.RACE_FIRST_ROUND) in fl.calls
     assert ("A", rr.RACE_FIRST_ROUND) not in fl.calls
     assert ("B", rr.RACE_FIRST_ROUND) not in fl.calls
@@ -603,7 +603,7 @@ def test_run_race_phase_already_done_on_entry_returns_immediately():
                  ("A", 5, 0.29), ("B", 5, 0.06)])
     fl = FakeLedger(preseed=df.to_dict("records"))
     decision = rr.run_race_phase(sigma_e=0.01, read_pulls_fn=fl.read, run_one=fl.run_one,
-                                  all_arms=["A", "B"], claimable_fn=lambda: False, log=_quiet_log)
+                                  all_arms=["A", "B"], claimable_fn=lambda: False, log=_quiet_log, sleep_fn=lambda s: None)
     assert decision["done"] is True
     assert fl.calls == []  # nothing left to pull
 
@@ -613,7 +613,7 @@ def test_run_race_phase_halts_loudly_when_arm_never_produces_ok_pull():
                      delta_fn=lambda arm, j: 0.1)
     with pytest.raises(RuntimeError, match="HUMAN INTERVENTION"):
         rr.run_race_phase(sigma_e=0.05, read_pulls_fn=fl.read, run_one=fl.run_one,
-                           all_arms=["good", "bad"], claimable_fn=lambda: False, log=_quiet_log)
+                           all_arms=["good", "bad"], claimable_fn=lambda: False, log=_quiet_log, sleep_fn=lambda s: None)
     assert ("bad", rr.RACE_FIRST_ROUND) in fl.calls
     # never silently advances past the failed arm to a later round
     assert all(j == rr.RACE_FIRST_ROUND for (a, j) in fl.calls)
@@ -787,7 +787,7 @@ def test_main_wires_gradient_note_preconditions_nulls_and_race_in_order(tmp_path
     monkeypatch.setattr(rr, "run_race_phase", fake_race_phase)
 
     decision = rr.main(log=_quiet_log, read_pulls_fn=fl.read, run_pull_fn=lambda *a, **k: None,
-                        claimable_fn=lambda: False)
+                        claimable_fn=lambda: False, sleep_fn=lambda s: None)
 
     assert order == ["gradient_note", "preconditions", "nulls", "race"]
     assert decision == {"done": True, "survivors": ["A"]}
