@@ -60,6 +60,7 @@ at that point -- never re-run an already-`ok` (arm, round) pull, never
 silently mis-attribute an elimination to an arm that simply hasn't been
 pulled yet this round because of a crash.
 """
+import os
 import argparse
 import sys
 import threading
@@ -293,6 +294,8 @@ def gpu_claimable(gpu, need_mib=pull.TRAIN_GPU_NEED_MIB, query=None) -> bool:
 
 
 def both_slots_claimable(query=None) -> bool:
+    if os.environ.get("BANDIT_PIN_GPU") is not None:
+        return False  # 1-GPU mode: never dispatch two-wide (owner freed the other GPU)
     return gpu_claimable(0, query=query) and gpu_claimable(1, query=query)
 
 
@@ -727,7 +730,8 @@ def main(log=print, sleep_fn=time.sleep, workers=EVAL_WORKERS,
 
     def run_one(spec):
         arm, j, slot = spec["arm"], spec["j"], spec["slot"]
-        gpu = SLOT_GPU[slot]
+        pin = os.environ.get("BANDIT_PIN_GPU")
+        gpu = int(pin) if pin is not None else SLOT_GPU[slot]
         log(f"pull start: arm={arm!r} round={j} slot={slot} gpu={gpu}")
         if arm == "null":
             row = run_pull_fn("null", j, slot, B=0, eval_fn=eval_fn,
