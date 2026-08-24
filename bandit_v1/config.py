@@ -87,6 +87,34 @@ DIAG_TERCILE_MAP_JSON = LEDGER_DIR / "diag_tercile_map.json"  # frozen category-
 MAP_MODELS_JOBLIB = LEDGER_DIR / "map_models.joblib"  # fitted p_hat_0 + p_stage (task 8, map_fit.py)
 ARMS_YAML = LEDGER_DIR / "arms.yaml"          # frozen clusters + Random (task 10, clustering.py)
 
+# --- task profiles (2026-08-17, track 2) -------------------------------------
+# Additive, env-gated override: BANDIT_TASK_PROFILE=ppccab retargets every
+# task-coupled constant at PickPlaceCounterToCabinet with a FRESH ledger/states
+# tree (bandit_v1/ledger_ppccab, states_ppccab) so nothing above -- and no
+# artifact of the original PickPlaceCounterToSink race -- is touched. Unset
+# (the default), this block is a no-op and the module is byte-for-byte the
+# frozen task-1 config. Must run before any sibling module binds these names
+# at import time (pool.py's POOL_PARQUET/HASHES_JSON), which holds because
+# they all `from . import config` first.
+import os as _os
+if _os.environ.get("BANDIT_TASK_PROFILE") == "ppccab":
+    TASK = "PickPlaceCounterToCabinet"
+    POOL_LEROBOT = Path("/data/xinyua11/robocasa_pkg/datasets/v1.0/pretrain/atomic/"
+                        "PickPlaceCounterToCabinet/20250819/mg/demo/2025-08-20-21-56-25/lerobot")
+    ARMS_JSON = REPO / "gradient_analysis/ppccab/d0_arms.json"      # base_episodes = task-2 D0 (400, rng 20260817)
+    FX_POOL_JSON = REPO / "gradient_analysis/ppccab/fx_pool_ppccab.json"
+    FX_EPISODES_JSON = REPO / "gradient_analysis/ppccab/fx_episodes_ppccab.json"  # written after diagnosis
+    D0_DATASET = Path("/data/xinyua11/ft_arms/ppccab_d0")
+    ENV_ARGS_HDF5 = REPO / "mimicgen_src/PickPlaceCounterToCabinet_pi0_src.hdf5"
+    LEDGER_DIR = BANDIT_DIR / "ledger_ppccab"
+    STATES_DIR = BANDIT_DIR / "states_ppccab"
+    E_DIR = STATES_DIR / "E"
+    DIAG_DIR = STATES_DIR / "diag"
+    DIAG_CHECK_DIR = STATES_DIR / "diag_check"
+    DIAG_TERCILE_MAP_JSON = LEDGER_DIR / "diag_tercile_map.json"
+    MAP_MODELS_JOBLIB = LEDGER_DIR / "map_models.joblib"
+    ARMS_YAML = LEDGER_DIR / "arms.yaml"
+
 SEED_PI0 = 1000
 def pull_seed(j: int) -> int: return 1000 + j       # round j >= 1
 NULL_SEEDS = (1001, 1002)

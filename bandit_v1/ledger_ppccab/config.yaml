@@ -1,0 +1,19 @@
+
+# bandit_v1 Task 9: pi_0 baseline b on the frozen 150-start eval set E
+# (config.EVAL_REPEATS independent repeats), written once by
+# run_baseline.sh -- never edited mid-run, same frozen-constant convention
+# as the rest of this file (bandit_v1/config.py's docstring).
+baseline:
+  b: 0.4977777777777778
+  per_stratum_b:
+    hard: 0.4266666666666667
+    mid: 0.4266666666666667
+    easy: 0.64
+  sigma_e_eval: 0.010183501544346316
+  per_repeat_means:
+  - 0.4866666666666667
+  - 0.5066666666666667
+  - 0.5
+  repeats: 3
+  checkpoint_id: null
+  written_at: '2026-08-18T17:36:25.843694+00:00'

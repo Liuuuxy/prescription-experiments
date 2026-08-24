@@ -1,0 +1,133 @@
+{
+  "sequential": {
+    "auc": 0.6782105955789511,
+    "calibration_bins": [
+      {
+        "empirical": 0.15833333333333333,
+        "mean_predicted": 0.048320011321187094,
+        "n": 240
+      },
+      {
+        "empirical": 0.2791666666666667,
+        "mean_predicted": 0.10720666432589078,
+        "n": 240
+      },
+      {
+        "empirical": 0.25833333333333336,
+        "mean_predicted": 0.17953386320622944,
+        "n": 240
+      },
+      {
+        "empirical": 0.39166666666666666,
+        "mean_predicted": 0.27569777057096173,
+        "n": 240
+      },
+      {
+        "empirical": 0.475,
+        "mean_predicted": 0.368544437132145,
+        "n": 240
+      },
+      {
+        "empirical": 0.4375,
+        "mean_predicted": 0.4548683512905377,
+        "n": 240
+      },
+      {
+        "empirical": 0.4791666666666667,
+        "mean_predicted": 0.533252764440954,
+        "n": 240
+      },
+      {
+        "empirical": 0.4166666666666667,
+        "mean_predicted": 0.6270664755441105,
+        "n": 240
+      },
+      {
+        "empirical": 0.5833333333333334,
+        "mean_predicted": 0.7521333055200244,
+        "n": 240
+      },
+      {
+        "empirical": 0.75,
+        "mean_predicted": 0.8592230048405519,
+        "n": 240
+      }
+    ],
+    "family": "sequential",
+    "gate_auc": {
+      "grasp": 0.6839231034879705,
+      "place": NaN,
+      "reach": 0.613586104154535,
+      "transport": 0.6518832555909151
+    },
+    "global_mean": 0.42291666666666666,
+    "log_loss": 0.6702528911286867,
+    "n": 2400,
+    "n_groups": 300,
+    "n_splits": 5,
+    "stage_log_loss": 1.2711334047418619
+  },
+  "two_model": {
+    "auc": 0.6657135743628959,
+    "calibration_bins": [
+      {
+        "empirical": 0.15416666666666667,
+        "mean_predicted": 0.056388880426758554,
+        "n": 240
+      },
+      {
+        "empirical": 0.26666666666666666,
+        "mean_predicted": 0.10899022297052778,
+        "n": 240
+      },
+      {
+        "empirical": 0.32916666666666666,
+        "mean_predicted": 0.1700034090782253,
+        "n": 240
+      },
+      {
+        "empirical": 0.3416666666666667,
+        "mean_predicted": 0.2560468114500251,
+        "n": 240
+      },
+      {
+        "empirical": 0.49166666666666664,
+        "mean_predicted": 0.3488702802063747,
+        "n": 240
+      },
+      {
+        "empirical": 0.49166666666666664,
+        "mean_predicted": 0.426644505904018,
+        "n": 240
+      },
+      {
+        "empirical": 0.425,
+        "mean_predicted": 0.5372408491335158,
+        "n": 240
+      },
+      {
+        "empirical": 0.4375,
+        "mean_predicted": 0.632438331263081,
+        "n": 240
+      },
+      {
+        "empirical": 0.55,
+        "mean_predicted": 0.7808230340685145,
+        "n": 240
+      },
+      {
+        "empirical": 0.7416666666666667,
+        "mean_predicted": 0.8890426201025529,
+        "n": 240
+      }
+    ],
+    "family": "two_model",
+    "global_mean": 0.42291666666666666,
+    "log_loss": 0.6936538850135961,
+    "n": 2400,
+    "n_groups": 300,
+    "n_splits": 5,
+    "stage_log_loss": 1.2758611481494204
+  },
+  "winner": "sequential"
+}

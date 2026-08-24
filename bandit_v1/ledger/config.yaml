@@ -131,3 +131,67 @@ gradient_analysis:
   - demo_ids per pull
   - paired seeds
   rationale: future per-demo gradient/influence analysis
+
+# bandit_v1 Task 9: pi_0 baseline b on the frozen 150-start eval set E
+# (config.EVAL_REPEATS independent repeats), written once by
+# run_baseline.sh -- never edited mid-run, same frozen-constant convention
+# as the rest of this file (bandit_v1/config.py's docstring).
+baseline:
+  b: 0.5133333333333333
+  per_stratum_b:
+    hard: 0.28
+    mid: 0.6066666666666666
+    easy: 0.6533333333333334
+  sigma_e_eval: 0.033333333333333326
+  per_repeat_means:
+  - 0.5133333333333333
+  - 0.48
+  - 0.5466666666666666
+  repeats: 3
+  checkpoint_id: /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1/19999
+  written_at: '2026-07-27T15:28:44.104928+00:00'
+
+# bandit_v1 emergency null-takeover (task-nulltakeover-report.md): server +
+# serial-finisher-driver PIDs for the manual null_j1/null_j2 eval completion.
+# UNCOMMITTED -- this is live process/run-state, not frozen config; delete or
+# update once complete_nulls.py has run and the race is ready to relaunch.
+null_finisher_pids:
+  written_at: '2026-07-28T07:05:29.803853+00:00'
+  note: 'Emergency null-takeover (task-nulltakeover-report.md): both null pulls training-complete
+    but eval interrupted by hung parallel_eval workers + box-wide contention. Serving
+    each checkpoint standalone + a serial, ledger-resumable finisher driver (scratchpad
+    finish_null.py, same pattern as finish_baseline.py) per null, one per GPU. Servers/drivers
+    launched setsid-detached (start_new_session=True), independent of run_race.py
+    (killed, not relaunched -- see task-nulltakeover-report.md for why). complete_nulls.py
+    (prepared, NOT run) finishes both pulls.parquet rows once both hit 450/450.'
+  null_j1:
+    server_pid: 660953
+    server_port: 8125
+    gpu: 0
+    config_name: pi0_ppc2sink_bandit_a
+    checkpoint: /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/null_j1/19999
+    server_log: /data/xinyua11/tmp/serve_null_j1_manual.log
+    driver_pid: 662760
+    driver_log: /data/xinyua11/tmp/finish_null_j1.log
+    rows_at_launch: 343
+    rows_target: 450
+  null_j2:
+    server_pid: 660954
+    server_port: 8126
+    gpu: 1
+    config_name: pi0_ppc2sink_bandit_b
+    checkpoint: /data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/null_j2/19999
+    server_log: /data/xinyua11/tmp/serve_null_j2_manual.log
+    driver_pid: 662761
+    driver_log: /data/xinyua11/tmp/finish_null_j2.log
+    rows_at_launch: 340
+    rows_target: 450
+
+# bandit_v1 run_race Phase NULLS: measured noise floor (2 null pulls --
+# recipe R on D0 alone at seeds 1001/1002 -- vs the frozen baseline b).
+# sigma_e = max(sample_std(null_deltas, ddof=1), baseline.sigma_e_eval).
+noise_floor:
+  null_deltas:
+  - 0.02444444444444449
+  - -0.008888888888888946
+  sigma_e: 0.033333333333333326

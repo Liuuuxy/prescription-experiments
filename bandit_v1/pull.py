@@ -109,6 +109,10 @@ ROBOCASA_PY = Path("/data/xinyua11/conda/envs/robocasa/bin/python")
 
 SLOTS = ("a", "b")
 SLOT_TRAIN_CONFIG = {"a": "pi0_ppc2sink_bandit_a", "b": "pi0_ppc2sink_bandit_b"}
+# task profile (config.py's BANDIT_TASK_PROFILE block): track-2 runs use the
+# ppccab train configs + slot symlinks; default (unset) is byte-identical task-1.
+if os.environ.get("BANDIT_TASK_PROFILE") == "ppccab":
+    SLOT_TRAIN_CONFIG = {"a": "pi0_ppccab_bandit_a", "b": "pi0_ppccab_bandit_b"}
 SLOT_PORT_BASE = 8130                     # slot "a" -> 8130, "b" -> 8131
 
 TRAIN_GPU_NEED_MIB = 70000                # matches launch_pi0.sh's threshold
@@ -175,14 +179,22 @@ def pull_id_for(arm: str, j: int) -> str:
     return f"{arm}_j{j}"
 
 
+# task profile: ppccab uses its own dataset prefix and the ppccab_slot_* names
+# the pi0_ppccab_bandit_* TrainConfigs' data_dirs point at. Default unchanged.
+if os.environ.get("BANDIT_TASK_PROFILE") == "ppccab":
+    _ARM_DS_PREFIX, _SLOT_PREFIX = "ppccab_bandit_", "ppccab_slot_"
+else:
+    _ARM_DS_PREFIX, _SLOT_PREFIX = "ppc2sink_bandit_", "ppc2sink_bandit_slot_"
+
+
 def dataset_dir_for(arm: str, j: int) -> Path:
-    return config.FT_ARMS_ROOT / f"ppc2sink_bandit_{arm}_j{j}"
+    return config.FT_ARMS_ROOT / f"{_ARM_DS_PREFIX}{arm}_j{j}"
 
 
 def slot_symlink_for(slot: str) -> Path:
     if slot not in SLOTS:
         raise ValueError(f"slot_symlink_for: unknown slot {slot!r}, expected one of {SLOTS}")
-    return config.FT_ARMS_ROOT / f"ppc2sink_bandit_slot_{slot}"
+    return config.FT_ARMS_ROOT / f"{_SLOT_PREFIX}{slot}"
 
 
 def slot_port(slot: str) -> int:

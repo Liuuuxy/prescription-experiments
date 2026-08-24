@@ -45,3 +45,43 @@ bandit_v1/ledger/*.parquet
 # and diagnosis.py's code are what's committed; the captured states themselves
 # are not.
 bandit_v1/states/
+
+# ---- 2026-08-24 cleanup: code + reports tracked, bulky data artifacts not ----
+
+# paper / talk heavy media (talk scripts + narrative md ARE tracked)
+main (1).tex
+refs.bib
+runB.log
+talk/figs/
+talk/*.pptx
+talk/*.pdf
+weakregion/daily_report_*.pdf
+
+# gradient_analysis + sandboxes: gradient sketches, absorption ladders,
+# trajectory dumps, synthetic result dumps -- large + regenerable from drivers
+gradient_analysis/**/*.npz
+gradient_analysis/**/*.npy
+gradient_analysis/**/*.pt
+gradient_analysis/**/*.parquet
+gradient_analysis/**/*.log
+gradient_analysis/**/sketches_*/
+gradient_analysis/q2_absorption/
+gradient_analysis/gate_traj/
+gradient_analysis/llm_borrow/f4_synth*.json
+gradient_analysis/llm_borrow/part1_synthetic_robot.json
+sandbox_regions/**/*.npz
+sandbox_regions/**/*.pt
+sandbox_regions/**/*.parquet
+prescription_compare/**/*.log
+
+# factor analysis: plots/renders regenerable from scripts/
+weakregion/factor_analysis/plots/
+weakregion/factor_analysis/renders/
+weakregion/factor_analysis/*.html
+
+# bandit_v1 track-2 (ppccab) tree: same conventions as the main ledger
+bandit_v1/states_ppccab/
+bandit_v1/ledger_ppccab/*.parquet
+bandit_v1/ledger*/pull_logs/
+bandit_v1/ledger*/*.lock
+bandit_v1/ledger*/map_models.joblib

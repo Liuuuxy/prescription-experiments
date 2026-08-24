@@ -100,6 +100,25 @@ The interesting gradient question this raises: WHY did 200 tall-vessel grasp-fai
 hard stratum (−2.7pp on its own target)? Per-demo gradient alignment between arm demos and the target
 stratum's failure modes is exactly the analysis the retained artifacts enable.
 
+## 5.5 Q0 done (2026-07-31)
+
+The encoding-gate question of §5 is ANSWERED: see `gradient_analysis/Q0_REPORT.md`.
+Tall-region membership is not usably encoded at π₀ (best-mode AUC 0.577 < shuffle-null
+floor 0.598); all eight round-3/4 draws are gradient-exchangeable (region-cos gap ~0.01 vs
+common mode ~0.20); D0 absorption gap 6× validates the pipeline. Reusable artifacts:
+`gradient_analysis/sketches_pi0base_19999/` (1,715 demos × 2048-d JL sketches + norms,
+proj seed 12345 — comparable with `weakregion/rcless` sketches), `demo_lists.json`,
+resume-safe scripts. Next: Q2 absorption dynamics along pull checkpoints (§5.5 of the report).
+
+## 5.6 Mid-checkpoint deletion (2026-08-12, owner-ordered)
+
+Steps 10000/15000 were DELETED for 19 pulls (~339 GB; exact list in
+`gradient_analysis/mid_ckpt_deletion_list.json`) after their gradient content was
+fully archived (Q2/Q2b/Q2c) and the 10k-vs-20k duration question was answered by the
+training-length ablation. Every pull retains 5000 + its final (19999, or 9999 for the
+10k-recipe series). Full 4-step ladders remain ONLY for the 5-pull duration panel:
+tall_vessel_grasp_fail_j4, random_j4, style_hi_j3, style_lo_j3, null_j1.
+
 ## 6. Pointers
 
 - Design: `weakregion/BANDIT_V1_DESIGN.md` · Walkthrough: `weakregion/BANDIT_V1_WALKTHROUGH.md`
