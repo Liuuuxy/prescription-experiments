@@ -1,0 +1,47 @@
+{
+  "n_ok_pulls": 14,
+  "arm_means_pp": {
+    "easy_band": 2.074,
+    "mid_band": 3.63,
+    "random": 2.593,
+    "tall_vessel_grasp_fail": 2.963
+  },
+  "spread_pp": 0.654,
+  "noise_pp": 1.837,
+  "spread_over_noise": 0.356,
+  "decision_accuracy_vs_pulls_per_arm": {
+    "1": {
+      "decision_accuracy": 0.622125,
+      "gpu_h": 28.0
+    },
+    "2": {
+      "decision_accuracy": 0.6730416666666666,
+      "gpu_h": 56.0
+    },
+    "3": {
+      "decision_accuracy": 0.7025,
+      "gpu_h": 84.0
+    },
+    "5": {
+      "decision_accuracy": 0.75425,
+      "gpu_h": 140.0
+    },
+    "10": {
+      "decision_accuracy": 0.82375,
+      "gpu_h": 280.0
+    },
+    "20": {
+      "decision_accuracy": 0.8866666666666667,
+      "gpu_h": 560.0
+    },
+    "40": {
+      "decision_accuracy": 0.9395416666666667,
+      "gpu_h": 1120.0
+    },
+    "80": {
+      "decision_accuracy": 0.9750416666666667,
+      "gpu_h": 2240.0
+    }
+  },
+  "note": "Optimistic: treats observed arm means as ground truth. DataDecide reports ~0.80 decision accuracy at 0.01% of target compute on near-deterministic LLM benchmarks, where spread/noise >> 1."
+}

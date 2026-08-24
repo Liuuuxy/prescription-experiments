@@ -1,0 +1,307 @@
+[
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1/19999/params",
+  "demos": "slice",
+  "out": "B__pi0__0.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/null_j1/5000/params",
+  "demos": "slice",
+  "out": "B__null_j1__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/null_j1/19999/params",
+  "demos": "slice",
+  "out": "B__null_j1__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/null_j2/5000/params",
+  "demos": "slice",
+  "out": "B__null_j2__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/null_j2/19999/params",
+  "demos": "slice",
+  "out": "B__null_j2__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/tall_vessel_grasp_fail_j3/5000/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/tall_vessel_grasp_fail_j3/19999/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/easy_band_j3/5000/params",
+  "demos": "slice",
+  "out": "B__easy_band_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/easy_band_j3/19999/params",
+  "demos": "slice",
+  "out": "B__easy_band_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/mid_band_j3/5000/params",
+  "demos": "slice",
+  "out": "B__mid_band_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/mid_band_j3/19999/params",
+  "demos": "slice",
+  "out": "B__mid_band_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j3/5000/params",
+  "demos": "slice",
+  "out": "B__random_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j3/19999/params",
+  "demos": "slice",
+  "out": "B__random_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/mid_band_j4/5000/params",
+  "demos": "slice",
+  "out": "B__mid_band_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/mid_band_j4/19999/params",
+  "demos": "slice",
+  "out": "B__mid_band_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/easy_band_j4/5000/params",
+  "demos": "slice",
+  "out": "B__easy_band_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/easy_band_j4/19999/params",
+  "demos": "slice",
+  "out": "B__easy_band_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/tall_vessel_grasp_fail_j4/5000/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/tall_vessel_grasp_fail_j4/19999/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/random_j4/5000/params",
+  "demos": "slice",
+  "out": "B__random_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/random_j4/19999/params",
+  "demos": "slice",
+  "out": "B__random_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/easy_band_j5/5000/params",
+  "demos": "slice",
+  "out": "B__easy_band_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/easy_band_j5/19999/params",
+  "demos": "slice",
+  "out": "B__easy_band_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/tall_vessel_grasp_fail_j5/5000/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/tall_vessel_grasp_fail_j5/19999/params",
+  "demos": "slice",
+  "out": "B__tall_vessel_grasp_fail_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/mid_band_j5/5000/params",
+  "demos": "slice",
+  "out": "B__mid_band_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/mid_band_j5/19999/params",
+  "demos": "slice",
+  "out": "B__mid_band_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j5/5000/params",
+  "demos": "slice",
+  "out": "B__random_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j5/19999/params",
+  "demos": "slice",
+  "out": "B__random_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gradarm_a_j3/5000/params",
+  "demos": "slice",
+  "out": "B__gradarm_a_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gradarm_a_j3/19999/params",
+  "demos": "slice",
+  "out": "B__gradarm_a_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j3/5000/params",
+  "demos": "slice",
+  "out": "B__gradarm_b_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j3/19999/params",
+  "demos": "slice",
+  "out": "B__gradarm_b_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j4/5000/params",
+  "demos": "slice",
+  "out": "B__gradarm_b_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j4/19999/params",
+  "demos": "slice",
+  "out": "B__gradarm_b_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gradarm_a_j4/5000/params",
+  "demos": "slice",
+  "out": "B__gradarm_a_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gradarm_a_j4/19999/params",
+  "demos": "slice",
+  "out": "B__gradarm_a_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j3/5000/params",
+  "demos": "slice",
+  "out": "B__style_hi_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j3/19999/params",
+  "demos": "slice",
+  "out": "B__style_hi_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j3/5000/params",
+  "demos": "slice",
+  "out": "B__style_lo_j3__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j3/19999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j3__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j4/5000/params",
+  "demos": "slice",
+  "out": "B__style_lo_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j4/19999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j4/5000/params",
+  "demos": "slice",
+  "out": "B__style_hi_j4__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j4/19999/params",
+  "demos": "slice",
+  "out": "B__style_hi_j4__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j5/5000/params",
+  "demos": "slice",
+  "out": "B__style_hi_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/style_hi_j5/19999/params",
+  "demos": "slice",
+  "out": "B__style_hi_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j5/5000/params",
+  "demos": "slice",
+  "out": "B__style_lo_j5__5000.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j5/19999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j5__19999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gc0_j101/9999/params",
+  "demos": "slice",
+  "out": "B__gc0_j101__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j102/9999/params",
+  "demos": "slice",
+  "out": "B__random_j102__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j102/9999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j102__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gc0_j102/9999/params",
+  "demos": "slice",
+  "out": "B__gc0_j102__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j103/9999/params",
+  "demos": "slice",
+  "out": "B__random_j103__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gc0_j103/9999/params",
+  "demos": "slice",
+  "out": "B__gc0_j103__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j103/9999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j103__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_a/gc0_j104/9999/params",
+  "demos": "slice",
+  "out": "B__gc0_j104__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j104/9999/params",
+  "demos": "slice",
+  "out": "B__random_j104__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/style_lo_j104/9999/params",
+  "demos": "slice",
+  "out": "B__style_lo_j104__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j105/9999/params",
+  "demos": "slice",
+  "out": "B__random_j105__9999.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/random_j106/9999/params",
+  "demos": "slice",
+  "out": "B__random_j106__9999.npz"
+ }
+]

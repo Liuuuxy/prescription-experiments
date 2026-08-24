@@ -1,0 +1,123 @@
+{
+ "n_pulls": 18,
+ "sigma_used": 3.3872187748662785,
+ "proxies": {
+  "phi_probe": {
+   "ablation_corr": {
+    "raw_r": -0.071,
+    "shrunk_c": -0.048,
+    "gate": false
+   },
+   "calibrated": {
+    "n": 17,
+    "slope": -33.816,
+    "intercept": 3.298,
+    "latent_B90": 2.26,
+    "kappa_sigma": 2.54,
+    "s_total": 3.82,
+    "gate": true,
+    "support": [
+     0.1456,
+     0.172
+    ]
+   },
+   "n": 17,
+   "gate": true
+  },
+  "phi_grad_coherence": {
+   "ablation_corr": {
+    "raw_r": -0.417,
+    "shrunk_c": -0.298,
+    "gate": false
+   },
+   "calibrated": {
+    "n": 18,
+    "slope": -528.04,
+    "intercept": 9.022,
+    "latent_B90": 0.0,
+    "kappa_sigma": 2.54,
+    "s_total": 3.38,
+    "gate": true,
+    "support": [
+     0.0161,
+     0.0257
+    ]
+   },
+   "n": 18,
+   "gate": true
+  },
+  "phi_grad_centroid_cos": {
+   "ablation_corr": {
+    "raw_r": -0.384,
+    "shrunk_c": -0.273,
+    "gate": false
+   },
+   "calibrated": {
+    "n": 18,
+    "slope": -137.437,
+    "intercept": 18.073,
+    "latent_B90": 0.68,
+    "kappa_sigma": 2.54,
+    "s_total": 3.43,
+    "gate": true,
+    "support": [
+     0.1281,
+     0.1617
+    ]
+   },
+   "n": 18,
+   "gate": true
+  }
+ },
+ "arms": {
+  "gc0": {
+   "paired_mean": -1.7,
+   "n": 3,
+   "lcb": -4.91,
+   "ucb_bound": 1.5,
+   "shadow_index": 3.1,
+   "proxy_bonus": 1.59
+  },
+  "gc1": {
+   "paired_mean": 0.74,
+   "n": 3,
+   "lcb": -2.47,
+   "ucb_bound": 3.95,
+   "shadow_index": 3.78,
+   "proxy_bonus": -0.17
+  },
+  "gc2": {
+   "paired_mean": -6.3,
+   "n": 3,
+   "lcb": -9.5,
+   "ucb_bound": -3.09,
+   "shadow_index": -7.2,
+   "proxy_bonus": -4.11
+  },
+  "gc3": {
+   "paired_mean": -2.59,
+   "n": 3,
+   "lcb": -5.8,
+   "ucb_bound": 0.61,
+   "shadow_index": 2.63,
+   "proxy_bonus": 2.01
+  },
+  "gc4": {
+   "paired_mean": -1.04,
+   "n": 3,
+   "lcb": -4.24,
+   "ucb_bound": 2.17,
+   "shadow_index": 5.41,
+   "proxy_bonus": 3.24
+  },
+  "gc5": {
+   "paired_mean": -1.41,
+   "n": 3,
+   "lcb": -4.61,
+   "ucb_bound": 1.8,
+   "shadow_index": -0.84,
+   "proxy_bonus": -2.63
+  }
+ },
+ "note": "all pairs are uniform-allocation (selection-free calibration stream); PRIMARY gate = calibrated validity, corr gate = ablation only"
+}

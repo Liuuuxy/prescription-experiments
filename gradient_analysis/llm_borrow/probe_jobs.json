@@ -1,0 +1,1 @@
+[{"ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1/19999/params", "demos": "probe", "out": "probe_pi0base.npz"}, {"ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j3/19999/params", "demos": "probe", "out": "probe_gradarmb.npz"}]

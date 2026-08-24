@@ -1,0 +1,220 @@
+
+====================================================================================================
+TEST A - JEST / RHO-LOSS learnability   score(z) = L(z; pi_0) - L(z; reference)
+====================================================================================================
+reference 1 (primary)   : gradarm_b_j3 @ 19999  (best realized delta of any pull: +7.78pp)
+reference 2 (robustness): mid_band_j4 @ 19999  (+3.78pp, DIFFERENT seed 1004 - controls constraint 4)
+scored demos exclude both reference draws and all of D0 (794 episodes) so absorption cannot manufacture the score
+
+--- A0. STABILITY of the estimate (how many noise/time draws are enough) ---------------------------
+  raw loss L(pi_0)          : per-demo SE(mean over 8 draws) = 0.03601 | between-demo SD = 0.34365 | SE/SD = 0.105 | split-half r = 0.963 -> reliability 0.981
+  learnability S=L0-Lref1   : per-demo SE(mean over 8 draws) = 0.02064 | between-demo SD = 0.12903 | SE/SD = 0.160 | split-half r = 0.929 -> reliability 0.963
+  S vs ref2                 : per-demo SE(mean over 8 draws) = 0.02312 | between-demo SD = 0.14233 | SE/SD = 0.162 | split-half r = 0.929 -> reliability 0.963
+  param-dtype control (bfloat16 vs float16 load of the SAME weights): corr(S) = 0.9998, mean|dS| = 0.00120 vs SD(S) = 0.09209 -> quantization noise is 1.3% of the signal SD (immaterial).
+  common random numbers: the SAME (noise, time, preprocess) rng per (episode, draw) is used at
+  every checkpoint, so S is a PAIRED difference. Raw single-draw loss SD is 0.1018; the paired difference SD is 0.0584 (1.7x variance reduction).
+
+--- A(i). Does the score recover the EXECUTION-QUALITY axis (style_hi vs style_lo)? ----------------
+  PRE-REGISTERED: raw loss AUC(style_lo > style_hi) >= 0.70 (falsifier < 0.60);
+                  learnability-difference AUC >= 0.60 but WEAKER than raw loss.
+  raw L(pi_0)           : AUC(lo>hi) = 0.752   lo mean +0.82453  hi mean +0.54331   perm-null 95% [0.402,0.594]
+  learnability S(ref1)  : AUC(lo>hi) = 0.650   lo mean +0.18577  hi mean +0.10706   perm-null 95% [0.401,0.594]
+  learnability S(ref2)  : AUC(lo>hi) = 0.701   lo mean +0.21191  hi mean +0.11438   perm-null 95% [0.407,0.596]
+  raw L(ref1)           : AUC(lo>hi) = 0.760   lo mean +0.63876  hi mean +0.43625   perm-null 95% [0.398,0.592]
+
+--- A(ii). Is the score correlated with the FAILURE REGION (tall-vessel grasp-fail)? ---------------
+  PRE-REGISTERED: NULL. AUC in [0.45, 0.60], at/below the Q0 shuffle-null floor 0.598.
+  raw L(pi_0)           : AUC(in>out) = 0.570   in mean +0.67023  out mean +0.65278   perm-null 95% [0.403,0.592]
+  learnability S(ref1)  : AUC(in>out) = 0.484   in mean +0.13327  out mean +0.14449   perm-null 95% [0.401,0.595]
+  learnability S(ref2)  : AUC(in>out) = 0.470   in mean +0.14350  out mean +0.15095   perm-null 95% [0.407,0.593]
+
+--- A(iii). Does the MEAN learnability of a pull's draw predict that pull's realized delta? --------
+  PRE-REGISTERED: NULL on content-only arms (|rho| < 0.30, CI covers 0). Any correlation
+  appearing only when the execution-quality arms are pooled in is a QUALITY detector,
+  reported as confounded - not evidence that learnability predicts outcome.
+
+  absorption guard: dropped 57 sampled demos that ref1 trained on (or that are in D0); pulls excluded for <10 usable demos: ['gradarm_b_j3']
+
+  pull_id                  arm                n  delta pp     mean_S      +-   mean_L0
+  style_hi_j3              style_hi          25     +5.78   +0.10947 0.02117   0.62760
+  tall_vessel_grasp_fail_j4 tall_vessel_grasp_fail  21     +5.11   +0.17245 0.04972   0.75992
+  easy_band_j5             easy_band         25     +4.67   +0.09193 0.01553   0.60941
+  gc0_j104                 gc0               25     +4.44   +0.09641 0.02281   0.60202
+  style_hi_j5              style_hi          25     +4.22   +0.13408 0.03781   0.57509
+  mid_band_j3              mid_band          25     +4.00   +0.12438 0.03026   0.65846
+  random_j3                random            24     +4.00   +0.13524 0.02239   0.62095
+  mid_band_j4              mid_band          25     +3.78   +0.14465 0.04337   0.71385
+  gc0_j101                 gc0               25     +3.78   +0.10008 0.01753   0.68353
+  random_j4                random            22     +3.33   +0.12601 0.02005   0.75333
+  mid_band_j5              mid_band          24     +3.11   +0.12467 0.01360   0.63863
+  gc0_j102                 gc0               25     +3.11   +0.13008 0.01830   0.69553
+  random_j105              random            25     +2.44   +0.10721 0.01297   0.62232
+  tall_vessel_grasp_fail_j3 tall_vessel_grasp_fail  25     +2.22   +0.12489 0.01629   0.67014
+  tall_vessel_grasp_fail_j5 tall_vessel_grasp_fail  25     +1.56   +0.12111 0.01541   0.58761
+  style_lo_j5              style_lo          23     +1.33   +0.17337 0.02643   0.82901
+  gradarm_a_j4             gradarm_a         25     +1.11   +0.08106 0.02112   0.60168
+  easy_band_j3             easy_band         24     +0.89   +0.11198 0.01496   0.59286
+  style_hi_j4              style_hi          23     +0.89   +0.11640 0.01809   0.60722
+  easy_band_j4             easy_band         25     +0.67   +0.16595 0.02284   0.71312
+  gc1_j101                 gc1               25     +0.67   +0.12002 0.01675   0.63439
+  random_j101              random            24     +0.44   +0.14159 0.02198   0.66997
+  random_j5                random            22     +0.44   +0.13480 0.03209   0.67740
+  survivor_mix_j105        survivor_mix      24     -0.44   +0.11332 0.01934   0.63167
+  gc0_j103                 gc0               25     -0.67   +0.08230 0.01200   0.54009
+  gradarm_b_j4             gradarm_b         20     -1.11   +0.11039 0.02227   0.57489
+  gc5_j101                 gc5               25     -1.11   +0.13374 0.02548   0.67545
+  random_j103              random            24     -1.78   +0.13553 0.02390   0.66722
+  style_lo_j4              style_lo          25     -2.00   +0.20538 0.02985   0.92299
+  style_lo_j104            style_lo          24     -2.22   +0.15325 0.02433   0.78011
+  survivor_mix_j106        survivor_mix      25     -2.22   +0.17761 0.02342   0.76899
+  gc4_j101                 gc4               25     -2.44   +0.09719 0.01415   0.60909
+  gradarm_a_j3             gradarm_a         25     -2.67   +0.06976 0.01231   0.57295
+  style_lo_j103            style_lo          25     -2.67   +0.18260 0.03428   0.83308
+  random_j104              random            25     -2.89   +0.12067 0.01826   0.67446
+  style_lo_j3              style_lo          25     -3.11   +0.15165 0.01596   0.71557
+  random_j102              random            23     -3.56   +0.10665 0.02409   0.66408
+  random_j106              random            22     -3.56   +0.10946 0.01337   0.56995
+  style_lo_j102            style_lo          25     -5.78   +0.13206 0.01814   0.76184
+  planted_bad_j102         planted_bad       25    -19.56   +0.11063 0.01401   0.59822
+  planted_bad_j101         planted_bad       24    -21.78   +0.09171 0.01478   0.60914
+
+  pull-mean measurement noise: mean within-pull SE = 0.02174 at n=24/200 sampled (finite-population corrected: 0.02038)
+  -> observed between-pull SD of mean_S = 0.02945  => reliability of the pull-level learnability score = 0.521
+     (global per-demo SD(S) = 0.16842, i.e. most of the per-demo spread is WITHIN pulls, not between them)
+  outcome-side ceiling: SD(delta) over these 41 pulls = 5.47pp, sigma_e = 3.33pp
+  -> reliability of the DELTA measurements = 0.629; the maximum |rho| ANY predictor
+     can attain against these deltas is sqrt(reliability) = 0.793
+  [all pulls] n=41  Spearman(mean_S, delta) = +0.017  [95% CI -0.318, +0.342] perm p=0.917  Pearson +0.110  | Spearman(mean_L0, delta) = -0.037 | Spearman(mean_S, delta_HARD) = -0.107
+       ceiling for this group: SD(delta)=5.47pp -> delta reliability 0.629; max attainable |rho| = sqrt(rel_delta*rel_S) = 0.572; disattenuated rho = +0.030
+  [content-only arms (PRIMARY, pre-registered)] n=30  Spearman(mean_S, delta) = +0.143  [95% CI -0.268, +0.509] perm p=0.449  Pearson +0.153  | Spearman(mean_L0, delta) = +0.228 | Spearman(mean_S, delta_HARD) = -0.186
+       ceiling for this group: SD(delta)=2.68pp -> delta reliability 0.000; max attainable |rho| = sqrt(rel_delta*rel_S) = 0.000; disattenuated rho = +nan
+  [execution-quality arms only] n=11  Spearman(mean_S, delta) = +0.218  [95% CI -0.545, +0.855] perm p=0.527  Pearson +0.408  | Spearman(mean_L0, delta) = +0.018 | Spearman(mean_S, delta_HARD) = +0.318
+       ceiling for this group: SD(delta)=8.87pp -> delta reliability 0.859; max attainable |rho| = sqrt(rel_delta*rel_S) = 0.669; disattenuated rho = +0.326
+  [20k-recipe pulls only] n=21  Spearman(mean_S, delta) = -0.052  [95% CI -0.548, +0.468] perm p=0.826  Pearson -0.059  | Spearman(mean_L0, delta) = +0.040 | Spearman(mean_S, delta_HARD) = -0.042
+       ceiling for this group: SD(delta)=2.56pp -> delta reliability 0.000; max attainable |rho| = sqrt(rel_delta*rel_S) = 0.000; disattenuated rho = +nan
+
+--- A(iii)-paired. Same-seed (within-round) pairs only - the only valid comparison per constraint 4 
+  93 same-seed pairs across 9 rounds: sign agreement = 0.462 (chance 0.5), Spearman(dS, dDelta) = +0.205
+  within-round top-1 pick by HIGHEST mean learnability: 0.111 over 9 rounds (chance 0.280), mean regret +4.79pp
+  within-round top-1 pick by LOWEST mean learnability: 0.444 over 9 rounds (chance 0.280), mean regret +5.11pp
+
+====================================================================================================
+TEST B - learning-progress reward: held-out loss at step 5000 vs final -> realized delta?
+====================================================================================================
+  PRE-REGISTERED: INVALID/NULL. |Spearman| < 0.30 and within-round paired sign agreement ~0.5.
+  VALID would require Spearman >= 0.50 AND sign agreement >= 0.70.
+
+  base pi_0 slice loss: holdout_pool=0.58826  d0=0.14341  style_hi=0.49874  style_lo=1.10173
+
+  pull_id                  rec   delta pp | L5000 hold  Lfin hold prog_e hold      +- |  L5000 d0   Lfin d0  prog_e d0
+  gradarm_b_j3             20k      +7.78 |    0.31423    0.47311    +0.27403 0.02797 |   0.25583   0.16130   -0.11242
+  style_hi_j3              20k      +5.78 |    0.30978    0.47743    +0.27848 0.02911 |   0.25997   0.16071   -0.11656
+  tall_vessel_grasp_fail_j4 20k      +5.11 |    0.31205    0.45582    +0.27620 0.02902 |   0.25938   0.16556   -0.11597
+  easy_band_j5             20k      +4.67 |    0.31594    0.47745    +0.27232 0.02824 |   0.26467   0.16445   -0.12126
+  gc0_j104                 10k      +4.44 |               0.35106                     |             0.22287           
+  style_hi_j5              20k      +4.22 |    0.31988    0.48839    +0.26837 0.02789 |   0.25894   0.16045   -0.11553
+  mid_band_j3              20k      +4.00 |    0.31168    0.46966    +0.27657 0.02782 |   0.25618   0.16275   -0.11277
+  random_j3                20k      +4.00 |    0.31410    0.47418    +0.27416 0.02751 |   0.25416   0.16463   -0.11074
+  mid_band_j4              20k      +3.78 |    0.31152    0.45377    +0.27673 0.02829 |   0.26227   0.16795   -0.11886
+  gc0_j101                 10k      +3.78 |               0.34628                     |             0.21400           
+  random_j4                20k      +3.33 |    0.31166    0.48131    +0.27660 0.02919 |   0.26279   0.16690   -0.11937
+  mid_band_j5              20k      +3.11 |    0.31229    0.47034    +0.27597 0.02820 |   0.25985   0.16417   -0.11643
+  gc0_j102                 10k      +3.11 |               0.35582                     |             0.21678           
+  null_j1                  20k      +2.44 |    0.32753    0.58292    +0.26072 0.02563 |   0.24281   0.14587   -0.09940
+  random_j105              10k      +2.44 |               0.34279                     |             0.21829           
+  tall_vessel_grasp_fail_j3 20k      +2.22 |    0.31853    0.47505    +0.26973 0.02847 |   0.26452   0.16556   -0.12110
+  tall_vessel_grasp_fail_j5 20k      +1.56 |    0.31332    0.45168    +0.27494 0.02789 |   0.25953   0.16650   -0.11612
+  style_lo_j5              20k      +1.33 |    0.31460    0.44462    +0.27365 0.02845 |   0.26569   0.17373   -0.12227
+  gradarm_a_j4             20k      +1.11 |    0.31756    0.47640    +0.27070 0.02822 |   0.26295   0.16738   -0.11953
+  easy_band_j3             20k      +0.89 |    0.31377    0.47407    +0.27449 0.02761 |   0.26078   0.16306   -0.11736
+  style_hi_j4              20k      +0.89 |    0.31863    0.49790    +0.26962 0.02881 |   0.25618   0.15961   -0.11276
+  easy_band_j4             20k      +0.67 |    0.31670    0.47142    +0.27155 0.02815 |   0.26040   0.16395   -0.11698
+  random_j5                20k      +0.44 |    0.31444    0.46668    +0.27382 0.02776 |   0.26098   0.16697   -0.11756
+  gc0_j103                 10k      -0.67 |               0.35964                     |             0.21588           
+  null_j2                  20k      -0.89 |    0.33029    0.59808    +0.25796 0.02745 |   0.24540   0.14549   -0.10199
+  gradarm_b_j4             20k      -1.11 |    0.31528    0.47104    +0.27298 0.02833 |   0.25919   0.16678   -0.11578
+  random_j103              10k      -1.78 |               0.34381                     |             0.21414           
+  style_lo_j4              20k      -2.00 |    0.30946    0.44292    +0.27880 0.02806 |   0.26541   0.17431   -0.12200
+  style_lo_j104            10k      -2.22 |               0.34043                     |             0.22963           
+  gradarm_a_j3             20k      -2.67 |    0.31424    0.47017    +0.27402 0.02761 |   0.26328   0.16566   -0.11987
+  style_lo_j103            10k      -2.67 |               0.34287                     |             0.22945           
+  random_j104              10k      -2.89 |               0.34626                     |             0.22061           
+  style_lo_j3              20k      -3.11 |    0.31830    0.45857    +0.26996 0.02858 |   0.26861   0.17218   -0.12520
+  random_j102              10k      -3.56 |               0.35540                     |             0.21298           
+  random_j106              10k      -3.56 |               0.33855                     |             0.21559           
+  style_lo_j102            10k      -5.78 |               0.33925                     |             0.22691           
+
+  [all pulls with 5000 (20k recipe)] n=24
+    Spearman(prog_early_holdout_pool , delta) = +0.292  [95% CI -0.141, +0.678]  perm p=0.165
+    Spearman(prog_early_d0           , delta) = +0.339  [95% CI -0.093, +0.677]  perm p=0.105
+    Spearman(prog_late_holdout_pool  , delta) = -0.316  [95% CI -0.643, +0.098]  perm p=0.131
+    Spearman(prog_total_holdout_pool , delta) = -0.223  [95% CI -0.557, +0.170]  perm p=0.292
+    Spearman(Lear_holdout_pool       , delta) = -0.292  [95% CI -0.650, +0.129]  perm p=0.163
+    Spearman(Lfin_holdout_pool       , delta) = +0.223  [95% CI -0.201, +0.579]  perm p=0.298
+    Spearman(Lear_d0                 , delta) = -0.339  [95% CI -0.677, +0.102]  perm p=0.108
+    Spearman(Lfin_d0                 , delta) = -0.362  [95% CI -0.671, +0.064]  perm p=0.084
+    (outcome ceiling for this group: SD(delta)=2.75pp, delta reliability 0.000, max attainable |rho| 0.000)
+
+  [content-only arms (PRIMARY)] n=18
+    Spearman(prog_early_holdout_pool , delta) = +0.457  [95% CI +0.059, +0.713]  perm p=0.057
+    Spearman(prog_early_d0           , delta) = +0.133  [95% CI -0.393, +0.606]  perm p=0.600
+    Spearman(prog_late_holdout_pool  , delta) = -0.117  [95% CI -0.569, +0.370]  perm p=0.639
+    Spearman(prog_total_holdout_pool , delta) = +0.026  [95% CI -0.443, +0.488]  perm p=0.925
+    Spearman(Lear_holdout_pool       , delta) = -0.457  [95% CI -0.695, -0.057]  perm p=0.058
+    Spearman(Lfin_holdout_pool       , delta) = -0.026  [95% CI -0.463, +0.434]  perm p=0.924
+    Spearman(Lear_d0                 , delta) = -0.133  [95% CI -0.602, +0.379]  perm p=0.601
+    Spearman(Lfin_d0                 , delta) = -0.152  [95% CI -0.585, +0.338]  perm p=0.547
+    (outcome ceiling for this group: SD(delta)=2.54pp, delta reliability 0.000, max attainable |rho| 0.000)
+
+  MULTIPLICITY: 16 correlations were computed above; at alpha=0.05 you expect 0.8 false positives by chance. Read every p against that.
+
+--- B-resolution. Can the step-5000 held-out loss even TELL TWO ARMS APART? ------------------------
+  276 arm pairs, PAIRED on the same 32 held-out demos and the same CRN noise draws:
+    |L_a(5000) - L_b(5000)|: median 0.00377, max 0.02083
+    paired SE of that difference: median 0.00359
+    pairs resolvable at |t|>2: 24%   at |t|>3: 11%
+  -> at this probe size (32 held-out demos x 2 noise draws) only 24% of arm
+     pairs are separated; resolving the MEDIAN arm-pair gap at |t|=2 needs ~116 held-out
+     demos (~3.6x this probe, still only ~2 GPU-min of forward passes).
+     So the reward is cheap to sharpen - the binding problem is on the OUTCOME side, not here.
+
+--- B-paired. Same-seed (within-round) pairs - the only valid comparison per constraint 4 ----------
+  70 same-seed pairs, progress on held-out pool : sign agreement = 0.557 (chance 0.5)   Spearman = +0.211
+      pairs involving a quality arm    n= 35: sign agreement = 0.514
+      content-vs-content pairs         n= 35: sign agreement = 0.600
+  70 same-seed pairs, progress on D0            : sign agreement = 0.671 (chance 0.5)   Spearman = +0.350
+      pairs involving a quality arm    n= 35: sign agreement = 0.771
+      content-vs-content pairs         n= 35: sign agreement = 0.571
+  within-round top-1 pick by MOST progress on held-out pool : 0.000 over 3 rounds (chance 0.139), mean regret +3.56pp
+  within-round top-1 pick by MOST progress on D0            : 0.000 over 3 rounds (chance 0.139), mean regret +2.81pp
+  pair detail (round, arms, d_progress_holdout, d_delta pp):
+    j3 gradarm_b        vs style_lo         dprog +0.00407  dDelta +10.89pp  AGREE
+    j3 gradarm_b        vs gradarm_a        dprog +0.00001  dDelta +10.44pp  AGREE
+    j3 style_hi         vs style_lo         dprog +0.00852  dDelta  +8.89pp  AGREE
+    j3 style_hi         vs gradarm_a        dprog +0.00445  dDelta  +8.44pp  AGREE
+    j3 mid_band         vs style_lo         dprog +0.00662  dDelta  +7.11pp  AGREE
+    j3 random           vs style_lo         dprog +0.00420  dDelta  +7.11pp  AGREE
+    j3 gradarm_b        vs easy_band        dprog -0.00046  dDelta  +6.89pp  disagree
+    j3 mid_band         vs gradarm_a        dprog +0.00255  dDelta  +6.67pp  AGREE
+    j3 random           vs gradarm_a        dprog +0.00014  dDelta  +6.67pp  AGREE
+    j3 gradarm_b        vs tall_vessel_grasp_fail dprog +0.00430  dDelta  +5.56pp  AGREE
+    j3 tall_vessel_grasp_fail vs style_lo         dprog -0.00023  dDelta  +5.33pp  disagree
+    j3 tall_vessel_grasp_fail vs gradarm_a        dprog -0.00429  dDelta  +4.89pp  disagree
+    j3 style_hi         vs easy_band        dprog +0.00399  dDelta  +4.89pp  AGREE
+    j3 easy_band        vs style_lo         dprog +0.00453  dDelta  +4.00pp  AGREE
+    j3 gradarm_b        vs mid_band         dprog -0.00255  dDelta  +3.78pp  disagree
+    j3 gradarm_b        vs random           dprog -0.00013  dDelta  +3.78pp  disagree
+    j3 easy_band        vs gradarm_a        dprog +0.00047  dDelta  +3.56pp  AGREE
+    j3 style_hi         vs tall_vessel_grasp_fail dprog +0.00875  dDelta  +3.56pp  AGREE
+    j3 mid_band         vs easy_band        dprog +0.00209  dDelta  +3.11pp  AGREE
+    j3 random           vs easy_band        dprog -0.00033  dDelta  +3.11pp  disagree
+    j3 gradarm_b        vs style_hi         dprog -0.00445  dDelta  +2.00pp  disagree
+    j3 style_hi         vs mid_band         dprog +0.00190  dDelta  +1.78pp  AGREE
+    j3 style_hi         vs random           dprog +0.00432  dDelta  +1.78pp  AGREE
+    j3 mid_band         vs tall_vessel_grasp_fail dprog +0.00685  dDelta  +1.78pp  AGREE
+
+--- B-bonus. The A(i) quality axis re-measured with every retained checkpoint as reference ---------
+  raw pi_0 loss AUC(lo>hi) on the small Test-B style slice (n=8/8): 0.844
+  learnability AUC(lo>hi) over 36 different reference checkpoints: mean 0.761  sd 0.139  range [0.281, 0.969]
+
+wrote /data/xinyua11/robocasa/gradient_analysis/llm_borrow/results_AB.json

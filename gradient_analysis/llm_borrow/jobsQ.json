@@ -1,0 +1,12 @@
+[
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_pi0base/pi0_v1/19999/params",
+  "demos": "slice",
+  "out": "Q__pi0__fp16.npz"
+ },
+ {
+  "ckpt": "/data/xinyua11/openpi/checkpoints/pi0_ppc2sink_bandit_b/gradarm_b_j3/19999/params",
+  "demos": "slice",
+  "out": "Q__ref1__fp16.npz"
+ }
+]

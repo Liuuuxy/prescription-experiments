@@ -1,0 +1,99 @@
+{
+ "n_in": 120,
+ "n_out": 120,
+ "fidelity_corr": 0.9422288164391056,
+ "best_mode_auc": 0.5772,
+ "best_mode_index": 23,
+ "best_mode_var_frac": 0.0068,
+ "split_half_contrast_auc": 0.5718,
+ "whiten10_best_mode_auc": 0.6457,
+ "whiten10_split_half_auc": 0.6604,
+ "whiten25_best_mode_auc": 0.6356,
+ "whiten25_split_half_auc": 0.5282,
+ "whiten50_best_mode_auc": 0.5725,
+ "whiten50_split_half_auc": 0.3461,
+ "shuffled_split_half_auc": 0.5006,
+ "shuffled_best_mode_auc_mean": 0.5985,
+ "shuffled_best_mode_auc_max": 0.6217,
+ "random_direction_auc": 0.536,
+ "common_mode_cos_in": 0.2302,
+ "common_mode_cos_out": 0.2182,
+ "norm_mean_in": 3.251,
+ "norm_mean_out": 3.0784,
+ "gR_n": 120,
+ "cos_dregion_gR": -0.0535,
+ "pull_sets": {
+  "tall_vessel_grasp_fail_j3": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0237,
+   "common_mode_cos": 0.2001,
+   "self_sim": 0.0447,
+   "norm_mean": 3.294,
+   "mean_cos_gR": 0.0006,
+   "frac_neg_gR": 0.525
+  },
+  "tall_vessel_grasp_fail_j4": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0213,
+   "common_mode_cos": 0.1988,
+   "self_sim": 0.0437,
+   "norm_mean": 3.3314,
+   "mean_cos_gR": 0.0041,
+   "frac_neg_gR": 0.505
+  },
+  "random_j3": {
+   "n": 200,
+   "mean_cos_region_dir": 0.019,
+   "common_mode_cos": 0.2058,
+   "self_sim": 0.0457,
+   "norm_mean": 3.1962,
+   "mean_cos_gR": 0.008,
+   "frac_neg_gR": 0.43
+  },
+  "random_j4": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0096,
+   "common_mode_cos": 0.2052,
+   "self_sim": 0.0455,
+   "norm_mean": 3.4498,
+   "mean_cos_gR": 0.0103,
+   "frac_neg_gR": 0.42
+  },
+  "mid_band_j3": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0099,
+   "common_mode_cos": 0.2034,
+   "self_sim": 0.0442,
+   "norm_mean": 2.826,
+   "mean_cos_gR": 0.0135,
+   "frac_neg_gR": 0.405
+  },
+  "mid_band_j4": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0056,
+   "common_mode_cos": 0.2022,
+   "self_sim": 0.0455,
+   "norm_mean": 3.0137,
+   "mean_cos_gR": 0.0089,
+   "frac_neg_gR": 0.445
+  },
+  "easy_band_j3": {
+   "n": 200,
+   "mean_cos_region_dir": 0.014,
+   "common_mode_cos": 0.2006,
+   "self_sim": 0.0443,
+   "norm_mean": 3.0589,
+   "mean_cos_gR": 0.0117,
+   "frac_neg_gR": 0.41
+  },
+  "easy_band_j4": {
+   "n": 200,
+   "mean_cos_region_dir": 0.0155,
+   "common_mode_cos": 0.2008,
+   "self_sim": 0.044,
+   "norm_mean": 3.0184,
+   "mean_cos_gR": 0.0119,
+   "frac_neg_gR": 0.39
+  }
+ }
+}

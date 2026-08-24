@@ -1,0 +1,9 @@
+{
+ "replica_vs_original_cos": 1.0,
+ "replica_norm": 108.03691101074219,
+ "original_norm": 108.03691101074219,
+ "orig_delta_pp": -3.56,
+ "replica_delta_pp": -4.44,
+ "episode_agreement": 0.671,
+ "note": "identical demo_ids AND seed 1106; anchors the Q5 cosine scale"
+}

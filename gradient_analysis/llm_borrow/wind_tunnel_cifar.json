@@ -1,0 +1,305 @@
+{
+ "mode": "cifar",
+ "budget_fte": 6.0,
+ "reps": 1,
+ "truth": {
+  "null": -0.004749999999999997,
+  "rare": 0.037875000000000006,
+  "random": 0.008750000000000008,
+  "easy": -0.0038749999999999965,
+  "gradarm_a": 0.0027500000000000094,
+  "gradarm_b": 0.008500000000000008
+ },
+ "results": {
+  "successive_halving": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 6.0,
+   "mean_unspent_fte": 0.0,
+   "spend_by_kind": {
+    "pull": 6.0
+   },
+   "mean_wall_s": 2.3126602172851562e-05,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "rounds": 1,
+    "finalists": [
+     "rare",
+     "gradarm_b",
+     "random"
+    ],
+    "pulls_per_arm": {
+     "null": 1,
+     "rare": 1,
+     "random": 1,
+     "easy": 1,
+     "gradarm_a": 1,
+     "gradarm_b": 1
+    },
+    "arm_means_pp": {
+     "null": -0.3,
+     "rare": 3.7,
+     "random": 1.25,
+     "easy": -0.2,
+     "gradarm_a": -0.55,
+     "gradarm_b": 1.9
+    }
+   },
+   "norm_regret": 0.0
+  },
+  "learning_progress_exp3": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "spend_by_kind": {
+    "loss_probe": 0.1566,
+    "burst": 5.8226
+   },
+   "mean_wall_s": 255.52530145645142,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "n_bursts": 121,
+    "pulls_per_arm": {
+     "null": 14,
+     "rare": 31,
+     "random": 5,
+     "easy": 16,
+     "gradarm_a": 16,
+     "gradarm_b": 39
+    },
+    "mean_progress_reward": {
+     "null": 0.2956,
+     "rare": 0.4753,
+     "random": 0.2294,
+     "easy": 0.2581,
+     "gradarm_a": 0.3163,
+     "gradarm_b": 0.356
+    }
+   },
+   "norm_regret": 0.0
+  },
+  "learning_progress_ucb": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "spend_by_kind": {
+    "loss_probe": 0.1566,
+    "burst": 5.8226
+   },
+   "mean_wall_s": 254.6873505115509,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "n_bursts": 121,
+    "pulls_per_arm": {
+     "null": 15,
+     "rare": 36,
+     "random": 19,
+     "easy": 13,
+     "gradarm_a": 17,
+     "gradarm_b": 21
+    },
+    "mean_progress_reward": {
+     "null": 0.2496,
+     "rare": 0.4234,
+     "random": 0.3053,
+     "easy": 0.1818,
+     "gradarm_a": 0.2779,
+     "gradarm_b": 0.325
+    }
+   },
+   "norm_regret": 0.0
+  },
+  "regmix": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 3.789473684210526,
+   "mean_unspent_fte": 2.210526315789474,
+   "spend_by_kind": {
+    "pull": 3.7895
+   },
+   "mean_wall_s": 206.363924741745,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "n_proxies": 24,
+    "proxy_steps": 250,
+    "coef": {
+     "null": 0.00694,
+     "rare": 0.10076,
+     "random": 0.01393,
+     "easy": 0.00198,
+     "gradarm_a": 0.01655,
+     "gradarm_b": 0.01506
+    }
+   },
+   "norm_regret": 0.0
+  },
+  "jest": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 0.24701754385964914,
+   "mean_unspent_fte": 5.752982456140351,
+   "spend_by_kind": {
+    "reference": 0.2406,
+    "score": 0.0064
+   },
+   "mean_wall_s": 10.925003290176392,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "scores": {
+     "rare": 2.7706,
+     "random": 1.6497,
+     "easy": 0.6715,
+     "gradarm_a": 1.0609,
+     "gradarm_b": 1.7461
+    },
+    "ref_steps": 500,
+    "unspent_fte": 5.753
+   },
+   "norm_regret": 0.0
+  },
+  "jest_then_confirm": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 4.247017543859649,
+   "mean_unspent_fte": 1.7529824561403506,
+   "spend_by_kind": {
+    "reference": 0.2406,
+    "score": 0.0064,
+    "pull": 4.0
+   },
+   "mean_wall_s": 10.921687841415405,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "scores": {
+     "rare": 2.7357,
+     "random": 1.6296,
+     "easy": 0.6523,
+     "gradarm_a": 1.0329,
+     "gradarm_b": 1.6954
+    },
+    "shortlist": [
+     "rare",
+     "gradarm_b"
+    ],
+    "confirm_reps": 2,
+    "screened_out": [
+     "random",
+     "easy",
+     "gradarm_a"
+    ]
+   },
+   "norm_regret": 0.0
+  },
+  "random": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 6.0,
+   "mean_unspent_fte": 0.0,
+   "spend_by_kind": {
+    "pull": 6.0
+   },
+   "mean_wall_s": 1.5020370483398438e-05,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "n_pulls": 6,
+    "arms_seen": [
+     "gradarm_a",
+     "gradarm_b",
+     "null",
+     "random",
+     "rare"
+    ]
+   },
+   "norm_regret": 0.0
+  },
+  "oracle": {
+   "budget_fte": 6.0,
+   "reps": 1,
+   "mean_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "mean_spent_fte": 0.0,
+   "mean_unspent_fte": 6.0,
+   "spend_by_kind": {},
+   "mean_wall_s": 0.0,
+   "picks": [
+    "rare"
+   ],
+   "example_notes": {
+    "spend": 0.0
+   },
+   "norm_regret": 0.0
+  }
+ },
+ "diagnostics": {
+  "cache_import_check": {
+   "pull": "rare:1.0000|s0|n2000",
+   "imported_pp": 3.7,
+   "recomputed_pp": 2.85,
+   "abs_diff_pp": 0.85
+  },
+  "mixture_linearity": {
+   "mix": "rare0.5+easy0.5",
+   "seed": 7,
+   "observed_pp": 1.6,
+   "linear_prediction_pp": 1.7,
+   "residual_pp": -0.1
+  },
+  "cifar_compute": {
+   "n_real_finetunes": 270,
+   "n_cache_hits": 16,
+   "compute_wall_s": 822.6
+  }
+ },
+ "cost_model": {
+  "unit": "one bs=128 train step",
+  "eval_units": 78.125,
+  "full_pull_units": 2078.125
+ },
+ "elapsed_s": 844.3
+}

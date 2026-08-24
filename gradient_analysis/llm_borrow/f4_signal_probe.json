@@ -1,0 +1,197 @@
+{
+ "steps": 500,
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "truth_pp": {
+  "null": -0.475,
+  "rare": 3.788,
+  "random": 0.875,
+  "easy": -0.387,
+  "gradarm_a": 0.275,
+  "gradarm_b": 0.85
+ },
+ "loss_progress_channel": {
+  "clean": {
+   "mean_progress": {
+    "null": -1.01816,
+    "rare": 3.69722,
+    "random": 1.63243,
+    "easy": -0.7469,
+    "gradarm_a": -0.23162,
+    "gradarm_b": 0.42447
+   },
+   "pearson_vs_truth": 0.964,
+   "spearman_vs_truth": 1.0,
+   "argmax_arm": "rare",
+   "true_argmax": "rare",
+   "per_seed_spearman": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "per_seed_argmax": [
+    "rare",
+    "rare",
+    "rare"
+   ]
+  },
+  "offtarget": {
+   "mean_progress": {
+    "null": -0.6076,
+    "rare": -0.50414,
+    "random": -0.23986,
+    "easy": -0.13988,
+    "gradarm_a": -0.39358,
+    "gradarm_b": -0.45103
+   },
+   "pearson_vs_truth": -0.259,
+   "spearman_vs_truth": 0.029,
+   "argmax_arm": "easy",
+   "true_argmax": "rare",
+   "per_seed_spearman": [
+    0.029,
+    0.029,
+    0.029
+   ],
+   "per_seed_argmax": [
+    "easy",
+    "easy",
+    "easy"
+   ]
+  },
+  "noisy0.25": {
+   "mean_progress": {
+    "null": -1.38101,
+    "rare": 2.72021,
+    "random": 1.21262,
+    "easy": -0.59596,
+    "gradarm_a": -0.3393,
+    "gradarm_b": 0.22905
+   },
+   "pearson_vs_truth": 0.945,
+   "spearman_vs_truth": 1.0,
+   "argmax_arm": "rare",
+   "true_argmax": "rare",
+   "per_seed_spearman": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "per_seed_argmax": [
+    "rare",
+    "rare",
+    "rare"
+   ]
+  },
+  "noisy0.5": {
+   "mean_progress": {
+    "null": -1.7478,
+    "rare": 1.72135,
+    "random": 0.87222,
+    "easy": -0.50945,
+    "gradarm_a": -0.32254,
+    "gradarm_b": -0.00964
+   },
+   "pearson_vs_truth": 0.878,
+   "spearman_vs_truth": 1.0,
+   "argmax_arm": "rare",
+   "true_argmax": "rare",
+   "per_seed_spearman": [
+    1.0,
+    1.0,
+    0.943
+   ],
+   "per_seed_argmax": [
+    "rare",
+    "rare",
+    "rare"
+   ]
+  },
+  "noisy1.0": {
+   "mean_progress": {
+    "null": -2.42146,
+    "rare": -0.23805,
+    "random": 0.08166,
+    "easy": -0.21916,
+    "gradarm_a": -0.40086,
+    "gradarm_b": -0.44238
+   },
+   "pearson_vs_truth": 0.409,
+   "spearman_vs_truth": 0.486,
+   "argmax_arm": "random",
+   "true_argmax": "rare",
+   "per_seed_spearman": [
+    0.771,
+    0.771,
+    0.314
+   ],
+   "per_seed_argmax": [
+    "random",
+    "random",
+    "random"
+   ]
+  }
+ },
+ "elapsed_s": 384.7,
+ "jest_channel": {
+  "clean": {
+   "mean_score": {
+    "rare": 2.9884,
+    "random": 1.6629,
+    "easy": 0.8066,
+    "gradarm_a": 1.4376,
+    "gradarm_b": 1.9346
+   },
+   "spearman_vs_truth": 0.9,
+   "pearson_vs_truth": 0.97,
+   "argmax_arm": "rare",
+   "n_seeds": 2,
+   "note": "null arm is unscorable by JEST (no data)"
+  },
+  "noisy0.25": {
+   "mean_score": {
+    "rare": 2.5064,
+    "random": 1.7221,
+    "easy": 1.0327,
+    "gradarm_a": 1.5445,
+    "gradarm_b": 1.889
+   },
+   "spearman_vs_truth": 0.9,
+   "pearson_vs_truth": 0.945,
+   "argmax_arm": "rare",
+   "n_seeds": 2,
+   "note": "null arm is unscorable by JEST (no data)"
+  },
+  "noisy0.5": {
+   "mean_score": {
+    "rare": 2.1117,
+    "random": 1.6642,
+    "easy": 1.3018,
+    "gradarm_a": 1.8402,
+    "gradarm_b": 1.708
+   },
+   "spearman_vs_truth": 0.6,
+   "pearson_vs_truth": 0.846,
+   "argmax_arm": "rare",
+   "n_seeds": 2,
+   "note": "null arm is unscorable by JEST (no data)"
+  },
+  "noisy1.0": {
+   "mean_score": {
+    "rare": 1.2689,
+    "random": 1.385,
+    "easy": 1.5053,
+    "gradarm_a": 2.0017,
+    "gradarm_b": 1.6326
+   },
+   "spearman_vs_truth": -0.7,
+   "pearson_vs_truth": -0.578,
+   "argmax_arm": "gradarm_a",
+   "n_seeds": 2,
+   "note": "null arm is unscorable by JEST (no data)"
+  }
+ }
+}

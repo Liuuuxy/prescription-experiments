@@ -1,0 +1,19 @@
+{
+ "checkpoint": 6000,
+ "n_pool": 8000,
+ "n_rare_pool": 2400,
+ "gate_n_per_side": 120,
+ "seed": 20260730,
+ "best_mode_auc": 0.6492,
+ "best_mode_index": 22,
+ "best_mode_null_mean": 0.5906,
+ "best_mode_null_max": 0.614,
+ "split_half_contrast_auc": 0.8697,
+ "full_pool_cos_to_gfail_auc": 0.9613,
+ "robot_reference": {
+  "best_mode_auc": 0.577,
+  "best_mode_null_mean": 0.598,
+  "split_half_contrast_auc": 0.572,
+  "source": "gradient_analysis/q0_gate_report.json"
+ }
+}

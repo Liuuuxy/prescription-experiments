@@ -1,0 +1,81 @@
+{
+ "truth_pp": {
+  "null": -0.475,
+  "rare": 3.788,
+  "random": 0.875,
+  "easy": -0.387,
+  "gradarm_a": 0.275,
+  "gradarm_b": 0.85
+ },
+ "same_seed_reproducibility": {
+  "rare_s0": {
+   "armrace_value_pp": 2.85,
+   "recomputes_pp": [
+    3.7,
+    3.35
+   ],
+   "sd_across_identical_runs_pp": 0.427,
+   "range_pp": 0.85
+  },
+  "null_s0": {
+   "armrace_value_pp": -0.3,
+   "recomputes_pp": [
+    -0.05,
+    -2.8
+   ],
+   "sd_across_identical_runs_pp": 1.521,
+   "range_pp": 2.75
+  },
+  "random_s0": {
+   "armrace_value_pp": 1.25,
+   "recomputes_pp": [
+    1.8,
+    1.6
+   ],
+   "sd_across_identical_runs_pp": 0.278,
+   "range_pp": 0.55
+  }
+ },
+ "same_seed_sd_pp_mean": 0.742,
+ "proxy_fidelity": {
+  "truth_pp": {
+   "null": -0.475,
+   "rare": 3.788,
+   "random": 0.875,
+   "easy": -0.387,
+   "gradarm_a": 0.275,
+   "gradarm_b": 0.85
+  },
+  "truth_argmax": "rare",
+  "steps_250": {
+   "values_pp": {
+    "null": -0.275,
+    "rare": 7.175,
+    "random": 2.075,
+    "easy": -0.475,
+    "gradarm_a": 0.775,
+    "gradarm_b": 0.9
+   },
+   "argmax": "rare",
+   "spearman_vs_full": 0.943,
+   "picks_the_right_arm": true
+  },
+  "steps_500": {
+   "values_pp": {
+    "null": -0.525,
+    "rare": 7.425,
+    "random": 2.275,
+    "easy": -0.425,
+    "gradarm_a": 0.825,
+    "gradarm_b": 1.8
+   },
+   "argmax": "rare",
+   "spearman_vs_full": 1.0,
+   "picks_the_right_arm": true
+  }
+ },
+ "cifar_compute": {
+  "n_real_finetunes": 30,
+  "compute_wall_s": 595.6
+ }
+}

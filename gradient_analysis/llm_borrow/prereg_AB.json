@@ -1,0 +1,43 @@
+{
+  "written_before_any_measurement": true,
+  "date": "2026-08-14",
+  "author": "llm_borrow forward-pass-only signal test",
+  "constraints_invoked": {
+    "F1_loss_does_not_transfer": "training-loss effects do not transfer to closed-loop success (1-step loss proxy passed while the fine-tune was the worst arm ever)",
+    "F2_pull_cost": "1 robot pull = 5-9 GPU-h, +/-3.3pp noise floor",
+    "F3_burst_proxies_misrank": "1.5k-step training-burst proxies mis-rank (measured)",
+    "F4_seed_steers": "same-seed weight updates 97% aligned across different draws; data fingerprint ~1.5%",
+    "F5_encoding": "flow-matching loss gradient does NOT encode scene semantics/region (AUC 0.577 < 0.598 null floor) but DOES encode action quality (AUC 0.778)"
+  },
+
+  "TEST_A": {
+    "signal": "JEST / RHO-LOSS learnability: score(z) = L(z; pi_0) - L(z; reference), reference = a stronger retained pull checkpoint",
+    "A_i_execution_quality_axis": {
+      "prediction": "POSITIVE. Raw L(z; pi_0) separates style_lo (higher loss) from style_hi with AUC >= 0.70. The learnability DIFFERENCE score separates too but WEAKER than raw loss (AUC 0.55-0.70), because a stronger reference also has higher loss on inconsistent demos, so the quality component partially cancels in the difference.",
+      "directional_claim": "style_lo has HIGHER raw loss than style_hi at pi_0",
+      "falsifier": "raw-loss AUC < 0.60"
+    },
+    "A_ii_failure_region": {
+      "prediction": "NULL. AUC(in-region vs out-region) in [0.45, 0.60], i.e. at or below the Q0 shuffle-null floor of 0.598. Per F5 the loss does not see region membership; a scalar loss can only be weaker than the full gradient, which already failed the gate.",
+      "falsifier": "AUC >= 0.65"
+    },
+    "A_iii_pull_level_prediction": {
+      "prediction_primary": "NULL on content-only arms. Spearman(mean learnability of a pull's draw, realized delta) over pulls whose selection axis is NOT execution quality (null, random, tall, mid, easy, gradarm, gc, survivor) has |rho| < 0.30 with a bootstrap CI covering 0.",
+      "prediction_secondary_preregistered_confound": "If the execution-quality arms (style_hi / style_lo / gradqual / planted_bad) are POOLED IN, a nonzero correlation MAY appear. That would be a QUALITY detector, not a learnability-to-outcome predictor, and must be reported as confounded: those arms were constructed on the quality axis, which F5 says the loss can see and which the style race showed moves rollouts.",
+      "rationale": "F1 (loss does not transfer), F4 (seed dominates the update, data fingerprint ~1.5%), and the already-measured Q3 result (no pi_0-time statistic of a draw predicted delta, |rho|<=0.23 at n=16).",
+      "falsifier_of_null": "|rho| >= 0.5 on content-only arms with CI excluding 0"
+    },
+    "stability_requirement": "report SE of the per-demo score from M independent (noise,time) draws under common random numbers across checkpoints; declare the estimate stable only if SE(score) << between-demo SD(score)."
+  },
+
+  "TEST_B": {
+    "signal": "Graves/ODM learning-progress reward: held-out loss on a fixed slice at step 5000 vs at the final step; does early loss-progress predict the pull's realized rollout delta?",
+    "prediction": "INVALID / NULL. Per F1 and F3, held-out-loss progress will NOT predict final realized delta on the content arms: |Spearman| < 0.30, and within-round paired sign agreement ~50% (chance).",
+    "preregistered_validity_criterion": {
+      "VALID": "Spearman(loss-progress, delta) >= 0.50 across non-catastrophic pulls AND within-round paired sign agreement >= 70%",
+      "INVALID": "|Spearman| < 0.30 and sign agreement ~50%"
+    },
+    "prediction_resolution_floor": "The reward may still have resolution for CATASTROPHIC corruptions (a -20pp planted-bad-style arm). If so the honest conclusion is: a learning-progress reward is a SAFETY FILTER, not an allocator - it cannot rank arms in the +/-3-8pp band where bandit decisions actually live.",
+    "why_this_is_the_decision": "an online bandit on this stack is only possible if a sub-pull-cost reward ranks arms. Step-5000 held-out loss is the cheapest such reward that is not a 1.5k-step burst. If it fails, every remaining online design must use rollouts, i.e. 5-9 GPU-h per unit of feedback."
+  }
+}

@@ -1,0 +1,160 @@
+{
+ "n_pulls_with_loss_probe": 14,
+ "n_non_null": 12,
+ "loss_reward_all_pulls": {
+  "loss_target": {
+   "pearson_r": -0.42454265362015486,
+   "pearson_p": 0.13026934006094726,
+   "spearman_rho": -0.2508252342879179,
+   "spearman_p": 0.38706495191873,
+   "n": 14
+  },
+  "tpg": {
+   "pearson_r": 0.4245426536201548,
+   "pearson_p": 0.13026934006094726,
+   "spearman_rho": 0.2508252342879179,
+   "spearman_p": 0.38706495191873,
+   "n": 14
+  },
+  "loss_balanced": {
+   "pearson_r": -0.4105926397102267,
+   "pearson_p": 0.14475851758899375,
+   "spearman_rho": -0.1342135025575701,
+   "spearman_p": 0.6473547246536242,
+   "n": 14
+  },
+  "bpg": {
+   "pearson_r": 0.41059263971022675,
+   "pearson_p": 0.1447585175889935,
+   "spearman_rho": 0.1342135025575701,
+   "spearman_p": 0.6473547246536242,
+   "n": 14
+  }
+ },
+ "loss_reward_non_null": {
+  "loss_target": {
+   "pearson_r": -0.11839728201158563,
+   "pearson_p": 0.714009276330547,
+   "spearman_rho": -0.05954474980875943,
+   "spearman_p": 0.8541546246233473,
+   "n": 12
+  },
+  "tpg": {
+   "pearson_r": 0.1183972820115857,
+   "pearson_p": 0.714009276330547,
+   "spearman_rho": 0.05954474980875943,
+   "spearman_p": 0.8541546246233473,
+   "n": 12
+  },
+  "loss_balanced": {
+   "pearson_r": -0.05698341265432214,
+   "pearson_p": 0.860372745558217,
+   "spearman_rho": 0.11908949961751886,
+   "spearman_p": 0.7123998368899924,
+   "n": 12
+  },
+  "loss_retention": {
+   "pearson_r": -0.027843195358044387,
+   "pearson_p": 0.9315504136492173,
+   "spearman_rho": -0.12959739664259406,
+   "spearman_p": 0.6881039438604584,
+   "n": 12
+  }
+ },
+ "within_round_kendall_neg_loss_target_vs_delta": {
+  "3": {
+   "n": 4,
+   "tau": -0.18257418583505539,
+   "p": 0.7179816667337766,
+   "arms": [
+    "mid_band",
+    "tall_vessel_grasp_fail",
+    "easy_band",
+    "random"
+   ]
+  },
+  "4": {
+   "n": 4,
+   "tau": 0.6666666666666669,
+   "p": 0.3333333333333333,
+   "arms": [
+    "easy_band",
+    "random",
+    "mid_band",
+    "tall_vessel_grasp_fail"
+   ]
+  },
+  "5": {
+   "n": 4,
+   "tau": -0.3333333333333334,
+   "p": 0.75,
+   "arms": [
+    "easy_band",
+    "mid_band",
+    "random",
+    "tall_vessel_grasp_fail"
+   ]
+  }
+ },
+ "arm_the_loss_reward_would_pick_per_round": {
+  "3": {
+   "arm": "tall_vessel_grasp_fail",
+   "loss_target": 0.4695839198306203,
+   "realized_delta_pp": 2.2222222222222254
+  },
+  "4": {
+   "arm": "tall_vessel_grasp_fail",
+   "loss_target": 0.4404650286771357,
+   "realized_delta_pp": 5.111111111111111
+  },
+  "5": {
+   "arm": "tall_vessel_grasp_fail",
+   "loss_target": 0.4515524462175866,
+   "realized_delta_pp": 1.5555555555555656
+  }
+ },
+ "arm_mean_delta_pp": {
+  "easy_band": 2.0740740740740797,
+  "mid_band": 3.6296296296296306,
+  "random": 2.592592592592598,
+  "tall_vessel_grasp_fail": 2.9629629629629672
+ },
+ "graves_gpg_and_batch_stats": {
+  "mean_gnorm": {
+   "pearson_r": 0.1651875278467802,
+   "pearson_p": 0.5409511070946657,
+   "spearman_rho": 0.06916852498036807,
+   "spearman_p": 0.7990822637780812,
+   "n": 16
+  },
+  "coherence": {
+   "pearson_r": 0.23949408091369473,
+   "pearson_p": 0.3716592222231308,
+   "spearman_rho": -0.020603390419684106,
+   "spearman_p": 0.9396294086034467,
+   "n": 16
+  },
+  "wsep": {
+   "pearson_r": 0.44032960255445913,
+   "pearson_p": 0.08783320040745284,
+   "spearman_rho": 0.22663729461652515,
+   "spearman_p": 0.3986265512599061,
+   "n": 16
+  },
+  "self_sim": {
+   "pearson_r": 0.24528412197578778,
+   "pearson_p": 0.3598517429468638,
+   "spearman_rho": -0.020603390419684106,
+   "spearman_p": 0.9396294086034467,
+   "n": 16
+  },
+  "cos_region": {
+   "pearson_r": 0.02442733359781884,
+   "pearson_p": 0.9284493948273415,
+   "spearman_rho": 0.038263439350841914,
+   "spearman_p": 0.8881158366818847,
+   "n": 16
+  }
+ },
+ "noise_floor_pp": 3.3
+}

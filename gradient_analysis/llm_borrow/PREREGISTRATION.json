@@ -1,0 +1,72 @@
+{
+ "written_utc": "2026-08-14 (before any race run; only the prior smoke run at 6 FTE / 1 rep and the calibration file existed)",
+ "author": "gradient-analysis session",
+ "rule": "These are point predictions made BEFORE the runs. They are scored verbatim against outcomes; misses are reported as misses.",
+
+ "part1_metrics": {
+  "simple_regret": "max_a v_a - sum_a w_a v_a, in percentage points of target-slice success/accuracy",
+  "p_correct": "fraction of reps whose argmax weight is the truly best arm",
+  "b95": "smallest budget (FTE) at which mean decision VALUE >= 0.95 * oracle value; '>Bmax' if never reached on the grid"
+ },
+
+ "part1_predictions": {
+  "cifar_real": {
+   "regime_note": "spread/noise ~ 2.9pp gap vs ~0.7pp same-seed sd => SNR ~4. Prior calibration says this is a POSITIVE CONTROL, not a discriminator.",
+   "6_12_24_FTE": "ALL eight allocators regret 0.00pp, P(correct) = 1.00 at every budget. No ranking is possible in this regime; I expect the table to be uninformative and I am running the sub-1-round budgets (1.5, 3 FTE) precisely because that is the only place CIFAR can discriminate.",
+   "1p5_FTE": {
+    "jest": "P(correct) ~0.9-1.0 (spends only 0.25 FTE; budget-independent) -> JEST and jest_then_confirm WIN at 1.5 FTE",
+    "jest_then_confirm": "P(correct) ~0.9-1.0",
+    "successive_halving": "P(correct) ~0.33 (cannot afford one paired round over 6 arms; drops 4 arms at random, keeps 2 => P(rare kept) = 2/6)",
+    "random": "P(correct) ~0.17 (1 pull, 1/6)",
+    "learning_progress_exp3": "P(correct) 0.6-0.8",
+    "learning_progress_ucb": "P(correct) 0.6-0.8",
+    "regmix": "P(correct) ~0.6 (9 proxies, 6 coefficients)"
+   },
+   "b95_pred_fte": {"jest": 0.25, "jest_then_confirm": 0.25, "learning_progress_exp3": 3, "learning_progress_ucb": 3, "regmix": 3, "successive_halving": 6, "random": 6}
+  },
+  "synthetic_robot": {
+   "regime_note": "values from the measured ledger: null 0.00 / easy_band 2.07 / random 2.59 / tall_vessel 2.96 / mid_band 3.63 pp; per-pull sd 1.84pp, shared seed sd 0.80pp. best-vs-2nd gap = 0.67pp = 0.36 x noise. Cheap signals are the MEASURED-pathological ones (proxy inflates tall_vessel, loss progress prefers tall_vessel).",
+   "successive_halving": {"p_correct_6": 0.30, "p_correct_12": 0.40, "p_correct_24": 0.50, "note": "resolving 0.67pp against a 2.6pp paired-difference sd needs ~60 paired rounds; 24 FTE buys ~4.8. SH should be the best method and still be bad."},
+   "random": {"p_correct_6": 0.25, "p_correct_12": 0.30, "p_correct_24": 0.35},
+   "learning_progress_exp3": {"p_correct": 0.0, "note": "lp_reward argmax is tall_vessel at every budget; LP converges CONFIDENTLY to the wrong arm. But tall_vessel is the SECOND best arm, so its REGRET (0.67pp) may still beat the random floor. I predict P(correct)~0 AND normalized regret < 1 -- the two metrics disagree, and that disagreement is the point."},
+   "learning_progress_ucb": {"p_correct": 0.0, "same_note": true},
+   "jest": {"p_correct": 0.0, "regret_pp": 0.67, "note": "jest_score argmax is tall_vessel; budget-independent; spends 0.25 FTE and leaves 5.75-23.75 FTE unspent"},
+   "jest_then_confirm": {"p_correct": 0.0, "regret_pp": 0.67, "note": "STRONG PREDICTION: the confirm stage cannot repair a wrong shortlist. Top-2 by jest_score = {tall_vessel, easy_band}; mid_band (the true best) is never shortlisted, so no amount of confirm budget helps. jest_then_confirm == jest here."},
+   "regmix": {"p_correct": 0.10, "note": "250-step proxies with the measured bias rank tall_vessel first (v_eff: tall 5.59 > mid 2.32); ridge over 24 proxies with 1.84pp noise on 5 coefficients is additionally noisy"},
+   "b95_pred_fte": {"successive_halving": ">48", "random": ">48", "everything_else": ">48", "note": "95% of oracle = 3.45pp; only mid_band (3.63) clears it, so B95 requires P(correct) ~0.95. I predict NO allocator reaches B95 anywhere on the grid in the robot regime."}
+  },
+  "synthetic_cifar_like": {"all_allocators": "regret ~0 at 6 FTE and above; matches the real CIFAR ceiling"}
+ },
+
+ "part2_design": {
+  "what_is_decoupled": "ONLY the cheap-signal channel (held-out loss / learnability). The outcome channel (a pull's realized target-slice delta) is left faithful, because that is exactly our situation: rollout reward is expensive but true, loss reward is cheap and may not transfer (F4).",
+  "axis_1_correlation_c": "cheap signal s = c*z_truth + sqrt(1-c^2)*z_orth, z_orth fixed and orthogonal to z_truth. c=1 perfect transfer, c=0 the signal measures something REAL but ORTHOGONAL to outcome, c=-1 anti-correlated. Applied identically to lp_reward and jest_score.",
+  "axis_2_noise": "reward noise multiplier on the cheap signal, expressed as signal_spread / noise_sd. The MEASURED robot operating point is spread/noise = 0.356 (decision_accuracy_diagnostic.json).",
+  "measured_robot_anchor": "reward_signal_test.json: Spearman(loss reward, realized delta) = -0.06 (non-null pulls) to +0.25 (all pulls), ns; and the loss reward would have picked tall_vessel in ALL THREE rounds while mid_band/random won. => our real operating point is c ~ 0 +/- 0.3.",
+  "cifar_real_mechanisms": {
+   "A_label_noise": "fraction rho of the held-out probe slice gets uniformly random labels. Truth (clean rare-class test accuracy) unchanged.",
+   "B_offtarget_probe": "fraction alpha of the probe slice is drawn from the well-learned (non-rare) classes instead of the target classes. Truth unchanged. alpha=1 => the cheap signal measures a REAL thing that is not the thing being scored -- the exact shape of F4."
+  }
+ },
+
+ "part2_predictions": {
+  "invariant_by_construction": ["successive_halving", "random", "oracle"],
+  "regmix": "also invariant: it reads pull outcomes, not loss. Expect a flat line within noise. (If it moves, the harness is leaking.)",
+  "learning_progress": "STEP, not slope. LP takes hundreds of cheap looks, so it converges to argmax(signal) almost regardless of noise; its regret is therefore determined by WHERE the signal's argmax is, and should be flat-then-cliff as c falls. Predicted crossover (stops beating random): c* between 0.6 and 0.3.",
+  "jest": "same step shape, crossover at a similar or slightly higher c* (fewer looks, more noise per look => the step is smeared but arrives earlier).",
+  "jest_then_confirm": "PARTIALLY PROTECTED. It only needs the true best inside the top-2 of the corrupted score, then real pulls decide. Predicted crossover c* about 0.2-0.3 lower than pure jest, i.e. it survives about one extra step of decoupling. This is the single most useful prediction in Part 2: it says the borrow that survives is 'cheap signal SHORTLISTS, expensive outcome DECIDES'.",
+  "noise_vs_decoupling_asymmetry": "STRONG QUALITATIVE PREDICTION: pure noise degrades the cheap methods TOWARD the random floor (normalized regret -> 1) and no further; decoupling (c<0) pushes them BELOW the floor (normalized regret > 1, actively anti-selecting). If true, 'noisy reward' and 'wrong reward' are different failure classes and only the second is fatal.",
+  "cifar_real": {
+   "B_offtarget_alpha_1": "LP picks 'easy' (true value -0.39pp, the worst or second-worst arm) instead of 'rare' (+3.79pp) => regret ~4.2pp, far WORSE than the random floor. P(correct) -> 0.",
+   "A_label_noise_rho_1": "LP degrades to a random picker (regret ~ random floor), NOT to the worst arm -- because random labels destroy information rather than pointing elsewhere.",
+   "rho_0p5": "partial: P(correct) 0.4-0.7",
+   "prediction_that_would_falsify_the_asymmetry": "if rho=1 also drives LP to 'easy', the noise/decoupling distinction is wrong"
+  }
+ },
+
+ "what_would_change_my_mind": [
+  "If successive_halving in the robot regime reaches P(correct) > 0.7 at 24 FTE, then the noise floor is less binding than I computed and cheap screening is unnecessary.",
+  "If jest_then_confirm equals jest in Part 2 (no protection from the confirm stage), then hybrid screening is not the surviving borrow and the honest answer is 'only rollout-reward SH transfers'.",
+  "If regmix moves at all under loss decoupling, there is a leak in the harness and every Part 2 number is void."
+ ]
+}

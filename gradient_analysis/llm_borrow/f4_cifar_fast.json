@@ -1,0 +1,376 @@
+{
+ "budget_fte": 6.0,
+ "reps": 5,
+ "cells": {
+  "0.0|1.0|learning_progress_exp3": {
+   "allocator": "learning_progress_exp3",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.036750000000000005,
+   "sd_regret": 0.006847102489374614,
+   "se_regret": 0.003062117323029933,
+   "mean_value": 0.0011250000000000051,
+   "p_correct": 0.0,
+   "p_correct_ci": [
+    0.0,
+    0.43449149475208104
+   ],
+   "frac_of_oracle": 0.029702970297029833,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "wall_s": 2015.4,
+   "pick_counts": {
+    "easy": 3,
+    "gradarm_b": 1,
+    "random": 1
+   },
+   "regrets": [
+    0.04175,
+    0.029375,
+    0.04175,
+    0.029124999999999998,
+    0.04175
+   ],
+   "values": [
+    -0.0038749999999999965,
+    0.008500000000000008,
+    -0.0038749999999999965,
+    0.008750000000000008,
+    -0.0038749999999999965
+   ],
+   "rho": 0.0,
+   "alpha": 1.0,
+   "n_corrupted_labels": 0,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 1.0
+   }
+  },
+  "0.0|1.0|jest": {
+   "allocator": "jest",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.0,
+   "sd_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "p_correct_ci": [
+    0.5655085052479191,
+    1.0
+   ],
+   "frac_of_oracle": 1.0,
+   "mean_spent_fte": 0.24701754385964914,
+   "mean_unspent_fte": 5.752982456140351,
+   "wall_s": 79.3,
+   "pick_counts": {
+    "rare": 5
+   },
+   "regrets": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "values": [
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006
+   ],
+   "rho": 0.0,
+   "alpha": 1.0,
+   "n_corrupted_labels": 0,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 1.0
+   }
+  },
+  "1.0|0.0|learning_progress_exp3": {
+   "allocator": "learning_progress_exp3",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.032999999999999995,
+   "sd_regret": 0.0054886246000250384,
+   "se_regret": 0.002454587541726716,
+   "mean_value": 0.004875000000000007,
+   "p_correct": 0.0,
+   "p_correct_ci": [
+    0.0,
+    0.43449149475208104
+   ],
+   "frac_of_oracle": 0.12871287128712888,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "wall_s": 1856.9,
+   "pick_counts": {
+    "easy": 1,
+    "gradarm_a": 1,
+    "gradarm_b": 3
+   },
+   "regrets": [
+    0.029375,
+    0.029375,
+    0.035124999999999997,
+    0.04175,
+    0.029375
+   ],
+   "values": [
+    0.008500000000000008,
+    0.008500000000000008,
+    0.0027500000000000094,
+    -0.0038749999999999965,
+    0.008500000000000008
+   ],
+   "rho": 1.0,
+   "alpha": 0.0,
+   "n_corrupted_labels": 49486,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.0
+   }
+  },
+  "1.0|0.0|jest": {
+   "allocator": "jest",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.03397499999999999,
+   "sd_regret": 0.0025714781741247575,
+   "se_regret": 0.0011499999999999995,
+   "mean_value": 0.003900000000000009,
+   "p_correct": 0.0,
+   "p_correct_ci": [
+    0.0,
+    0.43449149475208104
+   ],
+   "frac_of_oracle": 0.10297029702970319,
+   "mean_spent_fte": 0.24701754385964914,
+   "mean_unspent_fte": 5.752982456140351,
+   "wall_s": 79.2,
+   "pick_counts": {
+    "gradarm_a": 4,
+    "gradarm_b": 1
+   },
+   "regrets": [
+    0.035124999999999997,
+    0.035124999999999997,
+    0.029375,
+    0.035124999999999997,
+    0.035124999999999997
+   ],
+   "values": [
+    0.0027500000000000094,
+    0.0027500000000000094,
+    0.008500000000000008,
+    0.0027500000000000094,
+    0.0027500000000000094
+   ],
+   "rho": 1.0,
+   "alpha": 0.0,
+   "n_corrupted_labels": 49486,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.0
+   }
+  },
+  "0.0|0.5|learning_progress_exp3": {
+   "allocator": "learning_progress_exp3",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.00835,
+   "sd_regret": 0.018671167612123247,
+   "se_regret": 0.008350000000000002,
+   "mean_value": 0.029525000000000006,
+   "p_correct": 0.8,
+   "p_correct_ci": [
+    0.3755282641185388,
+    0.9637768390302125
+   ],
+   "frac_of_oracle": 0.7795379537953796,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "wall_s": 1855.1,
+   "pick_counts": {
+    "easy": 1,
+    "rare": 4
+   },
+   "regrets": [
+    0.0,
+    0.0,
+    0.04175,
+    0.0,
+    0.0
+   ],
+   "values": [
+    0.037875000000000006,
+    0.037875000000000006,
+    -0.0038749999999999965,
+    0.037875000000000006,
+    0.037875000000000006
+   ],
+   "rho": 0.0,
+   "alpha": 0.5,
+   "n_corrupted_labels": 0,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.5
+   }
+  },
+  "0.0|0.5|jest": {
+   "allocator": "jest",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.0,
+   "sd_regret": 0.0,
+   "se_regret": 0.0,
+   "mean_value": 0.037875000000000006,
+   "p_correct": 1.0,
+   "p_correct_ci": [
+    0.5655085052479191,
+    1.0
+   ],
+   "frac_of_oracle": 1.0,
+   "mean_spent_fte": 0.24701754385964914,
+   "mean_unspent_fte": 5.752982456140351,
+   "wall_s": 79.2,
+   "pick_counts": {
+    "rare": 5
+   },
+   "regrets": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "values": [
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006
+   ],
+   "rho": 0.0,
+   "alpha": 0.5,
+   "n_corrupted_labels": 0,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.5
+   }
+  },
+  "0.5|0.0|learning_progress_exp3": {
+   "allocator": "learning_progress_exp3",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.02005,
+   "sd_regret": 0.01900135685944559,
+   "se_regret": 0.00849766512049045,
+   "mean_value": 0.017825000000000008,
+   "p_correct": 0.4,
+   "p_correct_ci": [
+    0.1176182311592533,
+    0.769280067791163
+   ],
+   "frac_of_oracle": 0.47062706270627075,
+   "mean_spent_fte": 5.9791077694235515,
+   "mean_unspent_fte": 0.02089223057644869,
+   "wall_s": 1857.7,
+   "pick_counts": {
+    "easy": 1,
+    "gradarm_b": 1,
+    "random": 1,
+    "rare": 2
+   },
+   "regrets": [
+    0.029375,
+    0.0,
+    0.04175,
+    0.029124999999999998,
+    0.0
+   ],
+   "values": [
+    0.008500000000000008,
+    0.037875000000000006,
+    -0.0038749999999999965,
+    0.008750000000000008,
+    0.037875000000000006
+   ],
+   "rho": 0.5,
+   "alpha": 0.0,
+   "n_corrupted_labels": 24771,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.0
+   }
+  },
+  "0.5|0.0|jest": {
+   "allocator": "jest",
+   "budget_fte": 6.0,
+   "reps": 5,
+   "best_arm": "rare",
+   "best_value": 0.037875000000000006,
+   "mean_regret": 0.007024999999999999,
+   "sd_regret": 0.01570837754193602,
+   "se_regret": 0.007024999999999998,
+   "mean_value": 0.03085000000000001,
+   "p_correct": 0.8,
+   "p_correct_ci": [
+    0.3755282641185388,
+    0.9637768390302125
+   ],
+   "frac_of_oracle": 0.8145214521452147,
+   "mean_spent_fte": 0.24701754385964914,
+   "mean_unspent_fte": 5.752982456140351,
+   "wall_s": 79.3,
+   "pick_counts": {
+    "gradarm_a": 1,
+    "rare": 4
+   },
+   "regrets": [
+    0.0,
+    0.0,
+    0.0,
+    0.035124999999999997,
+    0.0
+   ],
+   "values": [
+    0.037875000000000006,
+    0.037875000000000006,
+    0.037875000000000006,
+    0.0027500000000000094,
+    0.037875000000000006
+   ],
+   "rho": 0.5,
+   "alpha": 0.0,
+   "n_corrupted_labels": 24771,
+   "probe_composition": {
+    "n": 2048,
+    "offtarget_frac": 0.0
+   }
+  }
+ },
+ "truth": {
+  "null": -0.004749999999999997,
+  "rare": 0.037875000000000006,
+  "random": 0.008750000000000008,
+  "easy": -0.0038749999999999965,
+  "gradarm_a": 0.0027500000000000094,
+  "gradarm_b": 0.008500000000000008
+ }
+}
