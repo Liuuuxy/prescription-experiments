@@ -1,0 +1,41 @@
+{
+  "budget": 200,
+  "use_uncertainty": false,
+  "source": "prescription_compare predictor_pick on robocasa twin (fidelity -0.335)",
+  "group_allocation": {
+    "unfixable_hard": 74.9,
+    "hard_collectable": 54.5,
+    "retention_toxic": 40.5,
+    "easy_majority": 30.1
+  },
+  "allocation": {
+    "juice": 13,
+    "jar": 20,
+    "cheese_grater": 14,
+    "wine": 14,
+    "water_bottle": 14,
+    "pitcher": 10,
+    "reamer": 10,
+    "colander": 10,
+    "bottled_water": 5,
+    "jug": 5,
+    "yogurt": 11,
+    "spray": 4,
+    "tongs": 6,
+    "dish_brush": 5,
+    "mug": 5,
+    "rolling_pin": 8,
+    "straw": 2,
+    "whisk": 7,
+    "wooden_spoon": 5,
+    "ladle": 2,
+    "cucumber": 5,
+    "corn": 5,
+    "carrot": 4,
+    "broccoli": 4,
+    "pear": 4,
+    "apple": 3,
+    "banana": 2,
+    "lemon": 3
+  }
+}

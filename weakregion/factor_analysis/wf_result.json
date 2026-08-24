@@ -1,0 +1,446 @@
+{
+ "shape": {
+  "key": "shape",
+  "result": {
+   "artifacts": [
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_00_common.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_01_eda_marginals.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_02_phase.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_03_within_category.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_04_threshold.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_05_headtohead.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_sr_vs_bins_overall.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_sr_vs_bins_perphase.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_vs_category_headtohead.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_within_cat_mediansplit.csv",
+    "/data/xinyua11/tmp/factor_analysis_scratch/shape_headtohead_splits.csv"
+   ],
+   "conclusion": "Object shape does NOT beat category head-to-head, but it comes close and is the more mechanistic signal: held-out category-only AUC 0.661 vs nonlinear-shape-only 0.645 (category wins by +0.016 in 96% of 120 run-split CVs), while shape explains 53% of per-category SR variance and \u2014 critically \u2014 WITHIN-category height variation predicts failure with the same per-meter logit slope as between-category (\u22125.6 vs \u22127.1 logit/m, cell-perm p<0.003), so shape is causal-ish rather than a mere category proxy; category identity carries only a modest residual (+0.008 AUC on top of shape when combined). The shape effect is entirely a grasp-phase phenomenon (grasp AUC 0.633 vs transport/place 0.509, null) and is non-monotonic: SR peaks at height 0.04\u20130.08 m and ramps down from ~0.08\u20130.10 m (no sharp cliff; best single threshold h>0.212 m costs \u22120.22 SR out-of-sample). Caveat: eval configs repeat across runs, so held-out-run CV is not fully independent (affects both models; category possibly favored via repeated instances), and the transport/place null is underpowered below AUC~0.55.",
+   "findings": [
+    {
+     "claim": "Object height is the dominant shape predictor of failure within-run: run-FE logistic AUC 0.616, far above width (0.541) and aspect ratio (0.584), and adding width/aspect to height gains nothing (0.617)",
+     "evidence": "n=7062 episodes, 28 runs; within-run AUC 0.617 with run-bootstrap 95% CI [0.603, 0.632]; run-stratified permutation p=0.0033 (300 perms, null AUC 0.510 +/- 0.005); z-slopes: height -0.542, width -0.111, aspect -0.324",
+     "strength": "strong"
+    },
+    {
+     "claim": "The shape effect lives entirely in the GRASP phase: height predicts grasped-vs-no-grasp at AUC 0.633 but does not predict success-given-grasped (AUC 0.509)",
+     "evidence": "Grasp stage (n=7062, grasp rate 0.525): height AUC 0.633, run-boot CI [0.616, 0.650], perm p=0.0033. Transport/place stage (n=3709 grasped, cond. SR 0.885): height AUC 0.509, CI [0.463, 0.556], perm p=0.61; full shape model only 0.553. Phase labels validated: 0% of fail_no_grasp episodes reached max_lift>0.05 m vs 99.8% of grasped-failures. Transport/place null is underpowered below AUC ~0.55 (only 427 grasped-failures)",
+     "strength": "strong"
+    },
+    {
+     "claim": "WITHIN-category height variation predicts failure with the same per-meter effect as between-category variation, indicating shape is causal-ish, not just a category-identity proxy",
+     "evidence": "Run-FE + category-FE logistic: within-height slope -0.462 (z-units), run-x-category cell-permutation p<0.0025 (obs exceeds all 400 nulls, null sd 0.094, |z|~4.9). Per-meter logit slopes: h_within -5.57 [-8.04, -2.81] vs h_between -7.14 [-7.74, -6.48] \u2014 overlapping CIs, same magnitude. Caveat: only 7.6% of height variance is within-category (within-cat sd 0.021 m), so h_within alone yields AUC just 0.522 vs 0.604 for category-mean height; a cruder per-category median-split test agrees in direction (weighted tall-minus-short demeaned SR -0.025, grasp -0.032) but is itself ns (Wilcoxon p=0.36) at category granularity",
+     "strength": "moderate"
+    },
+    {
+     "claim": "The height-SR relation is an inverted-U with a graded ramp (not a sharp cliff): SR peaks at height 0.04-0.08 m and degrades from ~0.08-0.10 m upward; very flat objects (<0.04 m) are also below peak",
+     "evidence": "Run-demeaned binned SR: +0.11 to +0.12 at 0.04-0.08 m, -0.005 at <0.038 m, -0.155 at ~0.20 m, -0.198 at 0.23-0.30 m. Quadratic h+h^2 beats linear height (within-run AUC 0.656 vs 0.616). Threshold scan is a plateau: demeaned SR diff -0.21 to -0.24 for any threshold in 0.10-0.23 m",
+     "strength": "strong"
+    },
+    {
+     "claim": "Best single height threshold: h > 0.212 m, costing -0.236 run-demeaned SR (raw SR 0.523 below vs 0.172 above; grasp rate 0.591 vs 0.196), and this survives honest out-of-sample threshold selection",
+     "evidence": "OOS protocol (choose threshold on 14 runs, evaluate on held-out 14, 50 splits): mean demeaned SR diff -0.223 (sd 0.016); selected threshold median 0.212 m, IQR [0.175, 0.230]; n_above=1176 episodes (17%)",
+     "strength": "strong"
+    },
+    {
+     "claim": "Head-to-head with held-out-run evaluation, category-only slightly beats shape-only (delta AUC +0.016), but shape adds independent signal on top of category and vice versa",
+     "evidence": "120 random half-run splits, within-run AUC on held-out runs: nonlinear shape (h, h^2, w, log-aspect) 0.6445 +/- 0.0098; category (EB-shrunken per-category demeaned SR, insensitive to shrinkage m=0/10/30) 0.6609 +/- 0.0140; category>shape in 95.8% of splits (paired diff +0.0164 +/- 0.0096). Combined shape+category 0.6692: beats category alone by +0.0083 in 100% of splits and shape alone by +0.0247 in 100%",
+     "strength": "strong"
+    },
+    {
+     "claim": "Shape explains about half of the category-level success signal: per-category mean height correlates r=-0.587 with per-category run-demeaned SR, and a 4-feature shape model explains 53% of per-category SR variance",
+     "evidence": "81 categories: Pearson r=-0.587 (p=8.1e-9), Spearman -0.445 (p=3.1e-5); n-weighted R^2 of per-category demeaned SR on (h, h^2, w, log-aspect) = 0.530",
+     "strength": "strong"
+    },
+    {
+     "claim": "Object width has essentially no within-run predictive power for success and its apparent binned dips are category confounds; at most a weak hint of wide objects hurting placement",
+     "evidence": "Width-only within-run AUC 0.541 (success) and 0.534 (grasp); width slope ns in within-category test (cell-perm p=0.54); width dip at 0.13-0.15 m coexists with high SR at 0.24-0.46 m (non-monotone, category-driven). Transport/place stage width slope -0.195 (binned cond. SR 0.92 at 0.09 m to 0.84 at 0.32 m) but stage AUC 0.546 not significance-tested and stage is underpowered",
+     "strength": "weak"
+    }
+   ]
+  },
+  "verdicts": [
+   {
+    "claim": "Object height is the dominant shape predictor of failure within-run: run-FE logistic AUC 0.616, far above width (0.541) and aspect ratio (0.584), and adding width/aspect to height gains nothing (0.617)",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation with /data/xinyua11/conda/envs/robocasa/bin/python reproduces every substantive number. n=7062 after dropping 50 rows with missing obj_height/obj_width. Within-run (episode-weighted per-run) AUC for failure: height 0.6161 (claim 0.616), width 0.5411 (claim 0.541), aspect 0.5836 (claim 0.584); joint run-FE logistic h+w+aspect gives 0.6166 (claim 0.617), i.e., width/aspect add ~0.0005 \u2014 nothing. Run-FE logistic z-slopes match exactly: height -0.542, width -0.111, aspect -0.324. Cluster (run) bootstrap 95% CI [0.602, 0.632] matches claimed [0.603, 0.632]. Run-stratified permutation: 0/300 null draws >= observed, p = 1/301 = 0.0033 exactly as claimed (the floor at 300 perms); at 2000 perms p = 0.0005 with null max 0.526. Refutation attempts failed: the effect survives strict within-run stratification (per-run height AUC > 0.5 in 26/27 runs, median ~0.61), and all four aggregation variants (pairs-pooled 0.611, macro 0.611, n-weighted 0.616, demeaned-pooled 0.619) agree within 0.006, so unbalanced strata and run confounding are ruled out. Aspect's joint-model slope flips to +0.16 while height's strengthens to -0.67, confirming aspect is a height proxy. Two immaterial nits: effective runs in the analysis are 27 (the 50 missing-shape rows constitute one entire run), and the claimed permutation null mean 0.510+/-0.005 should be 0.500+/-0.007 (null AUC centers at 0.5), which understates rather than overstates significance.",
+    "corrected": null
+   },
+   {
+    "claim": "The shape effect lives entirely in the GRASP phase: height predicts grasped-vs-no-grasp at AUC 0.633 but does not predict success-given-grasped (AUC 0.509)",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation with run-controlled statistics reproduces every key number. Grasp stage: n=7062 (50 NaN-height rows dropped, all from run pi0_PickPlaceCounterToSink), grasp rate 0.5252; run-stratified height AUC for no-grasp = 0.629 (claim 0.633), run-level bootstrap 95% CI [0.613, 0.645] (claim [0.616, 0.650]), within-run permutation p <= 0.001 (claim 0.0033) \u2014 significant either way. Transport/place stage: n=3709 grasped, conditional SR 0.8851; run-stratified height AUC for success-given-grasped = 0.5094 (claim 0.509, exact), CI [0.442, 0.562] (claim [0.463, 0.556]), perm p = 0.596 (claim 0.61). A run-demeaned height+width+interaction logistic on the place stage gives in-sample AUC 0.5475 (claim's 0.553 slightly generous; honest run-grouped CV is 0.517, which only strengthens the null). Phase labels validated exactly: 0/3376 fail_no_grasp episodes exceed max_lift 0.05 m vs 426/427 = 99.77% of grasped-failures. Underpowered-null statement is consistent with the CI upper bound (~0.556-0.562) and 427 grasped-failures (426 with height). Adversarial checks: run confounding is real (pooled grasp AUC inflates to 0.657) but the claimed values are the properly run-controlled ones, and the grasp effect holds in all 27 individual runs (per-run AUC min 0.514, median 0.639, sign test p=1.5e-8), so it is not a run artifact. Only refinement: within object_category the grasp height AUC attenuates to ~0.53-0.54, meaning the signal is mostly between-category shape variation \u2014 consistent with the claim's 'shape effect' framing and irrelevant to the phase-specificity conclusion being verified. Direction and magnitude reproduce; verdict CONFIRMED.",
+    "corrected": null
+   },
+   {
+    "claim": "WITHIN-category height variation predicts failure with the same per-meter effect as between-category variation, indicating shape is causal-ish, not just a category-identity proxy",
+    "strength": "moderate",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation (own IRLS logistic, no statsmodels/sklearn) reproduces every headline number: run+cat-FE within-height slope -0.459 z-units (claimed -0.462; per-meter -5.945 x sd 0.0773); run-x-category cell permutation with 400 nulls gives 0 exceedances -> p=0.0025, null sd 0.098 z-units (claimed 0.094), |z|=4.83 (claimed ~4.9); joint-model per-meter slopes h_within -5.567 [-7.99, -3.14] vs h_between -7.139 [-7.89, -6.39] (claimed -5.57 [-8.04, -2.81] vs -7.14 [-7.74, -6.48]) with formal equality test p=0.22 \u2014 same magnitude, overlapping CIs; within-cat variance share 7.58% and sd 0.0213 m match. Adversarial probes fail to refute: slope stable with within-cat width control (-6.20, width ns despite r=0.275 with height), stable with region+layout+style FE (-5.88), leave-one-category-out slopes all in [-7.28, -5.13], grasp-phase outcome slope -6.90 consistent with mechanism, within-cat height variation is genuine (80/81 cats >1 height). Secondary numbers deviate slightly but not conclusion-changing: AUC h_within 0.515 pooled / 0.533 per-run (claimed 0.522) and cat-mean AUC 0.596-0.633 (claimed 0.604) depending on pooled vs per-run convention; median-split weighted SR -0.019 (claimed -0.025), grasp -0.032 exact match; Wilcoxon ns as claimed though my p is 0.74-0.91 rather than 0.36. Direction and approximate magnitude of all core numbers reproduce; the claim's own caveats are accurate.",
+    "corrected": "Only trivial secondary corrections: pooled AUC h_within->failure is 0.515 (0.533 averaged per-run), cat-mean-height AUC 0.633 pooled / 0.596 per-run; median-split weighted demeaned SR is -0.019 (grasp -0.032 as claimed) and its Wilcoxon p is 0.74-0.91 (still ns, as the claim states); run mean-success range is 0.25-0.59 not 0.2-0.66."
+   },
+   {
+    "claim": "The height-SR relation is an inverted-U with a graded ramp (not a sharp cliff): SR peaks at height 0.04-0.08 m and degrades from ~0.08-0.10 m upward; very flat objects (<0.04 m) are also below peak",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation (own code: demeaning, binning, run-FE logistic via L-BFGS, pair-weighted within-run AUC, stratified permutation) reproduces every claimed number within ~0.005-0.01. Run-demeaned binned SR: -0.0045 at <0.038 m (claim -0.005), +0.115 at 0.04-0.08 m (claim +0.11 to +0.12), -0.160 at 0.19-0.22 m (claim -0.155), -0.193 at 0.23-0.30 m (claim -0.198). Quadratic h+h^2 beats linear: within-run AUC 0.652 vs 0.611 (claim 0.656 vs 0.616), gap survives 5-fold CV (0.650 vs 0.610); quadratic vertex 0.060 m inside claimed peak band, negative curvature = inverted-U. Threshold scan is a plateau: -0.208 to -0.233 for all thresholds 0.10-0.23 m (claim -0.21 to -0.24). Refutation attempts failed: (a) run confounding is severe (corr(run mean height, run mean SR) = -0.81) but within-run stratified permutation gives p~0.0002 for peak-vs-flat (diff +0.101, 5.9 null SDs), peak-vs-tall (+0.233, 18.6 SDs), flat-vs-verytall (+0.196, 10.5 SDs); (b) per-run sign consistency: peak>tall in 27/27 runs, peak>flat in 78% of runs; (c) flat bin dominated by cream_cheese_stick/ice_cube but leave-one-category-out keeps peak-vs-flat diff at 0.085-0.114 for all 80 categories; (d) success column is clean {'0','1'}, only 50/7112 rows lack height. Decile bins show a graded ramp (+0.09 at 0.078-0.111 m, then -0.04, -0.11, -0.16, -0.21), not a cliff. Minor nuance only: the 0.08-0.10 m bin is still at peak (+0.131); measurable degradation starts just above ~0.10 m, marginally later than the claim's \"~0.08-0.10 m\" onset phrasing, but within its stated tolerance.",
+    "corrected": null
+   }
+  ]
+ },
+ "location": {
+  "key": "location",
+  "result": {
+   "artifacts": [
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_region_phase.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_continuous_abs.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_balance_variance.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_region_bars.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_phase_mix.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_binned_curves.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/loc_heatmap_xy.png"
+   ],
+   "conclusion": "Start location is a real, checkpoint-robust driver of success, but the geometry is radial, not directional: there is no near/far gradient (far-near = -0.014, p=0.36) and no left/right gradient (p=0.15); instead placements on the outer rim of the counter placement region (max(|x_rel|,|y_rel|)>0.65, 26% of episodes) lose 18.3 SR points (0.330 vs 0.513 run-adjusted, perm p=1e-4, negative in 27/28 runs), producing a bull's-eye heatmap (corner cells 0.25-0.35 vs central cells 0.55-0.66). Absolute kitchen coordinates add nothing beyond region-relative position (dR2<=0.0006), rim failures occur by the same no-grasp mechanism as elsewhere (phase mix flat across regions), and rim placement is uncorrelated with category or object size, so location and shape are additive orthogonal factors of similar magnitude (R2 0.041 vs 0.052, together 0.095). For data prescription this means targeting the rim of the placement region is a cleaner location-based weak-region signal than any compass direction; caveat: rows repeat eval configs across runs (3154 unique of 7112), mitigated by within-run stratification and the 27/28-run sign consistency.",
+   "findings": [
+    {
+     "claim": "Placements on the outer rim of the counter placement region (max(|x_rel|,|y_rel|)>0.65; 26% of episodes) have an 18.3-point lower success rate than interior placements, robust across checkpoints.",
+     "evidence": "Run-adjusted SR 0.330 (rim) vs 0.513 (interior); diff -0.183, run-stratified permutation p=0.0001 (10k perms), within-run bootstrap 95% CI [-0.208,-0.159]; per-run effect negative in 27/28 runs (mean -0.181). Continuous slopes of run-demeaned success: -0.332 per unit |x_rel| and -0.329 per unit |y_rel|, both p=0.0001; outermost octiles drop to adjusted SR 0.319 (|x|) and 0.326 (|y|) vs ~0.50 mid; 2D quintile heatmap corners 0.25-0.35 vs central cells 0.55-0.66.",
+     "strength": "strong"
+    },
+    {
+     "claim": "There is no near-to-far (depth) gradient in success over the counter start position.",
+     "evidence": "far minus near run-demeaned SR = -0.0136, stratified perm p=0.36, bootstrap 95% CI [-0.043,+0.015] (n=6427, 22 runs) - powered to exclude effects beyond ~4 pts; consistent with start-to-sink distance being nearly constant across depth bands (untouched-object min_sink_dist 0.586/0.558/0.571 m for far/mid/near).",
+     "strength": "null"
+    },
+    {
+     "claim": "There is no monotone left-to-right gradient; the apparent column effect is an edge-vs-center penalty (a slice of the radial effect).",
+     "evidence": "right minus left = -0.022, perm p=0.15, CI [-0.050,+0.008] (null); edge-columns minus center-column = -0.055, perm p=0.0001, CI [-0.080,-0.030], negative in 17/22 runs; best 3x3 cell mid-center adjusted SR 0.597 [0.544,0.648], worst far-right 0.391 [0.355,0.427].",
+     "strength": "strong"
+    },
+    {
+     "claim": "Absolute world position adds essentially nothing beyond position relative to the counter placement region; the location effect is region-relative, not kitchen-frame reachability.",
+     "evidence": "Adding (x_abs,y_abs) to quad(rel) model of run-demeaned success: dR2=0.0002 (linear) / 0.0006 (quadratic) on base R2=0.0412; within-layout abs~rel collinearity median R2=0.93; layout-level residual SR vs counter-centroid correlation +0.10 (perm p=0.49, x) and -0.09 (p=0.55, y) across 50 layouts; layout fixed effects alone R2=0.011.",
+     "strength": "strong"
+    },
+    {
+     "claim": "Rim/far placements do not fail by a different mechanism: the failure-phase mix is location-invariant, with grasp failure dominating everywhere.",
+     "evidence": "no-grasp share of failures 0.875-0.889 across depth bands and 0.873-0.897 across columns; far-near difference in no-grasp share +0.014 (perm p=0.28), edge-center -0.018 (p=0.16); never-lifted (max_lift<2cm) share of failures 0.77-0.80 in all depth bands; mean max_lift among failures 0.021-0.023 m everywhere.",
+     "strength": "moderate"
+    },
+    {
+     "claim": "Object category and object size are randomized with respect to start region, so the rim/location effect is not a category or shape artifact (and vice versa).",
+     "evidence": "On 2709 deduplicated unique configs: category x region chi2=624, Cramers V=0.170, Monte-Carlo p=0.67; rim radius ~ category between-group permutation p=0.55; corr(rim radius, obj_height)=-0.002, corr(rim radius, obj_width)=-0.008.",
+     "strength": "strong"
+    },
+    {
+     "claim": "Object category is NOT perfectly balanced across layouts, so category effects can be partially entangled with layout (but not with start location).",
+     "evidence": "category x layout on 3154 unique configs: chi2=4591, Cramers V=0.172, Monte-Carlo p=0.002.",
+     "strength": "moderate"
+    },
+    {
+     "claim": "Location and shape explain comparable, almost perfectly additive shares of within-run success variance (each ~4-5%).",
+     "evidence": "R2 on run-demeaned success (5 df each, n=7062): location quad(x_rel,y_rel)=0.0412 [boot 95% CI 0.033-0.051], shape quad(h,w)=0.0521 [0.044-0.062], both=0.0948; incremental loc|shape=0.0428, shape|loc=0.0536; within-run-shuffled null R2 mean 0.0007 (95th pct 0.0018), p<0.002 for both.",
+     "strength": "strong"
+    }
+   ]
+  },
+  "verdicts": [
+   {
+    "claim": "Placements on the outer rim of the counter placement region (max(|x_rel|,|y_rel|)>0.65; 26% of episodes) have an 18.3-point lower success rate than interior placements, robust across checkpoints.",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independently recomputed from /data/.../scratchpad/pooled_episodes.csv (7112 episodes, 28 runs) with /data/xinyua11/conda/envs/robocasa/bin/python. Every headline number reproduces: rim fraction (max(|x_rel|,|y_rel|)>0.65) = 26.04% (claimed 26%); run-adjusted SR (grand mean + within-run demeaning) = 0.3298 rim vs 0.5130 interior, diff -0.1832 (claimed 0.330/0.513/-0.183); run-stratified permutation (10k, within-run label shuffles) two-sided p = 1e-4 with 0/10000 permutations exceeding the observed statistic (claimed 0.0001); within-run bootstrap 95% CI [-0.207, -0.158] (claimed [-0.208, -0.159]); per-run diff negative in 27/28 runs, mean -0.181 (claimed 27/28, -0.181). Continuous checks also reproduce: run-demeaned slopes -0.3316 per unit |x_rel| and -0.3294 per unit |y_rel|, both stratified-perm p~=1e-4 (claimed -0.332/-0.329); outermost octile adjusted SR 0.319 (|x|) and 0.326 (|y|) vs ~0.43-0.54 for interior octiles (claimed 0.319/0.326 vs ~0.50); 2D quintile heatmap corners 0.254-0.346 (claimed 0.25-0.35) vs innermost cells 0.563-0.656 (claimed 0.55-0.66). Adversarial refutation attempts all failed: (1) run confounding is real but small \u2014 rim fraction varies 0.21-0.34 per run with corr(-0.29) vs run success, yet the within-run FE estimate (-0.184) barely differs from the raw pooled diff (-0.192), so the effect is not a run artifact; (2) threshold 0.65 is not cherry-picked \u2014 the adjusted diff grows monotonically with threshold (-0.11 at 0.55, -0.13 at 0.6, -0.18 at 0.65, -0.23 at 0.7, -0.40 at 0.8), a genuine spatial gradient; (3) object-category/geometry confounding \u2014 rim rate varies hugely by category (kettle 6% to yogurt 50%), but the rim effect survives run+category two-way fixed effects (-0.193), height+width controls (-0.190 on 7062 complete cases; obj_height has 50 NaNs), and within-category run-demeaned diffs are negative in 70/78 categories (mean -0.218); (4) survives run-x-layout stratification (-0.189) and holds for both policies (pi0 -0.182 n=7012; groot -0.289 n=100); (5) no coding errors \u2014 success parses cleanly as 0/1 int with no NaNs, x_rel/y_rel span roughly [-0.88, 0.87] as expected for normalized region coordinates, and rim failures shift toward fail_no_grasp/no-transport phases consistent with a real placement-difficulty effect. Direction and magnitude match the claim to the third decimal; scripts at scratchpad/verify_rim.py, verify_rim2.py, verify_rim3.py.",
+    "corrected": null
+   },
+   {
+    "claim": "There is no monotone left-to-right gradient; the apparent column effect is an edge-vs-center penalty (a slice of the radial effect).",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independently recomputed from pooled_episodes.csv (6427 episodes with non-null region, 22 of 28 runs carry region labels \u2014 which is why the per-run count is /22). Used within-run demeaning for adjusted SRs, run-stratified permutation (20k) for p-values, and within-run bootstrap (re-demeaned per replicate, 3-5k) for CIs. Every claimed number reproduced to within rounding: (1) right-left = -0.0216 (claim -0.022), stratified perm p=0.147 (claim 0.15), CI [-0.052,+0.007] (claim [-0.050,+0.008]) \u2014 includes 0, null as claimed. (2) edge-columns minus center-column = -0.0546 (claim -0.055), perm p=0.00005 (claim 0.0001), CI [-0.080,-0.030] (identical), negative in exactly 17/22 runs. (3) 3x3 cells: mid-center is the best cell, adj SR 0.597 [0.542,0.650] (claim [0.544,0.648], n=295); far-right is the worst, 0.391 [0.358,0.429] (claim [0.355,0.427], n=662) \u2014 non-overlapping CIs. Monotonicity is ruled out directly: column adjusted SRs are left 0.468 < center 0.511 > right 0.446 (inverted-U), and rows mirror it (near 0.464, mid 0.510, far 0.451), with the edge-vs-center column penalty negative within every row (-0.049/-0.100/-0.092) \u2014 consistent with the radial/center-peak interpretation. Confound checks: raw and run-adjusted differences are identical because columns are balanced within runs (center share 33-34% in every run) and category shares differ across columns by at most 2.6pp; the edge-center effect survives the strictest run-x-category stratified permutation (-0.038, p=0.0004). One minor caveat that does not overturn the claim: under run-x-category control the right-left contrast picks up a nominally significant asymmetry (-0.028, p=0.026 uncorrected), suggesting a possible small extra right-side penalty on top of the edge effect \u2014 but the pattern remains clearly non-monotone (center is highest) and the edge-center penalty stays ~1.5-2x larger and far more significant, so the claim's characterization stands.",
+    "corrected": null
+   },
+   {
+    "claim": "Absolute world position adds essentially nothing beyond position relative to the counter placement region; the location effect is region-relative, not kitchen-frame reachability.",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation on pooled_episodes.csv (7112 episodes, 28 runs, 50 layouts; success is int 0/1 in the file) with run-demeaned success reproduces every claimed number: base quad(rel) R2 = 0.0412 (exact match); dR2 from adding abs = 0.0002 (linear) and 0.0006 (quadratic), exactly matching the claim, and both are indistinguishable from chance \u2014 run-stratified permutation null for the abs-quad dR2 has mean 0.0006 (95th pct 0.0014, perm p = 0.47) and the F-test gives p = 0.51. Within-layout abs~rel collinearity median R2 = 0.939 (claimed 0.93). Layout-level residual SR vs counter centroid: x r = +0.105, perm p = 0.465 (claimed +0.10, p = 0.49); y r = -0.112, perm p = 0.450 (claimed -0.09, p = 0.55) \u2014 same direction, both firmly null; the small magnitude/p differences are within residual-definition and permutation noise. Layout FE alone R2 = 0.0112 (claimed 0.011). Adversarial checks all failed to refute: (1) run confounding \u2014 run x layout is balanced (chi2 p = 1.0), and per-run abs dR2 (median 0.0196) matches the per-run overfit chance level (median 5/n = 0.0167), so no run hides an abs effect; (2) asymmetry test \u2014 quad(abs) alone gives R2 = 0.0011 (~chance) while adding quad(rel) on top of quad(abs) gains dR2 = 0.0408, the exact opposite asymmetry a kitchen-frame effect would show; (3) binned residuals across x_abs/y_abs octiles show no systematic pattern (means bounce within +/-0.03), ruling out nonlinearity missed by the quadratic; (4) alternate outcome (fail_no_grasp, run-demeaned) gives rel R2 = 0.0293 with abs dR2 = 0.0012, again ~chance. One minor nuance that does not contradict the claim: layout fixed effects beyond quad(rel) are marginally significant (dR2 = 0.0104 vs chance 0.0069, F p = 0.006), so a small layout-level effect exists \u2014 but it is not carried by absolute counter position (centroid correlations null), so it is consistent with layout geometry/style rather than kitchen-frame reachability. Caveat on power: with 50 layouts the centroid test can only exclude |r| >~ 0.28, but combined with the in-sample dR2 sitting exactly at the chance level, \"adds essentially nothing\" is supported. Two trivial discrepancies in the prompt's caveat text (success is int, not string; run means span 0.25-0.59, not 0.2-0.66) do not affect the evidence.",
+    "corrected": null
+   },
+   {
+    "claim": "Rim/far placements do not fail by a different mechanism: the failure-phase mix is location-invariant, with grasp failure dominating everywhere.",
+    "strength": "moderate",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation reproduces every claimed number within rounding/Monte-Carlo noise. No-grasp share of failures by depth band = 0.875 (near) / 0.889 (far, mid), exactly the claimed 0.875-0.889; by column = 0.873 (right) / 0.885 (left) / 0.897 (center), matching 0.873-0.897. Far-near diff = +0.0139 with run-stratified permutation p = 0.285 (claim +0.014, p=0.28); edge-center = -0.0179, p = 0.150 (claim -0.018, p=0.16). Never-lifted (max_lift<2cm) share of failures by depth = 0.769/0.790/0.798 (claim 0.77-0.80); mean max_lift among failures = 0.0208-0.0233 m across depth bands and 0.0202-0.0231 across columns (claim 0.021-0.023). Adversarial checks fail to refute: (1) run x depth-band and run x column composition among failures is homogeneous (chi2 p=0.86 and 0.99), so run confounding cannot hide or fake a location effect; within-run demeaned no-grasp shares differ by at most +/-0.010 with the same direction. (2) Testing the full 3-category failure-phase mix (not just no-grasp) gives chi2 p=0.23 (depth) and 0.16 (column), and run-stratified permutation of the chi2 statistic gives p=0.227 and 0.164 \u2014 the entire mix is location-invariant. (3) Coding checks: success string handled; the -0.018 edge-center figure requires dropping the 685 NaN-region rows before defining edge=left+right (a naive col!='center' pulls NaN rows into edge and gives -0.0125); the 429 NaN-region failures (no-grasp share 0.914) cannot be located and their exclusion is proper. (4) Multiplicity only strengthens a null claim. Only caveat: per-band n~1150 gives a minimum detectable difference of ~2.5-3 pp in no-grasp share, so invariance means no effect larger than a few percentage points \u2014 consistent with the claim's own small ranges. Grasp failure dominates in every band/column (87-90% of failures), so the claim's direction and magnitudes are fully reproduced.",
+    "corrected": null
+   }
+  ]
+ },
+ "env": {
+  "key": "env",
+  "result": {
+   "findings": [
+    {
+     "claim": "Visual STYLE strongly drives success: per-style run-demeaned SR spread far exceeds the within-run permutation null.",
+     "evidence": "Observed SD across 50 styles = 0.094 vs null 0.042 (null 95% [0.034, 0.051]), permutation p = 0.0005 (floor at 2000 perms, stratified by run). Survives controlling run + object_category + layout via two-way/three-way fixed-effect demeaning: SD 0.085 vs null 0.039, p = 0.001.",
+     "strength": "strong"
+    },
+    {
+     "claim": "Style effect size is large and stable across checkpoints: true-effect SD ~0.08 SR, best-vs-worst style gap ~0.31 SR, and the SAME styles are hard for different policy checkpoints.",
+     "evidence": "Method-of-moments sd_true = 0.084 (bias-corrected within-run bootstrap CI [0.071, 0.098]); raw best-worst gap 0.391 vs null-expected 0.196 (p = 0.0005); EB-shrunk gap 0.310. Split-half reliability across disjoint run halves: mean Pearson r = 0.69 (300 splits, 95% range [0.59, 0.78]; null 0.00\u00b10.16; p = 0.003; Spearman-Brown full-data 0.82); still r = 0.67 after controlling category+layout. Hardest styles: 49, 43, 42, 21, 22; easiest: 27, 36, 31, 30, 17.",
+     "strength": "strong"
+    },
+    {
+     "claim": "Kitchen LAYOUT is at best a weak driver: marginally significant spread that mostly evaporates after controlling object category and style, with low split-half stability.",
+     "evidence": "Marginal: observed SD across 50 layouts = 0.052 vs null 0.041 (95% [0.033, 0.050]), p = 0.005; sd_true = 0.032 with bias-corrected bootstrap CI [0.00, 0.051] (touches zero); raw best-worst gap 0.225 not beyond winner's-curse null 0.189 (p = 0.11); shrunk gap 0.082. After controlling run + category + style: SD 0.043 vs null 0.038, p = 0.099; split-half r drops from 0.28 (p = 0.030) to 0.16 (95% range [-0.06, 0.38]). Attenuation indicates paired-eval-config leakage (layout co-sampled with hard categories/styles) inflated the marginal estimate.",
+     "strength": "weak"
+    },
+    {
+     "claim": "The hypothesized phase split (style hurts grasp, layout hurts transport/reach) is REFUTED: both factors act mainly on the grasp phase, and style additionally hurts post-grasp phases while layout does not.",
+     "evidence": "Per-id SR effect vs grasp-fail effect: r = 0.91 (layout), r = 0.90 (style). Late-fail (transport+place) spread: style p = 0.0005, sd_true = 0.036; layout p = 0.066, sd_true = 0.012 (marginal). Conditional on failure, hard-10 styles have MORE late failures than easy-10 (P(late|fail) 0.135 vs 0.067, diff +0.068, p = 0.0005; P(success|grasped) 0.789 vs 0.954), while hard-10 layouts have FEWER (0.101 vs 0.143, diff -0.042, p = 0.022). Style behaves like broad visual difficulty; layout has no transport signature.",
+     "strength": "strong"
+    },
+    {
+     "claim": "No evidence that layout-to-sink geometry drives layout difficulty: layout hardness is uncorrelated with counter-to-sink distance, and the layout-by-region interaction is directional but nonsignificant (underpowered).",
+     "evidence": "Geometry proxy (per-layout median min_sink_dist on untouched no-grasp failures ~ initial object-sink distance) vs per-layout demeaned SR: Spearman r = 0.079, p = 0.59, n = 50 layouts (hard5 proxy 0.561 m vs easy5 0.542 m). Far-minus-near SR interaction (5 hardest minus 5 easiest layouts) = -0.091 (hard layouts worse for far starts), permutation p = 0.15, null SD 0.064 -> detectable effect at this n (~200-250 eps/cell) is ~0.13, so a moderate geometry interaction cannot be ruled out. Overall region main effect is tiny: demeaned SR mid +0.035, near -0.011, far -0.024.",
+     "strength": "null"
+    },
+    {
+     "claim": "Best-vs-worst comparisons on raw per-id SR are dominated by winner's curse at this sample size (~142 eps/id): the null best-worst gap is itself ~0.19-0.20 SR.",
+     "evidence": "Permutation null best-worst gap: layout 0.189 (95% [0.139, 0.256]), style 0.196 (95% [0.141, 0.265]). Only style's observed 0.391 clears it (p = 0.0005); layout's 0.225 does not (p = 0.11). Shrinkage-based gaps (0.310 style, 0.082 layout) are the honest estimates.",
+     "strength": "moderate"
+    }
+   ],
+   "conclusion": "Visual style is a real, large, checkpoint-stable driver of PickPlaceCounterToSink success (true SD ~0.08 SR, shrunk best-worst gap ~0.31 SR, split-half r ~0.69 across disjoint checkpoint halves, robust to controlling run, object category, and layout), and it degrades both grasp and post-grasp phases, consistent with visual/perceptual difficulty. Kitchen layout is at best a weak factor: its marginal significance (p=0.005) attenuates to p~0.10 and split-half r~0.16 once object category and style are controlled, its true-effect SD CI touches zero, it shows no transport-phase signature, and layout hardness is uncorrelated with counter-to-sink distance. Practical implication for data prescription: stratify or target by style (and object), not by floorplan; the layout-by-region geometry interaction is directionally negative but underpowered rather than ruled out. Caveat: paired eval configs repeat across runs, which demonstrably inflated the naive layout effect; all headline numbers use run-demeaned, within-run-permutation, and multi-factor-controlled estimates.",
+   "artifacts": [
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_analysis.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_fixci_plots.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_robustness_catctrl.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_results.json",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_plotdata.npz",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_sr_vs_null.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/layoutstyle_splithalf.png"
+   ]
+  },
+  "verdicts": [
+   {
+    "claim": "Visual STYLE strongly drives success: per-style run-demeaned SR spread far exceeds the within-run permutation null.",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation reproduces every claimed number: run-demeaned per-style SD = 0.0939 (claimed 0.094) vs stratified permutation null mean 0.0419, 95% [0.0336, 0.0507] (claimed 0.042, [0.034, 0.051]), p = 0.00050 at the 2000-perm floor \u2014 a genuine floor since the max null draw was 0.0587, far below 0.094. The three-way fixed-effect version (run + object_category + layout, iterative demeaning) also reproduces: SD 0.0853 (claimed 0.085) vs null 0.0392 (claimed 0.039), p = 0.0005 vs claimed 0.001 (both at/near floor; max null 0.0519). Refutation attempts failed: (1) run confounding is properly controlled \u2014 style is balanced across runs (Cram\u00e9r's V 0.073, chi2 p=1) and the test demeans and permutes within run; (2) style-layout (V=0.203) and style-category (V=0.230) associations exist but the effect survives three-way FE control; (3) not driven by unbalanced strata \u2014 per-style n 66\u2013216, null preserves counts, n-weighted SD 0.0876 nearly identical; (4) single omnibus statistic, so no multiple-comparison issue; (5) no coding error (success is int 0/1, though the caveat calls it a string); (6) the effect is stable, with split-half correlation 0.70 of style effects across disjoint pi0 run halves. One nuance: the pool is 27 pi0 runs + 1 groot run (100 episodes), so the result is effectively a pi0 finding (pi0-only: SD 0.0950, p=0.0005); the groot subsample is too small to test independently. Direction and magnitude fully reproduce.",
+    "corrected": null
+   },
+   {
+    "claim": "Style effect size is large and stable across checkpoints: true-effect SD ~0.08 SR, best-vs-worst style gap ~0.31 SR, and the SAME styles are hard for different policy checkpoints.",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation with within-run demeaning reproduces every key number: MoM sd_true = 0.0839 (claimed 0.084); best-worst demeaned style gap = 0.391 exactly as claimed, vs stratified within-run permutation null 0.209 (claimed 0.196), p = 0.0005 with 2000 permutations (the permutation of the max-min statistic already handles selection/multiple comparisons); EB-shrunk gap = 0.296 (claimed 0.310, within 5%, both ~0.3 SR). Split-half reliability over 300 disjoint 14/14 run splits: mean r = 0.691, 95% range [0.591, 0.786] (claimed 0.69 [0.59, 0.78]); Spearman-Brown 0.817 (claimed 0.82); permutation null 0.005 +/- 0.120, p = 0.0033 (claimed 0.003). After residualizing run + object_category + layout fixed effects, split-half r = 0.661 (claimed 0.67), so the effect survives real style-layout/category confounding (Cramer V ~ 0.2). Hardest/easiest style lists overlap 4/5 and 3/5 with top-1 (49 hardest, 27 easiest) matching exactly. Adversarial checks found no fatal flaw: run means vary 0.250-0.593 but demeaning/stratified nulls handle it; unbalanced strata (100/1400 empty style-run cells) are accounted for by the sampling-variance correction. Minor caveats: EB gap is 0.296 not 0.310 in my implementation; the 28 runs are 27 pi0 fine-tune checkpoints plus one 100-episode GR00T run, so cross-checkpoint stability is confirmed within the pi0 family (the single GR00T run, r = 0.10, has only ~2 episodes/style and is uninformative either way).",
+    "corrected": null
+   },
+   {
+    "claim": "The hypothesized phase split (style hurts grasp, layout hurts transport/reach) is REFUTED: both factors act mainly on the grasp phase, and style additionally hurts post-grasp phases while layout does not.",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independently recomputed every claimed number from pooled_episodes.csv with run-demeaning and within-run stratified permutation tests; all reproduce to reported precision. (1) Correlation of per-id run-demeaned SR effect with grasp-fail effect: layout |r|=0.913, style |r|=0.900 (claim 0.91/0.90); layout SR effect is uncorrelated with late-fail effect (r=-0.003) while style's is -0.594. (2) Late-fail (transport+place) per-id spread via within-run label permutation: style sd_true=0.0363, p=0.00025 (claim 0.036, 0.0005); layout sd_true=0.0116, p=0.068 (claim 0.012, 0.066). (3) Hard-10 vs easy-10 conditional on failure: style P(late|fail)=0.135 vs 0.067, diff +0.068, p=0.0002 (claim exact); P(success|grasped)=0.789 vs 0.954 (exact); layout P(late|fail)=0.101 vs 0.143, diff -0.042, p=0.021 (claim 0.022) \u2014 layout-hard has FEWER late failures. Adversarial checks all passed: hard/easy groups span all 28 runs and all tests were run-stratified (no run confound); layout-composition confound explains only +0.009 of the +0.068 style effect, and the style late-fail difference survives joint run+layout demeaning (+0.050, p=0.0016); selection-on-SR does not bias the conditional-on-failure test; style p-values survive any multiple-comparison correction, and the layout conditional effect points opposite to the 'layout hurts transport' hypothesis so multiplicity cannot rescue it. Phase breakdown confirms hard styles fail more at both transport and place (broad visual difficulty) while hard layouts fail relatively more at grasp. Minor caveats: the reported r values are magnitudes (actual sign negative, as expected for SR vs grasp-fail), and layout per-id effects are noisy (split-half r=0.28 vs 0.76 for style), consistent with the claim treating the layout late-fail signal as marginal. The refutation of the hypothesized phase split is fully supported.",
+    "corrected": null
+   },
+   {
+    "claim": "Best-vs-worst comparisons on raw per-id SR are dominated by winner's curse at this sample size (~142 eps/id): the null best-worst gap is itself ~0.19-0.20 SR.",
+    "strength": "moderate",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independently recomputed from /data/xinyua11/tmp/factor_analysis_scratch/pooled_episodes.csv (7112 eps, 50 layouts, 50 styles, 142.24 eps/id) with my own implementation, different RNG seed, 5000 stratified permutations (labels shuffled within each of the 28 runs, on run-demeaned success). Every number reproduces: layout null best-worst gap 0.1899 95%[0.140,0.253] vs claimed 0.189 [0.139,0.256]; style null 0.1957 [0.142,0.267] vs claimed 0.196 [0.141,0.265]; observed gaps 0.2246 (layout, p=0.125 vs claimed 0.11) and 0.3912 (style, p=0.0002, i.e. 0/5000 exceedances, vs claimed 0.0005 = 0/2000); EB-shrinkage gaps 0.0818 (layout) and 0.3100 (style), matching 0.082/0.310. The ~0.19-0.20 null gap also matches the analytic winner's-curse prediction (per-id SE ~0.041 x expected range of 50 draws ~4.5 SD ~ 0.19). Adversarial checks failed to refute: (1) run confounding is real (layout run-exposure alone predicts 0.098 SR spread, corr 0.51 with raw per-layout SR) but the claimed numbers already use run-demeaned SR with a within-run stratified null, which handles it; style is essentially unconfounded (corr 0.11). (2) Unbalanced strata: the within-run shuffle preserves per-run level counts, and restricting to levels with n>=100 leaves conclusions unchanged (layout p=0.137, style p=0.0003). (3) Multiple comparisons: style p<0.001 survives any correction; layout p~0.12 is correctly reported as not clearing the null. (4) No coding errors found; the shrinkage formula (var_true/(var_true+SE^2) toward the demeaned grand mean 0) is standard EB. Minor immaterial nuances: the quoted 'observed' gaps are run-demeaned per-id SR (truly raw gaps are 0.275/0.402; raw layout would be nominally p=0.036 but is exposure-confounded, so demeaned is the honest version, supporting the claim); a top5-minus-bottom5 robust statistic does detect a small real layout effect (p=0.008), consistent with the claim's own nonzero 0.082 shrinkage gap; the 'success is 0/1 string' caveat is wrong (it is int) and run means span 0.25-0.59, not 0.2-0.66 \u2014 none of this affects the claim.",
+    "corrected": null
+   }
+  ]
+ },
+ "decomp": {
+  "key": "decomp",
+  "result": {
+   "artifacts": [
+    "/data/xinyua11/tmp/factor_analysis_scratch/catsignal_1_power_null_reliability.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/catsignal_2_family_decomposition.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/catsignal_3_residual_perm.py",
+    "/data/xinyua11/tmp/factor_analysis_scratch/catsignal_null_spread_hist.png",
+    "/data/xinyua11/tmp/factor_analysis_scratch/catsignal_family_r2_bars.png"
+   ],
+   "conclusion": "Category signal is real and large, not noise: the spread of per-category (run-demeaned) success rates is 2.4x what a within-run label-permutation null produces (SD 0.155 vs 0.063, p=0.0005; implied true signal SD 0.141, i.e. 83% of observed spread variance is genuine), and per-category SRs replicate across disjoint run halves (r=0.73) and disjoint eval configs (r=0.66). The user \"cannot find a pattern\" for two reasons: (a) individual category estimates carry \u00b112pp Wilson-CI noise at median n=58 so mid-table ordering is unreadable, and (b) only ~43% of the category variance is explained by measured shape (and 53% by all of shape+location+layout+style), so no simple geometric rule is visible by eye \u2014 the remaining ~half is category-idiosyncratic (grasp affordance: hardest = kettle_non_electric, blender_jug, saucepan_lid, water_bottle, teapot; easiest = canned_food, cucumber, corn, potato, tangerine). In a run-CV ridge decomposition, category is the single strongest family (alone R\u00b2=0.073, within-run AUC 0.66) and retains the largest added-last increment (+0.028 R\u00b2, +0.026 AUC, residual perm p=0.0005), so category should be kept as a targeting variable rather than replaced by shape features; caveat: eval configs repeat across runs (1194 configs in >1 run) so cross-run rows are correlated, which the config-split reliability check explicitly controls for.",
+   "findings": [
+    {
+     "claim": "Per-category success rates carry large binomial noise: at median n=58 episodes/category, the median Wilson 95% CI half-width is +/-0.117, and 60 of 81 categories have half-width > 0.10",
+     "evidence": "81 categories, counts median 58 (IQR 48-74, min 5, max 405); CI half-width median 0.117 (IQR 0.099-0.129, max 0.326); naive pooled per-category SR SD 0.190, range 0.06-0.81",
+     "strength": "strong"
+    },
+    {
+     "claim": "Category has genuine signal far above noise: observed spread of per-category run-demeaned SR is 2.4x the null spread from permuting category labels within run",
+     "evidence": "observed SD 0.1545 vs null mean 0.0630 (null 95% range 0.0525-0.0739), permutation p=0.0005 (0/2000 exceedances, both SD and weighted-SSq statistics); implied true category-signal SD = 0.141; 83% of observed spread variance is signal",
+     "strength": "strong"
+    },
+    {
+     "claim": "Per-category SR estimates are moderately reliable in aggregate and the reliability is not an artifact of shared eval configs across runs",
+     "evidence": "split-half r across disjoint 14/14 run halves = 0.726 (95% range 0.628-0.812 over 200 splits, ~78 cats with n>=10 per half; Spearman-Brown full-data 0.84); split by disjoint config signatures r = 0.661 (0.568-0.750; SB 0.80) despite 1194/3349 configs repeating in up to 21 runs",
+     "strength": "strong"
+    },
+    {
+     "claim": "In a run-cross-validated ridge decomposition of run-demeaned success, category is the strongest single factor family, beating shape, location, style, and layout",
+     "evidence": "out-of-fold R2 alone: category 0.073 (within-run AUC 0.660) > shape 0.045 (AUC 0.613) > location 0.040 (AUC 0.609) > style 0.021 (AUC 0.581) > layout 0.002 (AUC 0.528); full model R2 0.116, AUC 0.703 (7 folds of runs, inner-CV ridge lambda)",
+     "strength": "strong"
+    },
+    {
+     "claim": "Category retains unique predictive signal after controlling shape+location+layout+style: it has the largest added-last increment, tied with location; shape adds nothing once category is in the model",
+     "evidence": "added-last dR2: category +0.028 (dAUC +0.026), location +0.025 (+0.024), style +0.006, shape +0.002, layout -0.005 (null); residual permutation after ridge controls: obs SD 0.115 vs null 0.062, p=0.0005",
+     "strength": "strong"
+    },
+    {
+     "claim": "Measured object geometry explains slightly under half of the category effect; the rest is category-idiosyncratic (affordance-level, not captured by height/width/position/scene)",
+     "evidence": "true category-signal SD ladder: raw 0.141 -> after shape 0.107 (43% of variance absorbed) -> +location 0.105 (44%) -> +layout+style 0.097 (53% absorbed); residual category signal still p=0.0005 at every rung",
+     "strength": "strong"
+    },
+    {
+     "claim": "Layout (kitchen floorplan, which sets sink position) has essentially no within-run predictive power for success; style has a small real effect",
+     "evidence": "layout alone CV R2 = 0.002, AUC 0.528, added-last -0.005 (regularizer pushed to lambda=10000); style alone R2 = 0.021, AUC 0.581, added-last +0.006",
+     "strength": "moderate"
+    },
+    {
+     "claim": "The extremes of the category table are interpretable: hardest categories are tall/handled/lidded containers, easiest are small compact graspables",
+     "evidence": "ridge category effects on demeaned SR: kettle_non_electric -0.49 (n=17, low-n caveat), blender_jug -0.37, saucepan_lid -0.33, water_bottle -0.30, cheese_grater -0.25, teapot -0.24 vs canned_food +0.28, cucumber +0.25, corn +0.25, potato +0.25, tangerine +0.24",
+     "strength": "moderate"
+    }
+   ]
+  },
+  "verdicts": [
+   {
+    "claim": "Per-category success rates carry large binomial noise: at median n=58 episodes/category, the median Wilson 95% CI half-width is +/-0.117, and 60 of 81 categories have half-width > 0.10",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation with /data/xinyua11/conda/envs/robocasa/bin/python reproduced every claimed number essentially exactly: 81 categories; episode counts median 58 (IQR 48-74, min 5, max 405); Wilson 95% CI half-width median 0.1171 (IQR 0.0987-0.1290, max 0.3258); exactly 60/81 categories with half-width > 0.10; naive pooled per-category SR SD 0.1897 with range 0.059-0.806. Coding checks passed (success parses to clean 0/1, 0 NaN, 7112 rows). Adversarial checks: run x category allocation is significantly unbalanced (chi2 p~0) and run-mix alone induces SD 0.066 in expected per-category SR (run-adjusted SR SD 0.164 vs naive 0.190), but the claim explicitly labels that SD \"naive\" and the central noise claim (Wilson half-widths) is a deterministic function of per-category (n, p-hat), unaffected by run confounding; run heterogeneity would only add overdispersion beyond binomial, making the \"large noise\" direction conservative. A 200-iteration within-run stratified permutation gives null per-category SR SD 0.095 and null median half-width 0.123, confirming the claimed noise scale. Minor context note (not part of the claim): run mean success range is 0.250-0.593, not 0.2-0.66 as stated in the caveats.",
+    "corrected": null
+   },
+   {
+    "claim": "Category has genuine signal far above noise: observed spread of per-category run-demeaned SR is 2.4x the null spread from permuting category labels within run",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independently recomputed from /data/xinyua11/tmp/factor_analysis_scratch/pooled_episodes.csv (7112 episodes, 28 runs, 81 categories) with my own code and a different RNG seed. Estimator identified: per-episode success demeaned within run, per-category mean of residuals over categories with >=20 episodes (K=79), unweighted SD (ddof=1). My results vs claim: observed SD 0.1545 (claim 0.1545); null mean over 2000 within-run label permutations 0.0630 (claim 0.0630); null 95% range 0.0530-0.0738 (claim 0.0525-0.0739); exceedances 0/2000 for BOTH the SD and weighted-SSq statistics, p=(0+1)/2001=0.0005 (claim identical); ratio 2.45x (claim 2.4x); implied signal SD sqrt(0.1545^2-0.0630^2)=0.1411 (claim 0.141); signal variance fraction 0.834 (claim 83%). Adversarial checks all failed to break it: (1) run confounding \u2014 permutation is stratified within run and leave-one-run-out SD stays 0.161-0.178 (no single checkpoint drives it); split-half analysis across disjoint 14/14 run halves gives category-effect correlation mean 0.715 (min 0.599 over 200 random splits), i.e., the category ranking replicates across independent policy checkpoints; (2) unbalanced strata \u2014 permutation preserves category sizes so small-n noise is in the null; result robust to no filter (obs 0.1640, null 0.0680, ratio 2.41), min_n=30/40 filters (ratio ~2.46), and count-weighted SD (ratio 2.97, even stronger); (3) the max null value across all 2000 draws is 0.0821 vs observed 0.1545 \u2014 observed is far outside the null support, so p=0.0005 is only the resolution limit of B=2000, not a borderline result; (4) coding \u2014 success parses cleanly as 0/1. Direction and magnitude fully reproduce; the claim is accurate as stated.",
+    "corrected": null
+   },
+   {
+    "claim": "Per-category SR estimates are moderately reliable in aggregate and the reliability is not an artifact of shared eval configs across runs",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation with a separate implementation (pandas/numpy, different RNG seeds) reproduces every claimed number within seed noise. Run-split (disjoint 14/14 runs, run-demeaned per-category SR, cats with n>=10 per half): mean r = 0.718, 95% range [0.607, 0.805], median 78 categories, Spearman-Brown 0.836 (claimed 0.726 [0.628, 0.812], ~78 cats, SB 0.84). Config-split by disjoint config signatures: mean r = 0.659 [0.573, 0.752], SB 0.794 (claimed 0.661 [0.568, 0.750], SB 0.80). Config-signature stats match exactly: 3349 unique configs, 1194 repeating across runs, max 21 runs. Adversarial refutation attempts failed: (1) run confounding is real (naive category SR correlates 0.54 with run-SR exposure; uncontrolled split-half r inflates to 0.80) but the claimed values are the properly run-demeaned ones, and re-demeaning within each half independently gives identical results; (2) null check \u2014 permuting category labels within run gives split-half r mean 0.022 (max 0.307 over 100 draws), so observed 0.72 is genuine signal, not chance; (3) config halves share zero signatures and are run-balanced (per-run fraction 0.46-0.63); (4) small categories (min n=5) are correctly excluded by the n>=10 filter (78/81 cats used). The disjoint-config split staying at r=0.66 (SB 0.80) despite 1194 shared configs supports the second part of the claim: reliability is not an artifact of shared eval configs. 'Moderately reliable' is a fair characterization of r~0.66-0.73 / SB~0.79-0.84.",
+    "corrected": null
+   },
+   {
+    "claim": "In a run-cross-validated ridge decomposition of run-demeaned success, category is the strongest single factor family, beating shape, location, style, and layout",
+    "strength": "strong",
+    "verdict": "CONFIRMED",
+    "reasoning": "Independent recomputation (own ridge/inner-CV code, random run-to-fold assignment over 5 seeds instead of the original size-snake folds) reproduces every claimed number to within ~0.005: category R2 0.076 (claimed 0.073) AUC 0.661 (0.660) > shape 0.045/0.612 (0.045/0.613) > location 0.040/0.609 (0.040/0.609) > style 0.021/0.581 (0.021/0.581) > layout 0.002/0.526 (0.002/0.528); full model 0.121/0.706 (claimed 0.116/0.703). Adversarial checks all failed to refute: (1) run-confounding is controlled \u2014 target is within-run demeaned, AUC is within-run, and a within-run permutation null gives category R2 max +0.002 and AUC max 0.522 vs observed 0.074/0.659 (p<=0.032 at 30 perms, observed ~40x null max); (2) capacity unfairness \u2014 enriching shape to 10 features (quadratics, interactions, log-aspect, splits) raises it to 0.058/0.645, and location to 15 features (abs+rel polys + region one-hot) does not help; category still wins clearly; (3) dropping the one run with 50 missing shape rows instead of imputing changes nothing; (4) the category>shape ranking is stable across all 5 fold seeds (gap 0.029-0.034, never flips). Minor note: actual run mean-success range is 0.250-0.593, slightly narrower than the 0.2-0.66 stated in the background caveat, but that is not part of the claim.",
+    "corrected": null
+   }
+  ]
+ },
+ "code": {
+  "key": "code",
+  "result": {
+   "answers": [
+    {
+     "question": "(1) How to pin kitchen layout and style (layout_ids/style_ids or equivalent); where consumed; accepted values; how the user's eval scripts currently set them",
+     "answer": "Kitchen.__init__ accepts three kwargs: layout_and_style_ids, layout_ids, style_ids (kitchen.py:392-394). If layout_and_style_ids is given it must be a list of [layout,style] pairs (or strings '5x5'/'5x1'); otherwise layout_ids x style_ids are cross-producted (kitchen.py:424-438), then filtered by class EXCLUDE_LAYOUTS/EXCLUDE_STYLES (kitchen.py:441-445; both empty for PickPlaceCounterToSink, which defines no override \u2014 base defaults at kitchen.py:212-214). Per reset, ONE pair is drawn with env.rng from that list (kitchen.py:595) unless ep_meta already contains layout_id/style_id (kitchen.py:591-593), and is passed to KitchenArena (kitchen.py:611-618). Accepted values: ints 1-60 (LayoutType/StyleType enums, scene_registry.py:9-100+) or negative group ids: -1=test(1-10), -2=train(11-60), -3=all(1-60), plus layout-only -4/-5/-6 (LAYOUT_GROUPS_TO_IDS scene_registry.py:85-92, STYLE_GROUPS_TO_IDS:166-170, unpack fns:239-276). So pinning = layout_and_style_ids=[[11,11]] (single pair -> rng.choice is a no-op) or layout_ids=11, style_ids=11. CRITICAL: create_env's split kwarg OVERRIDES these \u2014 split='pretrain' forces layout_ids=-2, style_ids=-2 (env_utils.py:86-104); you must pass split=None to have your ids respected. Current user scripts do NOT pin: rollout_eval.py:63-70 calls create_env(split=args.split) with default 'pretrain' (rollout_eval.py:173) -> random layout/style 11-60 every reset; build_eval_set.py:26-30 passes layout_ids=-2, style_ids=-2 explicitly (2500 combos, seed-determined); capture_rollouts.py:24 and record_pi0_demos.py:119 use gym.make(..., split='pretrain'). Verified empirically: with layout_and_style_ids=[[11,11]] all 5 seeds produced layout=11, style=11.",
+     "code_refs": [
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:392-394",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:424-445",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:591-597",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/scenes/scene_registry.py:85-92",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/scenes/scene_registry.py:166-170",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/scenes/scene_registry.py:239-276",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:86-104",
+      "/data/xinyua11/robocasa/policy_analysis/rollout_eval.py:63-70",
+      "/data/xinyua11/robocasa/policy_analysis/build_eval_set.py:26-30",
+      "/data/xinyua11/robocasa/policy_analysis/capture_rollouts.py:24"
+     ]
+    },
+    {
+     "question": "(2) How object start placement is sampled for PickPlaceCounterToSink; can it be pinned to fixed XY / narrow region; minimal mechanism",
+     "answer": "The target object's placement is hardcoded in PickPlaceCounterToSink._get_obj_cfgs (kitchen_pick_place.py:294-318): placement=dict(fixture=self.counter, sample_region_kwargs=dict(ref=self.sink, loc='left_right'), size=(0.30,0.40), pos=('ref',-1.0)). Consumption chain: EnvUtils._get_placement_initializer (env_utils.py:906, called from kitchen.py:804) -> counter.sample_reset_region (env_utils.py:1080) which rng.choice's among valid counter-top regions (fixture.py:383) \u2014 loc='left_right' yields up to TWO candidate regions (left/right of sink, counter.py:595-790), i.e. a per-episode coin flip; then an inner region of placement['size'] is positioned via pos within the outer region (env_utils.py:1099-1256) and the final XY is drawn uniformly by UniformRandomSampler._sample_x/_sample_y (placement_samplers.py:225-266); yaw drawn from default rotation=(-pi/4,pi/4) (env_utils.py:992). There is NO env kwarg exposing placement; minimal-invasive mechanism = monkeypatch the class method before env creation (verified working): wrap _get_obj_cfgs and for the cfg named 'obj' set sample_region_kwargs['loc']='left' (kills the coin flip), size=(0.02,0.02) (or (0.0,0.0) for an exact point), ensure_object_boundary_in_range=False (else the degenerate range raises PlacementError, placement_samplers.py:239-243; flag read at env_utils.py:1002-1004), rotation=0.0 (pins yaw). Measured result: object XY spread 1.9cm x 1.7cm over 5 seeds (residual comes from the 2cm region + the 10-step settle loop at kitchen.py:1146). Equivalent alternative: subclass PickPlaceCounterToSink overriding _get_obj_cfgs \u2014 robosuite's EnvMeta auto-registers it, robosuite.make('YourSubclass') works. A third path pins the REGION but not exact XY: env.set_ep_meta(saved_meta) before reset \u2014 cfg['reset_region'] is reused verbatim (env_utils.py:1069-1070). Also zero the robot spawn jitter: robot_spawn_deviation_pos_x/pos_y/rot default 0.15/0.05/0.0 (kitchen.py:405-407,415-417) \u2014 pass 0.0 to pin the base (verified identical base across seeds).",
+     "code_refs": [
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:294-318",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:906-1274",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:1002-1004",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:1069-1070",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/fixtures/fixture.py:330-383",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/fixtures/counter.py:595-790",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/placement_samplers.py:225-266",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:405-407",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:1146"
+     ]
+    },
+    {
+     "question": "(3) Is the sink (goal) position fully determined by the layout?",
+     "answer": "Yes. The task registers the sink as a fixture reference (kitchen_pick_place.py:272-275, register_fixture_ref(FixtureType.SINK)) and success = object inside that sink (kitchen_pick_place.py:352-362). The sink is a built-in fixture embedded in a counter at fixed fractional coordinates in the layout blueprint yaml (e.g. layout011.yaml:389-396: 'interior_obj: sink, obj_x_percent: 0.52'), instantiated by KitchenArena(layout_id,...) (kitchen.py:611-618); it has no sampled placement (only accessory fixtures go through the fixture-placement sampling in kitchen.py:663-790). All 60 layout yamls (50 train + 10 test) contain a sink, so no layout lacks the goal. Verified empirically: env.get_fixture('sink').pos identical (0.300,-1.796) across 5 different seeds at layout_and_style_ids=[[11,11]]. Pinning the layout therefore pins the goal exactly.",
+     "code_refs": [
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:272-280",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:352-362",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/assets/scenes/kitchen_layouts/train/layout011.yaml:389-396",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:611-618"
+     ]
+    },
+    {
+     "question": "(4) How object category/instance is chosen per episode; what the reset seed controls; can you sweep only the object; deterministic-reset path",
+     "answer": "Category/instance: the 'obj' cfg uses obj_groups (an ENV KWARG \u2014 PickPlace.__init__ kitchen_pick_place.py:14-18, default 'all') filtered by graspable=True, washable=True (kitchen_pick_place.py:306-307). create_obj (env_utils.py:1403-1491) -> sample_kitchen_object_helper: category = rng.choice(valid_categories) (kitchen_object_utils.py:440), registry weighted-choice (:463-467), instance = rng.choice(mjcf_paths) (:469), with obj_instance_split 'pretrain'/'target' filtering instances (:451-461). Passing obj_groups='<abs path to model.xml>' selects an EXACT instance deterministically (kitchen_object_utils.py:361-382). Seed: robosuite base MujocoEnv sets self.rng = np.random.default_rng(seed) ONCE at construction (robosuite/environments/base.py:144-145); every stochastic step (layout choice kitchen.py:595, region choice fixture.py:383, XY/yaw placement_samplers.py, category/instance choice, robot-base jitter) consumes this single stream, so episode k after construction is a deterministic function of (seed, kwargs, k). Deterministic paths: (a) fresh env per seed (build_eval_set.py:23-31 pattern \u2014 1 env = 1 episode = pure function of seed); (b) gym wrapper reset(seed=k) RE-SEEDS env.rng before every reset (gym_wrapper.py:342-344) \u2014 same effect without env re-creation; (c) exact replay: env.set_ep_meta(meta) then reset() (robosuite base.py:404-410) pins layout/style (kitchen.py:591-593), exact object instances via stored info.mjcf_path (kitchen.py:854-861 + env_utils.py:1413-1426), reset_region (env_utils.py:1069-1070) and robot base pos (kitchen.py:1118-1121) \u2014 everything except the exact XY draw within the region. Object-only sweep: verified \u2014 with layout/style pinned, placement monkeypatched and obj_groups='cup', 5 seeds gave identical kitchen/sink/base, XY within 2cm, instances varying (cup_4,cup_3,...). For exact control, enumerate instances via obj_groups=xml-path with a fixed seed instead of sweeping seeds. Caveat: obj_groups categories must satisfy graspable+washable or valid_categories is empty and rng.choice throws.",
+     "code_refs": [
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:14-18",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:306-307",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:1403-1491",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/objects/kitchen_object_utils.py:361-382",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/objects/kitchen_object_utils.py:440-469",
+      "/data/xinyua11/robosuite/robosuite/environments/base.py:144-145",
+      "/data/xinyua11/robosuite/robosuite/environments/base.py:404-410",
+      "/data/xinyua11/robocasa_pkg/robocasa/wrappers/gym_wrapper.py:342-344",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:854-861",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:1118-1121"
+     ]
+    },
+    {
+     "question": "(5) Where these knobs go in the data-GENERATION pipeline (mimicgen configs, pi0/GR00T collection scripts) for a fixed-context training set",
+     "answer": "Three insertion points. (i) Expert rollout collection: transfer/new_files/record_pi0_demos.py:119 builds the env via gym.make(f'robocasa/{task}', split=args.split, seed=...). The gym wrapper forwards **kwargs -> create_env -> robosuite.make -> Kitchen (gym_wrapper.py:169-177, env_utils.py:112-137), so change that call to gym.make(..., split=None, obj_instance_split='pretrain', layout_and_style_ids=[[11,11]], obj_groups=<category or xml path>, robot_spawn_deviation_pos_x=0.0, robot_spawn_deviation_pos_y=0.0, robot_spawn_deviation_rot=0.0, seed=...) and import the _get_obj_cfgs monkeypatch module at the top of the script (it must run in-process; it is NOT stored in the hdf5). Same one-line change applies to capture_rollouts.py:24 and to build_eval_set.py:26-30 / rollout_eval.py:63-70 on the eval side. (ii) The hdf5 env_args: build_env_info (record_pi0_demos.py:34-51) is the config that convert_to_robomimic_format writes into data.attrs['env_args'] (robomimic_dataset_utils.py:274-291); add the same kwargs (layout_and_style_ids, obj_groups, obj_instance_split, robot_spawn_deviation_*) into that dict \u2014 this is what any downstream env-recreation uses. (iii) mimicgen generation: /data/xinyua11/mimicgen/mimicgen/scripts/generate_dataset.py:143 reads env_meta from the SOURCE hdf5 (env_args) and data_generator.py:246 calls env.reset() per NEW generated episode \u2014 so once (ii) is done, mimicgen-generated episodes are fixed-context too (but the placement monkeypatch must also be importable/applied in the mimicgen process, e.g. via a small sitecustomize-style import or by using a registered subclass whose name is stored as env_name). The LeRobot conversion (robocasa/scripts/dataset_scripts/convert_hdf5_lerobot.py:79,99) replays EXACT stored mujoco states via env.reset_to (robomimic_env_wrapper.py:153-183 uses set_ep_meta + model xml), so it inherits fixed context automatically with no changes. Note /data/xinyua11/robocasa/mimicgen_src is the DATA directory (source hdf5s, generated/, lerobot/); the mimicgen code lives at /data/xinyua11/mimicgen.",
+     "code_refs": [
+      "/data/xinyua11/robocasa/transfer/new_files/record_pi0_demos.py:119",
+      "/data/xinyua11/robocasa/transfer/new_files/record_pi0_demos.py:34-51",
+      "/data/xinyua11/robocasa_pkg/robocasa/wrappers/gym_wrapper.py:169-177",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:112-137",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/robomimic/robomimic_dataset_utils.py:274-291",
+      "/data/xinyua11/mimicgen/mimicgen/scripts/generate_dataset.py:143",
+      "/data/xinyua11/mimicgen/mimicgen/datagen/data_generator.py:246",
+      "/data/xinyua11/robocasa_pkg/robocasa/scripts/dataset_scripts/convert_hdf5_lerobot.py:79-99",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/robomimic/robomimic_env_wrapper.py:153-183",
+      "/data/xinyua11/robocasa/policy_analysis/capture_rollouts.py:24"
+     ]
+    },
+    {
+     "question": "(6) Gotchas: placement feasibility, layouts lacking sink, distribution shift, fork quirks",
+     "answer": "(a) split kwarg silently overrides your layout pins (env_utils.py:86-104) \u2014 always pass split=None and set obj_instance_split yourself. (b) The gym wrapper's DEFAULT split='test' (gym_wrapper.py:151) is not a valid create_env value and raises ValueError \u2014 always pass split explicitly. (c) Degenerate placement size with the default ensure_object_boundary_in_range=True raises PlacementError (placement_samplers.py:239-243) \u2014 set ensure_object_boundary_in_range=False when size < object footprint; also a 4cm margin is subtracted from the outer region (env_utils.py:1105-1108). (d) loc='left_right' is a hidden per-episode coin flip between two counter regions (fixture.py:383) \u2014 pin loc='left' or 'right'; note left/right feasibility varies per layout, and PlacementError triggers up to 50 full _load_model retries (kitchen.py:647-650) then RuntimeError \u2014 if a chosen layout's left region is too small for tall objects, switch side or enlarge size slightly. (e) The distractor objects (distr_counter on the counter at offset (0,0.30), distr_sink inside the sink; kitchen_pick_place.py:321-348) are sampled from obj_groups='all' every episode \u2014 for strict object-only variation pin their categories (or drop them) in the same monkeypatch, and beware a huge distractor colliding with a tightly pinned target region. (f) Yaw is random +/-45 deg by default (env_utils.py:992) \u2014 set placement['rotation']=0.0. (g) Exact XY repeatability is ~1-2cm, not exact, due to the uniform draw inside even a 2cm region plus the 10-step physics settle (kitchen.py:1146); bitwise-identical starts require state replay (reset_to). (h) No sink-less layouts: all 60 layouts contain a sink and PickPlaceCounterToSink has no EXCLUDE_LAYOUTS, but layouts 1-10 are the TEST split (scene_registry.py:197-199) \u2014 use a layout/style in 11-60 for training data to preserve the project's train/test convention. (i) Fresh-env-per-seed is what makes seed->episode a pure function; reusing one env and calling reset() repeatedly advances the rng stream (robosuite base.py:145 seeds only at construction) \u2014 use gym reset(seed=k) (gym_wrapper.py:342-344) or set_ep_meta for reuse. (j) Fork quirks: obj_registries defaults to ('objaverse','lightwheel') (kitchen.py:397-400) unlike upstream ('objaverse','aai'), so instance counts/paths differ from upstream docs; robots renamed PandaMobile->PandaOmron (kitchen.py:460-463); hard_reset=True is forced (kitchen.py:521) so every reset rebuilds the model (pinning cost: ~10-20s/reset CPU). (k) Train-eval distribution shift: a policy trained only on one (layout,style) will look better on the matching fixed-context eval and WORSE on the existing split='pretrain' eval sets (phase1_data/eval_set.json seeds encode mixed layouts) \u2014 results are not comparable to prior arms (core/random/coverage were trained+evaled under layout variation); report the fixed-context arm on BOTH the fixed-context eval and the standard pretrain eval, and keep eval seeds (<1000) disjoint from generation seeds (>=1000 or 100000+ as record_pi0_demos already does).",
+     "code_refs": [
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:86-104",
+      "/data/xinyua11/robocasa_pkg/robocasa/wrappers/gym_wrapper.py:151",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/placement_samplers.py:239-243",
+      "/data/xinyua11/robocasa_pkg/robocasa/utils/env_utils.py:1105-1108",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:647-650",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/atomic/kitchen_pick_place.py:321-348",
+      "/data/xinyua11/robocasa_pkg/robocasa/models/scenes/scene_registry.py:197-199",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:397-400",
+      "/data/xinyua11/robocasa_pkg/robocasa/environments/kitchen/kitchen.py:521"
+     ]
+    }
+   ],
+   "recipe": "SHARED STEP 0 \u2014 one small module, used by both eval and generation. Create /data/xinyua11/robocasa/policy_analysis/fixed_context.py:\n\n  import numpy as np\n  from robocasa.environments.kitchen.atomic.kitchen_pick_place import PickPlaceCounterToSink\n  FIXED_LAYOUT_STYLE = [[11, 11]]          # any (l,s) with l,s in 11..60; keep constant everywhere\n  _orig = PickPlaceCounterToSink._get_obj_cfgs\n  def _pinned(self):\n      cfgs = _orig(self)\n      for cfg in cfgs:\n          p = cfg[\"placement\"]\n          if cfg[\"name\"] == \"obj\":\n              p[\"sample_region_kwargs\"][\"loc\"] = \"left\"        # kill left/right coin flip\n              p[\"size\"] = (0.02, 0.02)                          # ~point region ((0.0,0.0) for exact center)\n              p[\"pos\"] = (\"ref\", -1.0)\n              p[\"ensure_object_boundary_in_range\"] = False      # required for tiny regions\n              p[\"rotation\"] = 0.0                               # pin yaw\n          elif cfg[\"name\"] == \"distr_counter\":\n              cfg[\"obj_groups\"] = \"bowl\"                        # pin distractor identity (or leave; must match train/eval)\n          elif cfg[\"name\"] == \"distr_sink\":\n              cfg[\"obj_groups\"] = \"sponge\"\n      return cfgs\n  PickPlaceCounterToSink._get_obj_cfgs = _pinned\n  FIXED_ENV_KWARGS = dict(\n      split=None,                                              # REQUIRED: split overrides layout ids (env_utils.py:86-104)\n      obj_instance_split=\"pretrain\",                           # keep instance-level train/test disjointness (\"target\"/None for eval variants)\n      layout_and_style_ids=FIXED_LAYOUT_STYLE,\n      robot_spawn_deviation_pos_x=0.0, robot_spawn_deviation_pos_y=0.0, robot_spawn_deviation_rot=0.0,\n  )\n\n(a) FIXED-CONTEXT EVAL SET\n1. Enumerate the object sweep. Category sweep: pick washable+graspable categories (e.g. cup, mug, bowl...). Instance sweep (fully deterministic): per category, list instance xmls via `from robocasa.models.objects.kitchen_objects import OBJ_CATEGORIES; OBJ_CATEGORIES[\"cup\"][\"objaverse\"].mjcf_paths` and pass one path as obj_groups (kitchen_object_utils.py:361-382 spawns exactly that instance).\n2. Build the eval manifest (adapt build_eval_set.py:23-31): for each (object_spec, seed) pair create a FRESH env \u2014 `import fixed_context; env = robosuite.make(env_name=\"PickPlaceCounterToSink\", robots=\"PandaOmron\", controller_configs=cc, has_renderer=False, has_offscreen_renderer=False, use_camera_obs=False, use_object_obs=True, ignore_done=True, seed=seed, obj_groups=object_spec, **fixed_context.FIXED_ENV_KWARGS)`; env.reset(); save `env.get_ep_meta()` (JSON) per episode into eval_fixed_context.json. Use eval seeds < 1000 (project convention). ~10 seeds x N objects, or 1 fixed seed x all instances for a pure object sweep.\n3. Run policy eval (adapt rollout_eval.py:63-70): either (i) rebuild with the same kwargs+seed per episode (create_env forwards **kwargs: pass seed=..., obj_groups=..., **FIXED_ENV_KWARGS with camera_names/widths as now), or (ii) exact-replay: one env, per episode `env.set_ep_meta(saved_meta); env.reset()` (robosuite base.py:404; pins layout/style/instance/region/base \u2014 only the <=2cm XY draw re-samples). For gym-based eval (pi0/GR00T servers, as in analyze_pi0_weakregions): `env = gym.make(\"robocasa/PickPlaceCounterToSink\", seed=seed, obj_groups=..., **FIXED_ENV_KWARGS)` then `env.reset()`; or reuse one env and call `env.reset(seed=k)` which re-seeds env.rng (gym_wrapper.py:342-344).\n4. Sanity-check the manifest: assert a single (layout_id,style_id), sink pos constant, obj_xy spread < 3cm, and that only info.cat / info.mjcf_path vary across episodes.\n\n(b) FIXED-CONTEXT TRAINING DATA GENERATION\n1. Patch record_pi0_demos.py (the runnable copy under robocasa_experiments; source at transfer/new_files/record_pi0_demos.py): add `import fixed_context` at the top (after robocasa import), and change line 119 to `env = gym.make(f\"robocasa/{args.task}\", seed=args.seed + attempts, obj_groups=args.obj_groups, **fixed_context.FIXED_ENV_KWARGS)` (add an --obj_groups arg; keep generation seeds >= 100000, disjoint from eval). Drop the height-band rejection flags if the object set is now explicit.\n2. Also add the same kwargs into build_env_info's config dict (record_pi0_demos.py:38-50): `\"layout_and_style_ids\": [[11,11]], \"obj_instance_split\": \"pretrain\", \"robot_spawn_deviation_pos_x\": 0.0, \"robot_spawn_deviation_pos_y\": 0.0, \"robot_spawn_deviation_rot\": 0.0` (obj_groups too if fixed for the whole file). convert_to_robomimic_format copies this into data.attrs[\"env_args\"] (robomimic_dataset_utils.py:274-291) so every downstream env recreation is fixed-context.\n3. Collect: run with the pi0 (or GR00T) server up, sweeping obj_groups across your object list, e.g. `--n_success 10` per object -> one hdf5 (or one per object, then merge). Successful demos store model_file + ep_meta + full mujoco states (record_pi0_demos.py:140-142,193-196).\n4. Convert to LeRobot exactly as before: `python robocasa/scripts/dataset_scripts/convert_hdf5_lerobot.py --raw_dataset_path <hdf5> --camera_names robot0_agentview_left robot0_agentview_right robot0_eye_in_hand --camera_height 256 --camera_width 256` \u2014 it replays exact states via reset_to (convert_hdf5_lerobot.py:79,99), so fixed context is inherited with no changes.\n5. (Optional mimicgen amplification): mimicgen's generate_dataset.py reads env_args from the source hdf5 (line 143) and resets the env per generated episode (data_generator.py:246), so step 2 pins its context \u2014 BUT the placement monkeypatch is code, not config: make sure `import fixed_context` runs in the mimicgen process too (wrap generate_dataset in a small launcher that imports it first). If you want the pinning to survive env_args round-trips without an import, instead define `class PPC2SinkFixed(PickPlaceCounterToSink)` overriding _get_obj_cfgs in an installed module (robosuite auto-registers subclasses) and use env_name=\"PPC2SinkFixed\" everywhere, including build_env_info.\n6. Train the DP/pi0 arm on the resulting LeRobot set as usual (ppc2sink_pi0.yaml pattern), and evaluate on BOTH the fixed-context eval set from (a) (matched context: isolates object effect) and the existing split='pretrain' eval seeds (measures the single-kitchen distribution-shift penalty).",
+   "caveats": "Verified by code reading of the actual fork (/data/xinyua11/robocasa_pkg, /data/xinyua11/robosuite, /data/xinyua11/mimicgen) plus a 5-seed empirical smoke test (robosuite.make, layout_and_style_ids=[[11,11]], obj_groups='cup', monkeypatched placement): layout/style/sink/robot-base identical across seeds, object XY spread 1.9x1.7cm, instances varying \u2014 the pinning mechanism is confirmed working. Not tested end-to-end: pi0-server collection with the patched record_pi0_demos, mimicgen generation under pinned env_args, and convert_hdf5_lerobot on a fixed-context hdf5 (these reuse already-validated pipelines with only kwarg changes, but run one small smoke batch first). Residual nondeterminism: exact object XY varies ~1-2cm even with a 2cm region (uniform draw + 10-step physics settle, kitchen.py:1146); use placement size=(0.0,0.0) to shrink further, or state replay for bitwise-identical starts. The set_ep_meta replay path pins everything except that intra-region XY draw. The monkeypatch must be imported in EVERY process that creates new episodes (eval, collection, mimicgen) \u2014 it is not serialized into hdf5 env_args; the subclass route avoids this at the cost of a nonstandard env_name in the dataset. If you pass an obj_groups category that is not graspable+washable, category filtering yields an empty list and rng.choice throws \u2014 pre-filter categories via OBJ_CATEGORIES metadata. Results from fixed-context training/eval are not directly comparable to the project's earlier arms (those trained and evaluated under layout/style variation with split='pretrain'); keep the standard eval alongside. Line numbers cited are from the current working tree on 2026-07-20."
+  },
+  "verdicts": [
+   {
+    "verdict": "PARTIAL",
+    "reasoning": "Read every cited file/line. All six claim sets check out at the cited locations: (1) kitchen.py:392-394 kwargs, 424-445 cross-product+EXCLUDE (base empty 212-214; PickPlaceCounterToSink defines no override \u2014 the EXCLUDE_LAYOUTS hits in kitchen_pick_place.py at 486/612/730/1306/1389 belong to Microwave/Oven/Fridge variants), 591-597 ep_meta-else-rng.choice, 611-618 KitchenArena; scene_registry groups (-1/-2/-3, layout-only -4/-5/-6) and unpack fns exactly as cited; env_utils.py:86-104 split='pretrain' forces layout_ids=-2/style_ids=-2 and nulls layout_and_style_ids, split=None passes through; user scripts confirmed (rollout_eval.py:63-70 + default 'pretrain' at :173; build_eval_set.py:26-30 layout_ids=-2/style_ids=-2; capture_rollouts.py:24 and record_pi0_demos.py:119 default split='pretrain'). (2) Placement dict verbatim at kitchen_pick_place.py:294-318; chain kitchen.py:804 -> env_utils.py:906 -> sample_reset_region (:1080, rng.choice fixture.py:383); counter.py:767-866 builds up to two left/right regions (>0.20m each) = coin flip; uniform XY + PlacementError placement_samplers.py:225-266/239-243; yaw default :992; boundary flag :1002-1004; reset_region reuse :1069-1070 (and kitchen.py get_ep_meta serializes reset_region at 1190-1197, so the set_ep_meta path is real); spawn deviations 0.15/0.05/0.0 consumed at 1124-1131; settle loop :1146; EnvMeta auto-registration robosuite base.py:45-56. (3) Sink ref 272-275, success 352-362, layout011.yaml:389-396 verbatim; grep -L \"type: sink\" over all 60 layout yamls returns none. (4) obj_groups kwarg 14-18, filters 306-307, create_obj 1403-1491 with mjcf_path replay 1413-1426, exact-xml path 361-382, rng draws 440/463-467/469, split filter 451-461; rng seeded once (base.py:144-145); gym reset(seed) re-seeds (gym_wrapper.py:342-344); ep_meta replay pins layout/instance/region/base (591-593, 854-861, 1069-1070, 1118-1121). (5) gym wrapper forwards kwargs (169-177) -> create_env -> robosuite.make (114-138); env_args written robomimic_dataset_utils.py:274-291; mimicgen generate_dataset.py:143 + data_generator.py:246; LeRobot conversion replays states via reset_to (convert_hdf5_lerobot.py:79,99; robomimic_env_wrapper.py:153-183). (6) All code-checkable gotchas verified, incl. gym default split=\"test\" (:151) -> create_env ValueError (:104), margin :1105-1107, 50-retry RuntimeError :647-650, distractors 321-348, test layouts 1-10 :197-199, obj_registries :397-400, PandaOmron :460-463, hard_reset :521. Empirical assertions (5-seed layout/sink/XY spread) were not re-run but are mechanistically consistent. The RECIPE, however, is not runnable exactly as written in step (a)2 (see corrected).",
+    "corrected": "Two corrections, one load-bearing for the recipe: (1) RECIPE BUG in step (a)2 \u2014 FIXED_ENV_KWARGS includes split=None, but that dict is also passed to robosuite.make(env_name=\"PickPlaceCounterToSink\", ...). robosuite.make forwards kwargs unfiltered to the env class (robosuite/environments/base.py:42), and Kitchen.__init__ (kitchen.py:362-412) has NO **kwargs and no split parameter, so this raises TypeError: unexpected keyword argument 'split'. split is a create_env/gym-wrapper-level kwarg only. Fix: keep split=None only for the gym.make/create_env paths (steps a3, b1, which are correct) and strip it for direct robosuite.make, e.g. FIXED_ENV_KWARGS_RS = {k: v for k, v in FIXED_ENV_KWARGS.items() if k != \"split\"} \u2014 mirroring build_eval_set.py:26-30, which correctly omits split. All other kwargs in the dict (obj_instance_split, layout_and_style_ids, robot_spawn_deviation_*) are valid Kitchen params. (2) Minor nit: record_pi0_demos.py defaults to --seed 100 (argparse line 98), not >=100000 as the \"as record_pi0_demos already does\" aside in claim 6k/recipe implies; the >=100000 convention must be enforced via the --seed flag at invocation. Footnote (not an error): a subclass registered after robocasa import gets a robosuite.make name via EnvMeta but NOT a gym \"robocasa/<name>\" id (gym ids are minted at gym_wrapper import time, gym_wrapper.py:423-424); the recipe only uses the subclass via env_name/robosuite.make, so this only matters if someone later tries gym.make on the subclass. Also note counter.py's left/right region construction actually extends to ~line 866 (cited as 595-790) \u2014 cosmetic line-range imprecision only."
+   }
+  ]
+ }
+}

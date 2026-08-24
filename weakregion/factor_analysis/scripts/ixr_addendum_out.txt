@@ -1,0 +1,20 @@
+=== tall x rim contrast sensitivity (demeaned pp scale) ===
+h>0.12 rim>0.55: contrast=+0.0046  n11=1560
+h>0.12 rim>0.65: contrast=+0.0674  n11=678
+h>0.12 rim>0.75: contrast=+0.1549  n11=150
+h>0.15 rim>0.55: contrast=+0.0132  n11=1330
+h>0.15 rim>0.65: contrast=+0.0501  n11=586
+h>0.15 rim>0.75: contrast=+0.1387  n11=137
+h>0.18 rim>0.55: contrast=+0.0042  n11=1003
+h>0.18 rim>0.65: contrast=+0.0496  n11=427
+h>0.21 rim>0.55: contrast=+0.0055  n11=693
+h>0.21 rim>0.65: contrast=+0.0852  n11=320
+
+=== tall x rim on raw scale: additive vs multiplicative vs observed ===
+raw SRs: {(0, 0): np.float64(0.621), (0, 1): np.float64(0.408), (1, 0): np.float64(0.298), (1, 1): np.float64(0.14)}
+observed p11=0.140 | additive pred=0.085 | multiplicative pred=0.196 | log-odds-additive pred=0.151
+
+=== sanity: stochastic bucket vs Bernoulli bound ===
+repeated-config phat distribution: mean=0.437; frac phat==0: 0.282; frac phat==1: 0.163; frac 0<phat<1: 0.555
+configs with >=2 failures: 720; mean modal-failure-phase agreement among them: 0.926
+failure phase marginal: {'fail_no_grasp': 0.897, 'fail_grasped_no_transport': 0.084, 'fail_reached_sink_no_place': 0.019} -> chance agreement approx 0.811

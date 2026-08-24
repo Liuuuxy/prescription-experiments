@@ -1,0 +1,25 @@
+{
+  "budget": 200,
+  "use_uncertainty": false,
+  "source": "prescription_compare bandit_pick on robocasa twin (fidelity -0.335)",
+  "group_allocation": {
+    "unfixable_hard": 9.7,
+    "hard_collectable": 190.3,
+    "retention_toxic": 0.0,
+    "easy_majority": 0.0
+  },
+  "allocation": {
+    "juice": 2,
+    "jar": 2,
+    "cheese_grater": 2,
+    "wine": 2,
+    "water_bottle": 2,
+    "pitcher": 34,
+    "reamer": 37,
+    "colander": 33,
+    "bottled_water": 17,
+    "jug": 17,
+    "yogurt": 38,
+    "spray": 14
+  }
+}
