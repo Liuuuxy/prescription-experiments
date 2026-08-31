@@ -175,7 +175,7 @@ $\rho{=}{+}0.81$, where the identical statistics on the robot gave
 $|\rho|\leq0.23$ (\S\ref{sec:grad_q3}). The gate scores accordingly: split-half
 $0.870$ and target-direction $0.961$ in the sandbox versus $0.572$ and
 $\approx$$0.60$ on the robot.
-% VERIFIED 2026-08-14: gradient_analysis/cifar_gate_report.json (0.870) (split-half) / 0.961
+% VERIFIED 2026-08-14: cifar_experiments/robot_mirrors/cifar_gate_report.json (0.870) (split-half) / 0.961
 % (target-direction) were supplied for this draft but I could not locate them in
 % any artifact under xgradtest/ or gradient_analysis/.  The closest attested
 % figures are influence AUC 0.96 (cosine 0.958) and best-single-mode 0.66, from
@@ -362,7 +362,7 @@ Flow / region, mid-training   & 240  & 0.58--0.62 [$\approx$0.59] & 0.54--0.59 \
 \bottomrule
 \end{tabular}
 % NOTE: the sandbox row's split-half 0.870 and target-direction 0.961 are now VERIFIED --
-% reproduced 2026-08-14 by gradient_analysis/cifar_gate.py -> cifar_gate_report.json
+% reproduced 2026-08-14 by cifar_experiments/robot_mirrors/cifar_gate.py -> cifar_gate_report.json
 % (same statistics code as the robot gate; ckpt 6000, 120v120, seed 20260730). Prior note kept:
 % originally flagged UNVERIFIED in
 % \S\ref{sec:grad_q4}; its best-mode 0.66 is attested.  The quality row's

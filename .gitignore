@@ -69,9 +69,9 @@ gradient_analysis/q2_absorption/
 gradient_analysis/gate_traj/
 gradient_analysis/llm_borrow/f4_synth*.json
 gradient_analysis/llm_borrow/part1_synthetic_robot.json
-sandbox_regions/**/*.npz
-sandbox_regions/**/*.pt
-sandbox_regions/**/*.parquet
+cifar_experiments/sandbox_regions/**/*.npz
+cifar_experiments/sandbox_regions/**/*.pt
+cifar_experiments/sandbox_regions/**/*.parquet
 prescription_compare/**/*.log
 
 # factor analysis: plots/renders regenerable from scripts/

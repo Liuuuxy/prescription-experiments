@@ -9,7 +9,7 @@ brightness/colour), whitening (0.605→0.677), and the per-instance ceiling (≈
 `gradient_analysis/PAPER_SECTION_DRAFT.tex` argues the *same principle* with the **failure-region**
 numbers: best-mode 0.577 against its own shuffle null 0.598; split-half contrast 0.572 vs 0.501
 shuffled; CIFAR mirror 0.649 [null 0.591] / 0.870 / 0.961 (now reproducible via
-`gradient_analysis/cifar_gate.py` → `cifar_gate_report.json`).
+`cifar_experiments/robot_mirrors/cifar_gate.py` → `cifar_experiments/robot_mirrors/cifar_gate_report.json`).
 
 Two number sets for one claim will read as inconsistent — or worse, as the same experiment
 reported twice with different values. They are in fact **different experiments**: §4.4 asks
@@ -55,7 +55,7 @@ and instruments are sound; the domain is what differs.
    predict, in advance, the failure of budgeted data allocation" — the sandbox is no longer just
    a mechanism check, it is a positive control for the whole method.
 5. One number in §4.4 to double-check against the persisted artifact: the CIFAR best-single-mode
-   0.66 vs `cifar_gate_report.json`'s 0.649 (different sample: §4.4's is the full 8,000-image
+   0.66 vs `cifar_experiments/robot_mirrors/cifar_gate_report.json`'s 0.649 (different sample: §4.4's is the full 8,000-image
    pool; the new one is the 120-vs-120 mirror of the robot gate). If both stay, label them so
    the difference is obviously the sample, not a contradiction.
 
